@@ -9,7 +9,7 @@ interface LoginProps {
 export default function Login(props: LoginProps) {
   /*ADD FUNCTIONALITY HERE PLEASE */
   function handleSubmit() {
-    props.callback(Views.Register);
+    props.callback(Views.Admin);
   }
 
   return (
@@ -24,7 +24,7 @@ export default function Login(props: LoginProps) {
         </button>
         <button
           onClick={() => {
-            props.callback(Views.Register);
+            props.callback(Views.Admin);
           }}
           type="submit"
           className="mx-6 my-4 px-2 text-2xl border border-slate-900 hover:underline "

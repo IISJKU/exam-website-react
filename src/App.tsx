@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useCallback } from "react";
 
 export default function App() {
-  const [view, setView] = useState<Views>(Views.Admin);
+  const [view, setView] = useState<Views>(Views.Login);
 
   function changePage(v: Views) {
     setView(v);

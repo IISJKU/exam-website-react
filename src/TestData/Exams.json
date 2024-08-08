@@ -1,0 +1,95 @@
+[
+  {
+    "name": "PunzElektrotechnik0608",
+    "date": "2024-08-06T08:30:00.000Z",
+    "duration": 330,
+    "student": "ak1234",
+    "tutor": "Pax Munz",
+    "subject": "Elektrotechnik",
+    "course": "MTD"
+  },
+  {
+    "name": "PunzMTD0608",
+    "date": "2024-08-06T12:00:00.000Z",
+    "duration": 90,
+    "student": "ak1234",
+    "tutor": "Pax Munz",
+    "subject": "Media Technology",
+    "course": "MTD"
+  },
+
+  {
+    "name": "PunzThirdExam0608",
+    "date": "2024-08-06T11:00:00.000Z",
+    "duration": 360,
+    "student": "ak1234",
+    "tutor": "Pax Munz",
+    "subject": "Third Exam",
+    "course": "MTD"
+  },
+
+  {
+    "name": "KoutnyInformatics1234",
+    "date": "2024-12-31T11:15:00.000Z",
+    "duration": 60,
+    "student": "ak1235",
+    "tutor": "Pax Munz",
+    "subject": "Informatics",
+    "course": "Informatics"
+  },
+  {
+    "name": "KoutnyHardwaredesign1243",
+    "date": "2024-08-31T14:30:00.000Z",
+    "duration": 90,
+    "student": "ak1235",
+    "tutor": "Kreinhard Rutny",
+    "subject": "Hardwaredesign",
+    "course": "Informatics"
+  },
+  {
+    "name": "KoutnyDatamining1243",
+    "date": "2024-08-21T09:00:00.000Z",
+    "duration": 120,
+    "student": "ak1235",
+    "tutor": "Kreinhard Rutny",
+    "subject": "Datamining1243",
+    "course": "Informatics"
+  },
+
+  {
+    "name": "GharbiehSoftwareDevelopment0608",
+    "date": "2024-08-07T14:15:00.000Z",
+    "duration": 150,
+    "student": "ak1236",
+    "tutor": "Pax Munz",
+    "subject": "Software Development",
+    "course": "Informatics"
+  },
+  {
+    "name": "GharbiehWebdesign0608",
+    "date": "2024-08-25T15:30:00.000Z",
+    "duration": 120,
+    "student": "ak1236",
+    "tutor": "Kreinhard Rutny",
+    "subject": "Webdesign",
+    "course": "Informatics"
+  },
+  {
+    "name": "GharbiehSoftwareAccessibility0608",
+    "date": "2024-08-14T19:30:00.000Z",
+    "duration": 90,
+    "student": "ak1236",
+    "tutor": "Pax Munz",
+    "subject": "Software Accessibility",
+    "course": "Informatics"
+  },
+  {
+    "name": "DiabAI0608",
+    "date": "2024-08-13T17:15:00.000Z",
+    "duration": 60,
+    "student": "ak1237",
+    "tutor": "Kreinhard Rutny",
+    "subject": "Artificial Intelligence I",
+    "course": "Linguistics"
+  }
+]

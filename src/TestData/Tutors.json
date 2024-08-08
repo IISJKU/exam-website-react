@@ -1,0 +1,18 @@
+[
+  {
+    "firstName": "Pax",
+    "lastName": "Munz",
+    "eMail": "tutor1@gmail.com",
+    "phone": "0123411123",
+    "registrationNumber": "ak2234",
+    "course": "MTD"
+  },
+  {
+    "firstName": "Kreinhard",
+    "lastName": "Rutny",
+    "eMail": "tutor2@gmail.com",
+    "phone": "0123433134",
+    "registrationNumber": "ak2234",
+    "course": "Informatics"
+  }
+]
