@@ -17,7 +17,7 @@ export default function Admin() {
   }
 
   return (
-    <>
+    <div className=" h-full w-full">
       <Header />
       <div className="flex flex-column h-full w-full bg-slate-100">
         <div className="basis-1/6 h-max">
@@ -27,6 +27,6 @@ export default function Admin() {
           <InfoBox switchView={callback} state={boxState} selectedDate={selDate} />
         </div>
       </div>
-    </>
+    </div>
   );
 }
