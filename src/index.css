@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "/node_modules/react-big-calendar/lib/css/react-big-calendar.css";
+
 @import url("https://fonts.googleapis.com/css2?family=Lexend:wght@100..900");
 
 @layer base {

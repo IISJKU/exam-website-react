@@ -47,7 +47,7 @@
     "course": "Informatics"
   },
   {
-    "name": "KoutnyDatamining1243",
+    "name": "1KoutnyDatamining1243",
     "date": "2024-08-21T09:00:00.000Z",
     "duration": 120,
     "student": "ak1235",
@@ -55,7 +55,24 @@
     "subject": "Datamining1243",
     "course": "Informatics"
   },
-
+  {
+    "name": "2KoutnyDatamining1555",
+    "date": "2024-08-21T09:30:00.000Z",
+    "duration": 120,
+    "student": "ak1235",
+    "tutor": "Kreinhard Rutny",
+    "subject": "Datamining1243",
+    "course": "Informatics"
+  },
+  {
+    "name": "3KoutnyDatamining1555",
+    "date": "2024-08-21T10:30:00.000Z",
+    "duration": 120,
+    "student": "ak1235",
+    "tutor": "Kreinhard Rutny",
+    "subject": "Datamining1243",
+    "course": "Informatics"
+  },
   {
     "name": "GharbiehSoftwareDevelopment0608",
     "date": "2024-08-07T14:15:00.000Z",

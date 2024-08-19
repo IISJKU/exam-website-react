@@ -40,10 +40,44 @@ export default function CalendarWeek(props: CalendarProps) {
   let examsThisWeek: Exam[] = [];
   let examPositions: number[][] = [];
 
+  let overLaps: string[][] = [];
+
+  function getUniqueOverlaps() {
+    let uniqueNames: [string, number][] = [];
+
+    let count: number[] = [];
+
+    overLaps.forEach((o, index) => {
+      let found0 = false;
+      let found1 = false;
+      uniqueNames.forEach((unique, index) => {
+        if (unique[0] == o[0]) {
+          uniqueNames[index][1] = uniqueNames[index][1] + 1;
+          found0 = true;
+        }
+
+        if (unique[0] == o[1]) {
+          uniqueNames[index][1] = uniqueNames[index][1] + 1;
+          found1 = true;
+        }
+      });
+
+      if (!found0) {
+        uniqueNames.push([o[0], 1]);
+      }
+
+      if (!found1) {
+        uniqueNames.push([o[1], 1]);
+      }
+    });
+    console.log("uniqueNames");
+    console.log(uniqueNames);
+
+    return uniqueNames;
+  }
+
   function solveOverlap() {
     let overlap = true;
-
-    let overLaps = [];
 
     for (let x = 0; x < examsThisWeek.length; x++) {
       for (let y = 0; y < examsThisWeek.length; y++) {
@@ -60,18 +94,43 @@ export default function CalendarWeek(props: CalendarProps) {
 
           if (y1[0] > x2[0] || y2[0] < x1[0]) {
             overlap = false;
-            console.log("no overlap " + examsThisWeek[x].name + " | " + examsThisWeek[y].name);
+            //console.log("no overlap " + examsThisWeek[x].name + " | " + examsThisWeek[y].name);
           } else overlap = true;
 
           if (y1[1] > x2[1] || y2[1] < x1[1]) {
             overlap = false;
-            console.log("no overlap " + examsThisWeek[x].name + " | " + examsThisWeek[y].name);
-          } else overlap = true;
+            //console.log("no overlap " + examsThisWeek[x].name + " | " + examsThisWeek[y].name);
+          }
+          if (new Date(examsThisWeek[x].date).getDate() != new Date(examsThisWeek[y].date).getDate()) overlap = false;
+          else overlap = true;
 
-          if (overlap) console.log("overlap " + examsThisWeek[x].name + " | " + examsThisWeek[y].name);
+          if (overlap) {
+            if (!overLaps.includes([examsThisWeek[y].name, examsThisWeek[x].name])) {
+              let contains = false;
+
+              overLaps.forEach((o) => {
+                if (o[1] == examsThisWeek[x].name && o[0] == examsThisWeek[y].name) contains = true;
+              });
+
+              if (!contains) overLaps.push([examsThisWeek[x].name, examsThisWeek[y].name]);
+            }
+          }
         } else overlap = false;
       }
     }
+
+    let uniqueOverlaps = getUniqueOverlaps();
+    let positions: [position: number][] = [];
+
+    let solved = false;
+
+    examsThisWeek.forEach((exam, index) => {
+      for (var i = 0; i < uniqueOverlaps.length; i++) {
+        if (uniqueOverlaps[i][0] == exam.name) {
+          examPositions[index][2] = examPositions[index][2] / (uniqueOverlaps[i][1] + 1);
+        }
+      }
+    });
   }
 
   function getExams() {

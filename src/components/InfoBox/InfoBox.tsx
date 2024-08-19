@@ -5,11 +5,17 @@ import StudentView from "./views/StudentView";
 import TutorView from "./views/TutorView";
 import Tutor from "../classes/Tutor";
 import CalendarWeek from "./views/CalendarWeek";
+import BigCalendar from "./views/BigCalendar";
+
+import ExamEditor from "./views/ExamEditor";
+
+import { Event } from "react-big-calendar";
 
 interface InfoBoxProps {
   state: InfoBoxView;
   switchView: Function;
   selectedDate?: Date;
+  event?: Event;
 }
 
 export enum InfoBoxView {
@@ -19,6 +25,7 @@ export enum InfoBoxView {
   Tutors,
   IndividualTutor,
   IndividualStudent,
+  ExamEditor,
 }
 
 export default function InfoBox(props: InfoBoxProps) {
@@ -39,7 +46,9 @@ export default function InfoBox(props: InfoBoxProps) {
     case InfoBoxView.IndividualTutor:
       return <IndividualTutor tutor={tutor} />;
     case InfoBoxView.CalendarBig:
-      return <CalendarWeek date={props.selectedDate} />;
+      return <BigCalendar date={props.selectedDate} callback={props.switchView} />;
+    case InfoBoxView.ExamEditor:
+      return <ExamEditor event={props.event} />;
     default:
       return <ExamView />;
   }
