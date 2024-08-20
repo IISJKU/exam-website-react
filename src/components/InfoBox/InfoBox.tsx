@@ -9,13 +9,15 @@ import BigCalendar from "./views/BigCalendar";
 
 import ExamEditor from "./views/ExamEditor";
 
-import { Event } from "react-big-calendar";
+import Exam from "../classes/Exam";
+import IndividualStudent from "./views/IndividualStudentView";
+import Student from "../classes/Student";
 
 interface InfoBoxProps {
   state: InfoBoxView;
   switchView: Function;
   selectedDate?: Date;
-  event?: Event;
+  exam?: Exam;
 }
 
 export enum InfoBoxView {
@@ -31,16 +33,23 @@ export enum InfoBoxView {
 export default function InfoBox(props: InfoBoxProps) {
   const [tutor, setTutor] = useState<Tutor>(new Tutor());
 
+  const [student, setStudent] = useState<Student>(new Student());
+
   function tutorView(newTutor: Tutor) {
     setTutor(newTutor);
     props.switchView(InfoBoxView.IndividualTutor);
+  }
+
+  function studentView(student: Student) {
+    setStudent(student);
+    props.switchView(InfoBoxView.IndividualStudent);
   }
 
   switch (props.state) {
     case InfoBoxView.Exams:
       return <ExamView />;
     case InfoBoxView.Students:
-      return <StudentView />;
+      return <StudentView callback={studentView} />;
     case InfoBoxView.Tutors:
       return <TutorView callback={tutorView} />;
     case InfoBoxView.IndividualTutor:
@@ -48,7 +57,9 @@ export default function InfoBox(props: InfoBoxProps) {
     case InfoBoxView.CalendarBig:
       return <BigCalendar date={props.selectedDate} callback={props.switchView} />;
     case InfoBoxView.ExamEditor:
-      return <ExamEditor event={props.event} />;
+      return <ExamEditor exam={props.exam} />;
+    case InfoBoxView.IndividualStudent:
+      return <IndividualStudent student={student} />;
     default:
       return <ExamView />;
   }

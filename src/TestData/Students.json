@@ -7,7 +7,8 @@
     "emergencyPhone": "35423451334",
     "registrationNumber": "ak1234",
     "bonusTime": "1.30",
-    "Exams": ["PunzElektrotechnik0608", "PunzMTD0608", "PunzThirdExam0608"]
+    "Exams": ["PunzElektrotechnik0608", "PunzMTD0608", "PunzThirdExam0608"],
+    "misc": ""
   },
   {
     "firstName": "Reinhard",
@@ -17,7 +18,8 @@
     "emergencyPhone": "35423451334",
     "registrationNumber": "ak1235",
     "bonusTime": "1.20",
-    "Exams": ["KoutnyInformatics1234", "KoutnyHardwaredesign1243", "KoutnyDatamining1243"]
+    "Exams": ["KoutnyInformatics1234", "KoutnyHardwaredesign1243", "KoutnyDatamining1243"],
+    "misc": ""
   },
   {
     "firstName": "Danya",
@@ -27,7 +29,8 @@
     "emergencyPhone": "35424211334",
     "registrationNumber": "ak1236",
     "bonusTime": "1.30",
-    "Exams": ["GharbiehSoftwareDevelopment0608", "GharbiehWebdesign0608", "GharbiehSoftwareAccessibility0608"]
+    "Exams": ["GharbiehSoftwareDevelopment0608", "GharbiehWebdesign0608", "GharbiehSoftwareAccessibility0608"],
+    "misc": ""
   },
   {
     "firstName": "Isam",
@@ -37,6 +40,7 @@
     "emergencyPhone": "3532451334",
     "registrationNumber": "ak1237",
     "bonusTime": "1.60",
-    "Exams": ["DiabAI0608"]
+    "Exams": ["DiabAI0608"],
+    "misc": ""
   }
 ]

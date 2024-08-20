@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Calendar, momentLocalizer, Views, DateLocalizer } from "react-big-calendar";
 import moment from "moment";
+import { Event } from "react-big-calendar";
 
 import { InfoBoxView } from "../InfoBox";
 
@@ -14,17 +15,11 @@ interface CalendarProps {
   callback: Function;
 }
 
-interface Event {
-  id: number;
-  title: string;
-  start: Date;
-  end: Date;
-}
-
 export default function BigCalendar(props: CalendarProps) {
   const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const month = ["January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "Oktober", "November", "December"];
   const times = [];
+  const [events, setEvents] = useState(getExams());
 
   let days: Date[] = [];
 
@@ -44,8 +39,16 @@ export default function BigCalendar(props: CalendarProps) {
     setDate(props.date);
   }, [props]);
 
-  const handleSelectEvent = useCallback((event: Event) => props.callback(InfoBoxView.ExamEditor, event), []);
+  const handleSelectEvent = useCallback((event: Event) => {
+    for (var i = 0; i < examData.length; i++) {
+      if (event.title == examData[i].name) {
+        props.callback(InfoBoxView.ExamEditor, event.start, examData[i]);
+      }
+    }
+  }, []);
   let examsThisWeek: Exam[] = [];
+
+  // props.callback(InfoBoxView.ExamEditor, event.start, examData[events.indexOf(event)]}
 
   let examPositions: number[][] = [];
 
@@ -57,7 +60,6 @@ export default function BigCalendar(props: CalendarProps) {
 
       let date = new Date(exam.date);
       tEvents.push({
-        id: index + 1,
         title: exam.name,
         start: start,
         end: end,
@@ -66,8 +68,6 @@ export default function BigCalendar(props: CalendarProps) {
 
     return tEvents;
   }
-
-  const [events, setEvents] = useState(getExams());
 
   return (
     <div>
