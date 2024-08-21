@@ -1,4 +1,5 @@
 export default class Exam {
+  id!: number;
   name!: string;
   date!: string;
   duration!: number;

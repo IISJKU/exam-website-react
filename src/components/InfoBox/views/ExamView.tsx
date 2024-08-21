@@ -4,43 +4,16 @@ import ExamDate from "../components/ExamDate";
 import SearchBar from "../components/SearchBar";
 import Exam from "../../classes/Exam";
 
-export default function ExamView() {
+import ContentView from "./ContentView";
+
+interface ExamViewProps {
+  callback: Function;
+}
+
+export default function ExamView(props: ExamViewProps) {
   const [filteredExams, setExams] = useState<Exam[]>(examData);
+  const fields = ["Exam Name", "Date", "Student", "Tutor", "Students", "Course"];
+  const keys: (keyof Exam)[] = ["name", "date", "students", "tutor", "subject", "course"];
 
-  return (
-    <div className="w-full h-full overflow-auto p-5">
-      <h2 className="text-4xl w-full my-2 underline"></h2>
-
-      <div className="flex w-full content-center items-center">
-        <h2 className="text-4xl w-1/3 my-2 underline">Upcoming Exams</h2>
-        <SearchBar items={examData} filter={setExams} />
-      </div>
-      <div>
-        <table className="w-full table-auto text-left">
-          <tr>
-            <th>Exam Name</th>
-            <th>Date</th>
-            <th>Student</th>
-            <th>Tutor</th>
-            <th>Subject</th>
-            <th>Course</th>
-          </tr>
-
-          {filteredExams.map((exam) => (
-            <tr className="hover:bg-slate-300">
-              <td>{exam.name}</td>
-              <ExamDate date={exam.date} />
-              <td>{exam.students[0]}</td>
-              <td>{exam.tutor}</td>
-              <td>{exam.subject}</td>
-              <td>{exam.course}</td>
-              <td>
-                <button>Edit</button>
-              </td>
-            </tr>
-          ))}
-        </table>
-      </div>
-    </div>
-  );
+  return <ContentView title={"Upcoming Exams"} callback={props.callback} fields={fields} keys={keys} data={examData} />;
 }

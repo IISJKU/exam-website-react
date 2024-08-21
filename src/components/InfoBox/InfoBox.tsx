@@ -4,7 +4,6 @@ import IndividualTutor from "./views/IndividualTutor";
 import StudentView from "./views/StudentView";
 import TutorView from "./views/TutorView";
 import Tutor from "../classes/Tutor";
-import CalendarWeek from "./views/CalendarWeek";
 import BigCalendar from "./views/BigCalendar";
 
 import ExamEditor from "./views/ExamEditor";
@@ -17,7 +16,6 @@ interface InfoBoxProps {
   state: InfoBoxView;
   switchView: Function;
   selectedDate?: Date;
-  exam?: Exam;
 }
 
 export enum InfoBoxView {
@@ -34,6 +32,7 @@ export default function InfoBox(props: InfoBoxProps) {
   const [tutor, setTutor] = useState<Tutor>(new Tutor());
 
   const [student, setStudent] = useState<Student>(new Student());
+  const [exam, setExam] = useState<Exam>(new Exam());
 
   function tutorView(newTutor: Tutor) {
     setTutor(newTutor);
@@ -45,9 +44,14 @@ export default function InfoBox(props: InfoBoxProps) {
     props.switchView(InfoBoxView.IndividualStudent);
   }
 
+  function examView(exam: Exam) {
+    setExam(exam);
+    props.switchView(InfoBoxView.ExamEditor);
+  }
+
   switch (props.state) {
     case InfoBoxView.Exams:
-      return <ExamView />;
+      return <ExamView callback={examView} />;
     case InfoBoxView.Students:
       return <StudentView callback={studentView} />;
     case InfoBoxView.Tutors:
@@ -57,10 +61,10 @@ export default function InfoBox(props: InfoBoxProps) {
     case InfoBoxView.CalendarBig:
       return <BigCalendar date={props.selectedDate} callback={props.switchView} />;
     case InfoBoxView.ExamEditor:
-      return <ExamEditor exam={props.exam} />;
+      return <ExamEditor exam={exam} />;
     case InfoBoxView.IndividualStudent:
       return <IndividualStudent student={student} />;
     default:
-      return <ExamView />;
+      return <ExamView callback={examView} />;
   }
 }

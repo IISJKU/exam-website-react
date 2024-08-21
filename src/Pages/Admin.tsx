@@ -12,14 +12,10 @@ import students from "../TestData/Students.json";
 export default function Admin() {
   const [boxState, setBoxState] = useState<InfoBoxView>(InfoBoxView.Students);
   const [selDate, setSelDate] = useState<Date>(new Date());
-  const [exam, setExam] = useState<Exam>();
 
   function callback(boxView: InfoBoxView, date?: Date, exam?: Exam) {
     if (date != undefined) setSelDate(date);
-    if (exam != undefined) {
-      setExam(exam);
-      console.log(exam);
-    }
+
     setBoxState(boxView);
   }
 
@@ -31,7 +27,7 @@ export default function Admin() {
           <SideMenu callback={callback} />
         </div>
         <div className="basis-5/6 h-full w-full">
-          <InfoBox switchView={callback} state={boxState} selectedDate={selDate} exam={exam} />
+          <InfoBox switchView={callback} state={boxState} selectedDate={selDate} />
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 import tutorData from "../../../TestData/Tutors.json";
 import Tutor from "../../classes/Tutor";
+import ContentView from "./ContentView";
+
 interface TutorViewInterface {
   callback: Function;
 }
@@ -7,38 +9,8 @@ interface TutorViewInterface {
 export default function TutorView(props: TutorViewInterface) {
   let tutors: Tutor[];
 
-  return (
-    <div className="w-full h-full overflow-auto p-5">
-      <h2 className="text-4xl w-full my-2 underline">Tutors</h2>
-      <table className="w-full table-auto text-left">
-        <tr>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>eMail</th>
-          <th>Phone</th>
-          <th>Registration Number</th>
-          <th>Course</th>
-        </tr>
+  const fields = ["First Name", "Last Name", "eMail", "Phone", "Registration Number", "Course"];
+  const keys: (keyof Tutor)[] = ["firstName", "lastName", "eMail", "phone", "registrationNumber", "course"];
 
-        {tutorData.map((tutor) => (
-          <tr
-            className="hover:bg-slate-300"
-            onClick={() => {
-              props.callback(tutor);
-            }}
-          >
-            <td>{tutor.firstName}</td>
-            <td>{tutor.lastName}</td>
-            <td>{tutor.eMail}</td>
-            <td>{tutor.phone}</td>
-            <td>{tutor.registrationNumber}</td>
-            <td>{tutor.course}</td>
-            <td>
-              <button>Edit</button>
-            </td>
-          </tr>
-        ))}
-      </table>
-    </div>
-  );
+  return <ContentView title={"Tutors"} callback={props.callback} fields={fields} keys={keys} data={tutorData} />;
 }

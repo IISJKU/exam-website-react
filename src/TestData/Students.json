@@ -1,5 +1,6 @@
 [
   {
+    "id": 0,
     "firstName": "Max",
     "lastName": "Punz",
     "eMail": "maxpunz123@gmail.com",
@@ -11,6 +12,7 @@
     "misc": ""
   },
   {
+    "id": 1,
     "firstName": "Reinhard",
     "lastName": "Koutny",
     "eMail": "ReinhardKoutney@gmail.com",
@@ -22,6 +24,7 @@
     "misc": ""
   },
   {
+    "id": 2,
     "firstName": "Danya",
     "lastName": "Gharbieh",
     "eMail": "DanyaGharbieh@gmail.com",
@@ -33,6 +36,7 @@
     "misc": ""
   },
   {
+    "id": 3,
     "firstName": "Isam",
     "lastName": "Diab",
     "eMail": "IsamDiab@gmail.com",
