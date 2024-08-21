@@ -1,9 +1,10 @@
-import studentData from "../../../TestData/Students.json";
-import Student from "../../classes/Student";
-import examData from "../../../TestData/Exams.json";
 import SearchBar from "../components/SearchBar";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import SortableHeaders from "../components/SortableHeaders";
+
+import { useTranslation } from "react-i18next";
+
+import Pagination from "../components/Pagination";
 
 interface ContentViewInterface<T> {
   title: string;
@@ -14,7 +15,11 @@ interface ContentViewInterface<T> {
 }
 
 export default function ContentView<T extends { id?: number }>(props: ContentViewInterface<T>) {
+  const { t, i18n } = useTranslation();
   const [filtered, setFiltered] = useState<T[]>(props.data);
+  const entriesPerPage = 20;
+
+  const [page, setPage] = useState(1);
 
   //<div>▲▼</div>
 
@@ -30,24 +35,43 @@ export default function ContentView<T extends { id?: number }>(props: ContentVie
     return false;
   }
 
+  let entries: T[] = [];
+  let start = (page - 1) * entriesPerPage;
+
+  let numPages = Math.ceil(filtered.length / entriesPerPage);
+
+  let pages = [];
+
+  for (let i = start; i < entriesPerPage + start; i++) {
+    if (filtered[i] == undefined) break;
+    entries.push(filtered[i]);
+  }
+
+  console.log(start);
+  console.log(entries);
+
+  for (let i = 0; i < numPages; i++) {
+    pages.push(i + 1);
+  }
   return (
-    <div className="w-full h-full overflow-auto p-5">
-      <div className="flex w-full content-center items-center">
-        <h2 className="text-4xl w-1/3 my-2 underline">{props.title}</h2>
+    <div className="w-full h-full overflow-hidden p-5 select-none">
+      <div className="flex w-full content-center items-center ">
+        <h2 className="text-4xl w-1/3 my-2 ">{t(props.title)}</h2>
         <SearchBar items={props.data} filter={setFilteredData} />
       </div>
-      <table className="w-full table-auto text-left ">
+      <div className="h-5"></div>
+      <table className="w-full table-auto text-left border-2">
         <SortableHeaders fields={props.fields} keys={props.keys} elements={filtered} setElements={setFilteredData} />
 
-        {filtered.map((element: T) => (
+        {entries.map((element: T) => (
           <tr
-            className="hover:bg-slate-300"
+            className="hover:bg-slate-300 even:bg-slate-200 odd:bg-slate-100"
             onClick={() => {
               props.callback(element);
             }}
           >
             {props.keys.map((key) => (
-              <td>
+              <td className="pl-2">
                 {typeof element[key] === "string"
                   ? !isDate(element[key] as string)
                     ? (element[key] as string)
@@ -64,6 +88,8 @@ export default function ContentView<T extends { id?: number }>(props: ContentVie
           </tr>
         ))}
       </table>
+
+      <Pagination callback={setPage} pageNames={pages} activePage={page} />
     </div>
   );
 }

@@ -12,7 +12,7 @@ interface ExamViewProps {
 
 export default function ExamView(props: ExamViewProps) {
   const [filteredExams, setExams] = useState<Exam[]>(examData);
-  const fields = ["Exam Name", "Date", "Student", "Tutor", "Students", "Course"];
+  const fields = ["Exam Name", "Date", "Student", "Tutor", "Topic", "Course"];
   const keys: (keyof Exam)[] = ["name", "date", "students", "tutor", "subject", "course"];
 
   return <ContentView title={"Upcoming Exams"} callback={props.callback} fields={fields} keys={keys} data={examData} />;

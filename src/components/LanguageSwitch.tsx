@@ -1,4 +1,5 @@
 import { useState } from "react";
+import i18n from "../i18n";
 
 enum Language {
   EN,
@@ -8,12 +9,18 @@ enum Language {
 export default function LanguageSwitch() {
   const [lang, setLang] = useState<Language>(Language.EN);
 
+  function switchLang(lang: Language) {
+    if (lang === Language.EN) i18n.changeLanguage("en");
+    else i18n.changeLanguage("de");
+    setLang(lang);
+  }
+
   if (lang == Language.EN)
     return (
       <button
         type="button"
         onClick={() => {
-          setLang(Language.DE);
+          switchLang(Language.DE);
         }}
         className="select-none flex flex-row border-2 border-black text-2xl h-min w-min "
       >
@@ -28,7 +35,7 @@ export default function LanguageSwitch() {
       <button
         type="button"
         onClick={() => {
-          setLang(Language.EN);
+          switchLang(Language.EN);
         }}
         className="select-none flex flex-row border-2 border-black text-2xl h-min w-min"
       >

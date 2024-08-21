@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 
+import i18n from "../../../i18n";
+import { useTranslation } from "react-i18next";
+
 export enum SorterState {
   off,
   up,
@@ -15,11 +18,12 @@ interface SorterProps {
 }
 
 export default function Sorter(props: SorterProps) {
+  const { t, i18n } = useTranslation();
   //<div>▲▼</div>
 
   const [symbol, setSymbol] = useState(" ");
 
-  let className = "hover:bg-slate-300 ";
+  let className = "hover:bg-slate-300 pl-2";
 
   //const sorterText = ["", "▲", "▼"];
 
@@ -35,7 +39,7 @@ export default function Sorter(props: SorterProps) {
 
   return (
     <th id={String(props.id)} className={className} onClick={() => props.onClick(props.id)}>
-      {props.name} <div className="inline-block w-1">{symbol}</div>
+      {t(props.name)} <div className="inline-block w-1">{symbol}</div>
     </th>
   );
 }

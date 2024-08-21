@@ -62,7 +62,6 @@ export default function SortableHeaders<T extends { id?: number }>(props: SHProp
 
     tStates.forEach((state, index) => {
       if (state != SorterState.off) {
-        console.log("i come here");
         key = props.keys[index];
         tState = state;
       }
@@ -107,7 +106,7 @@ export default function SortableHeaders<T extends { id?: number }>(props: SHProp
 
   return (
     <>
-      <tr className="select-none">
+      <tr className="select-none border-2 border-black">
         {props.fields.map((field, index) => (
           <Sorter onClick={() => setActiveKey(props.keys[index])} id={props.keys[index]} name={props.fields[index].toString()} state={states[index]} />
         ))}

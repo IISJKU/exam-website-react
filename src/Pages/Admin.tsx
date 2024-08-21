@@ -20,9 +20,9 @@ export default function Admin() {
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="h-screen w-screen overflow-hidden">
       <Header />
-      <div className="flex flex-column h-full w-full bg-slate-100">
+      <div className="flex flex-column h-full w-full">
         <div className="basis-1/6 h-max ">
           <SideMenu callback={callback} />
         </div>
