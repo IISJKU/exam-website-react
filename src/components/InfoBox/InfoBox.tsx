@@ -59,7 +59,7 @@ export default function InfoBox(props: InfoBoxProps) {
     case InfoBoxView.IndividualTutor:
       return <IndividualTutor tutor={tutor} />;
     case InfoBoxView.CalendarBig:
-      return <BigCalendar date={props.selectedDate} callback={props.switchView} />;
+      return <BigCalendar date={props.selectedDate} callback={examView} />;
     case InfoBoxView.ExamEditor:
       return <ExamEditor exam={exam} />;
     case InfoBoxView.IndividualStudent:

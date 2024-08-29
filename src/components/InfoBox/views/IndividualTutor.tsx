@@ -15,19 +15,13 @@ export default function IndividualTutor(props: IndividualTutorProps) {
   }
 
   return (
-    <div>
-      <div className="font-bold">First Name</div>
-      <EditField editMode={editMode} text={props.tutor.firstName} />
-      <div className="font-bold">Last Name</div>
-      <EditField editMode={editMode} text={props.tutor.lastName} />
-      <div className="font-bold">EMail</div>
-      <EditField editMode={editMode} text={props.tutor.eMail} />
-      <div className="font-bold">Phone</div>
-      <EditField editMode={editMode} text={props.tutor.phone} />
-      <div className="font-bold">Registration</div>
-      <EditField editMode={editMode} text={props.tutor.registrationNumber} />
-      <div className="font-bold">Course</div>
-      <EditField editMode={editMode} text={props.tutor.course} /> <br />
+    <div className="">
+      <EditField title={"First Name"} editMode={editMode} text={props.tutor.firstName} />
+      <EditField title={"Last Name"} editMode={editMode} text={props.tutor.lastName} />
+      <EditField title={"EMail"} editMode={editMode} text={props.tutor.eMail} />
+      <EditField title={"Phone"} editMode={editMode} text={props.tutor.phone} />
+      <EditField title={"Registration"} editMode={editMode} text={props.tutor.registrationNumber} />
+      <EditField title={"Course"} editMode={editMode} text={props.tutor.course} /> <br />
       <button
         onClick={() => {
           setEditMode(!editMode);

@@ -29,7 +29,6 @@ export default function SortableHeaders<T extends { id?: number }>(props: SHProp
       let tKey = key;
 
       if (direction == SorterState.off) tKey = "id";
-      //console.log("the first key is " + a.keys[0]);
 
       const keyA = String(a[tKey]).toLowerCase(); // Convert to lowercase to ensure case-insensitive sorting
       const keyB = String(b[tKey]).toLowerCase();
@@ -70,13 +69,10 @@ export default function SortableHeaders<T extends { id?: number }>(props: SHProp
     let tElem = [...props.elements];
     let t = sortByKey(tElem, key, tState);
 
-    console.log(tState);
-    console.log(t);
     props.setElements(t);
   }
 
   function setActiveKey(key: keyof T) {
-    //console.log(key);
     let tKey = "";
 
     keyStates = [...states];

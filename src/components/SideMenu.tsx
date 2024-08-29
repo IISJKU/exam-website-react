@@ -16,7 +16,7 @@ export default function SideMenu(props: SidemenuProps) {
         onClick={() => {
           props.callback(InfoBoxView.Exams);
         }}
-        className="w-full text-left border-2 active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
       >
         {t("Exam Overview")}
       </button>
@@ -24,7 +24,7 @@ export default function SideMenu(props: SidemenuProps) {
         onClick={() => {
           props.callback(InfoBoxView.Students);
         }}
-        className="w-full text-left border-2 active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white  active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
       >
         {t("Students")}
       </button>
@@ -32,7 +32,7 @@ export default function SideMenu(props: SidemenuProps) {
         onClick={() => {
           props.callback(InfoBoxView.Tutors);
         }}
-        className="w-full text-left border-2 active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
       >
         {t("Tutors")}
       </button>

@@ -6,7 +6,8 @@
     "eMail": "tutor1@gmail.com",
     "phone": "0123411123",
     "registrationNumber": "ak2234",
-    "course": "MTD"
+    "course": "MTD",
+    "location": "Hagenberg"
   },
   {
     "id": 1,
@@ -15,6 +16,7 @@
     "eMail": "tutor2@gmail.com",
     "phone": "0123433134",
     "registrationNumber": "ak2234",
-    "course": "Informatics"
+    "course": "Informatics",
+    "location": "Linz"
   }
 ]

@@ -15,23 +15,15 @@ export default function IndividualStudent(props: IndividualStudentProps) {
   }
 
   return (
-    <div>
-      <div className="font-bold">First Name</div>
-      <EditField editMode={editMode} text={props.student.firstName} />
-      <div className="font-bold">Last Name</div>
-      <EditField editMode={editMode} text={props.student.lastName} />
-      <div className="font-bold">EMail</div>
-      <EditField editMode={editMode} text={props.student.eMail} />
-      <div className="font-bold">Phone</div>
-      <EditField editMode={editMode} text={props.student.phone} />
-      <div className="font-bold">Emergency Contact</div>
-      <EditField editMode={editMode} text={props.student.emergencyPhone} />
-      <div className="font-bold">Registration</div>
-      <EditField editMode={editMode} text={props.student.registrationNumber} />
-      <div className="font-bold">Overtime</div>
-      <EditField editMode={editMode} text={props.student.bonusTime} /> <br />
-      <div className="font-bold">Misc</div>
-      <EditField editMode={editMode} text={props.student.misc} /> <br />
+    <div className="m-10 ">
+      <EditField title="First Name" editMode={editMode} text={props.student.firstName} />
+      <EditField title="Last Name" editMode={editMode} text={props.student.lastName} />
+      <EditField title="EMail" editMode={editMode} text={props.student.eMail} />
+      <EditField title="Phone" editMode={editMode} text={props.student.phone} />
+      <EditField title="Registration" editMode={editMode} text={props.student.registrationNumber} />
+      <EditField title="Emergency Contact" hideTitle={false} editMode={editMode} text={props.student.emergencyPhone} />
+      <EditField title="Overtime" hideTitle={false} editMode={editMode} text={props.student.bonusTime} /> <br />
+      <EditField title="Misc" editMode={editMode} text={props.student.misc} /> <br />
       <button
         onClick={() => {
           setEditMode(!editMode);

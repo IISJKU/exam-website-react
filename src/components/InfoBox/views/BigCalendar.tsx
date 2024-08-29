@@ -42,7 +42,7 @@ export default function BigCalendar(props: CalendarProps) {
   const handleSelectEvent = useCallback((event: Event) => {
     for (var i = 0; i < examData.length; i++) {
       if (event.title == examData[i].name) {
-        props.callback(InfoBoxView.ExamEditor, event.start, examData[i]);
+        props.callback(examData[i]);
       }
     }
   }, []);

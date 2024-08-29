@@ -4,13 +4,16 @@ import Tutor from "../../classes/Tutor";
 import Exam from "../../classes/Exam";
 import studentData from "../../../TestData/Students.json";
 
+import DateField from "../components/DateField";
+
 import moment from "moment";
 
 import { Event } from "react-big-calendar";
 import Student from "../../classes/Student";
+import MultiField from "../components/MultiField";
 
 interface ExamEditorProps {
-  exam?: Exam;
+  exam: Exam;
 }
 
 export default function ExamEditor(props: ExamEditorProps) {
@@ -27,7 +30,7 @@ export default function ExamEditor(props: ExamEditorProps) {
 
   let registrationNumbers: string[] = [];
 
-  let d = new Date();
+  let d = new Date(props.exam.date);
   let students: Student[] = [];
 
   if (props.exam?.name != undefined) name = props.exam.name.toString();
@@ -49,21 +52,14 @@ export default function ExamEditor(props: ExamEditorProps) {
   });
   if (props.exam != undefined) {
     return (
-      <div>
-        <div className="font-bold">Exam Name</div>
-        <EditField editMode={editMode} text={name} />
+      <div className="m-5">
+        <EditField title={"Exam Name"} editMode={editMode} text={name} />
 
-        <div className="font-bold">Date</div>
-        <EditField editMode={editMode} text={date} />
+        <DateField editMode={editMode} text={date} />
 
-        <div className="font-bold">Duration</div>
-        <EditField editMode={editMode} text={duration} />
+        <EditField title={"Duration"} editMode={editMode} text={duration} />
 
-        <div className="font-bold">Students</div>
-
-        {students.map((student) => (
-          <EditField editMode={editMode} text={student.firstName + " " + student.lastName} />
-        ))}
+        <MultiField title={"Students"} editMode={editMode} elements={students} />
 
         <button
           onClick={() => {

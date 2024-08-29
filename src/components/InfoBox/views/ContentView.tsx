@@ -47,9 +47,6 @@ export default function ContentView<T extends { id?: number }>(props: ContentVie
     entries.push(filtered[i]);
   }
 
-  console.log(start);
-  console.log(entries);
-
   for (let i = 0; i < numPages; i++) {
     pages.push(i + 1);
   }

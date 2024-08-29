@@ -2,12 +2,14 @@ import { HTMLInputTypeAttribute, MouseEventHandler } from "react";
 import { useState } from "react";
 import examData from "../TestData/Exams.json";
 import { InfoBoxView } from "./InfoBox/InfoBox";
+import { useTranslation } from "react-i18next";
 
 interface CalendarProps {
   callback: Function;
 }
 
 export default function Calendar(props: CalendarProps) {
+  const { t } = useTranslation();
   const [date, setDate] = useState(new Date());
   const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const month = ["January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "Oktober", "November", "December"];
@@ -89,7 +91,7 @@ export default function Calendar(props: CalendarProps) {
             &lt; Prev
           </button>
           <div className="basis-3/5 text-center">
-            {month[date.getMonth()]} {date.getFullYear()}{" "}
+            {t(month[date.getMonth()])} {date.getFullYear()}{" "}
           </div>
           <button
             onClick={() => {
