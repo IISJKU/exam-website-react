@@ -25,12 +25,10 @@ export default function Login(props: LoginProps) {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.length);
         if (data.length === 0) {
           props.callback(Views.Login);
           return;
         }
-        console.log(data);
         props.callback(Views.Admin);
       });
   }

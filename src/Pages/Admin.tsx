@@ -7,7 +7,6 @@ import { InfoBoxView } from "../components/InfoBox/InfoBox";
 import Exam from "../components/classes/Exam";
 
 import tutors from "../TestData/Tutors.json";
-import students from "../TestData/Students.json";
 
 export default function Admin() {
   const [boxState, setBoxState] = useState<InfoBoxView>(InfoBoxView.Students);
@@ -27,7 +26,11 @@ export default function Admin() {
           <SideMenu callback={callback} />
         </div>
         <div className="basis-5/6 h-full w-full">
-          <InfoBox switchView={callback} state={boxState} selectedDate={selDate} />
+          <InfoBox
+            switchView={callback}
+            state={boxState}
+            selectedDate={selDate}
+          />
         </div>
       </div>
     </div>

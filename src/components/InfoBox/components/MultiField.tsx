@@ -12,7 +12,7 @@ interface MultiFieldProps<T> {
   hideTitle?: boolean;
 }
 
-export default function MultiField<T extends { firstName: string; lastName: string }>(props: MultiFieldProps<T>) {
+export default function MultiField<T extends { first_name: string; last_name: string }>(props: MultiFieldProps<T>) {
   const { t } = useTranslation();
   let refs: RefObject<any>[] = [];
   const [elements, setElements] = useState<T[]>(props.elements);
@@ -49,7 +49,7 @@ export default function MultiField<T extends { firstName: string; lastName: stri
           props.editMode ? (
             <div className="flex">
               <div className="bg-slate-100 w-52 relative group hover:bg-white">
-                <button className="absolute left-0 inline-block group-hover:underline">{element.firstName + " " + element.lastName}</button>{" "}
+                <button className="absolute left-0 inline-block group-hover:underline">{element.first_name + " " + element.last_name}</button>{" "}
                 <button
                   onClick={() => showPrompt(index)}
                   onBlur={() => hidePrompt(index)}
@@ -75,7 +75,7 @@ export default function MultiField<T extends { firstName: string; lastName: stri
             </div>
           ) : (
             <div className="">
-              {element.firstName + " " + element.lastName}
+              {element.first_name + " " + element.last_name}
               {additionalText}
             </div>
           )

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 interface EditFieldProps {
   editMode: boolean;
-  text: string;
+  text: string | number;
   title?: string;
   hideTitle?: boolean;
 }
@@ -21,12 +21,22 @@ export default function EditField(props: EditFieldProps) {
 
   if (props.hideTitle != undefined) hide = props.hideTitle;
 
-  if ((props.title === "First Name" || props.title === "Last Name" || props.title === "Exam Name") && !props.editMode) classList = "inline-block pr-2 text-3xl";
+  if (
+    (props.title === "First Name" ||
+      props.title === "Last Name" ||
+      props.title === "Exam Name") &&
+    !props.editMode
+  )
+    classList = "inline-block pr-2 text-3xl";
   if (props.title === "Duration") additionalText = " min";
 
   return (
     <div className={classList}>
-      {props.title != undefined && (props.editMode || !hide) ? <div className="font-bold">{t(props.title) + " "}</div> : <></>}
+      {props.title != undefined && (props.editMode || !hide) ? (
+        <div className="font-bold">{t(props.title) + " "}</div>
+      ) : (
+        <></>
+      )}
       {props.editMode ? (
         <input
           onChange={(e) => handleChange(e)}

@@ -1,11 +1,11 @@
 export default class Student {
   id!: number;
-  firstName!: string;
-  lastName!: string;
-  eMail!: string;
+  first_name!: string;
+  last_name!: string;
+  email!: string;
   phone!: string;
-  emergencyPhone!: string;
-  registrationNumber!: string;
-  bonusTime!: string;
+  emergency_contact!: string;
+  matrikel_number!: string;
+  bouns_time!: number;
   misc!: string;
 }

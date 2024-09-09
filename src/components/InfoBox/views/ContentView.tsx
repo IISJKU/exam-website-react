@@ -14,7 +14,9 @@ interface ContentViewInterface<T> {
   data: T[];
 }
 
-export default function ContentView<T extends { id?: number }>(props: ContentViewInterface<T>) {
+export default function ContentView<T extends { id?: number }>(
+  props: ContentViewInterface<T>
+) {
   const { t, i18n } = useTranslation();
   const [filtered, setFiltered] = useState<T[]>(props.data);
   const entriesPerPage = 20;
@@ -58,7 +60,12 @@ export default function ContentView<T extends { id?: number }>(props: ContentVie
       </div>
       <div className="h-5"></div>
       <table className="w-full table-auto text-left border-2">
-        <SortableHeaders fields={props.fields} keys={props.keys} elements={filtered} setElements={setFilteredData} />
+        <SortableHeaders
+          fields={props.fields}
+          keys={props.keys}
+          elements={filtered}
+          setElements={setFilteredData}
+        />
 
         {entries.map((element: T) => (
           <tr
@@ -72,9 +79,14 @@ export default function ContentView<T extends { id?: number }>(props: ContentVie
                 {typeof element[key] === "string"
                   ? !isDate(element[key] as string)
                     ? (element[key] as string)
-                    : (element[key] as string).substring(0, (element[key] as string).indexOf("T"))
+                    : (element[key] as string).substring(
+                        0,
+                        (element[key] as string).indexOf("T")
+                      )
                   : Array.isArray(element[key])
                   ? (element[key] as string[])[0]
+                  : typeof element[key] === "number"
+                  ? (element[key] as number)
                   : " "}
               </td>
             ))}
