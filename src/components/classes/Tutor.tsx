@@ -1,9 +1,9 @@
 export default class Tutor {
   id!: number;
-  firstName!: string;
-  lastName!: string;
-  eMail!: string;
+  first_name!: string;
+  last_name!: string;
+  email!: string;
   phone!: string;
-  registrationNumber!: string;
+  matrikel_number!: string;
   course!: string;
 }

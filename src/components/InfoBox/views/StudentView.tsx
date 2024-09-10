@@ -39,7 +39,7 @@ export default function StudentView(props: StudentViewInterface) {
       const data = await response.json();
       setStudentData(data["data"]); // Update state with fetched students
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching students:", error);
     } finally {
       setLoading(false); // Set loading to false when the fetch is complete
     }

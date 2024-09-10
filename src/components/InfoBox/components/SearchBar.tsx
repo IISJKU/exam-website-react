@@ -30,9 +30,9 @@ export default function SearchBar(props: SearchProps) {
           if (check(dateString, item, value)) matches.push(item);
         }
 
-        if (key == "firstName" && item["lastName"] != undefined) {
-          let temp1 = item["firstName"] + " " + item["lastName"];
-          let temp2 = item["lastName"] + " " + item["firstName"];
+        if (key == "first_name" && item["last_name"] != undefined) {
+          let temp1 = item["first_name"] + " " + item["last_name"];
+          let temp2 = item["last_name"] + " " + item["first_name"];
           if (check(temp1, item, value) || check(temp2, item, value)) matches.push(item);
         }
       }
