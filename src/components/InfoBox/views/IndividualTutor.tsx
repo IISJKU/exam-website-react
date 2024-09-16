@@ -39,7 +39,7 @@ export default function IndividualTutor(props: IndividualTutorProps) {
         hideTitle={false}
       />
       <EditField
-        title={"Registration"}
+        title={"Matrikel Nr"}
         editMode={editMode}
         text={props.tutor.matrikel_number}
         hideTitle={false}

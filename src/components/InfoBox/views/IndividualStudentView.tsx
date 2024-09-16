@@ -39,7 +39,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
         hideTitle={false}
       />
       <EditField
-        title="Registration"
+        title="Matrikel Nr"
         editMode={editMode}
         text={props.student.matrikel_number}
         hideTitle={false}
