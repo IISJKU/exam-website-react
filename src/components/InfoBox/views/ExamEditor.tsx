@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditField from "../components/EditField";
 import Tutor from "../../classes/Tutor";
 import Exam from "../../classes/Exam";
-import studentData from "../../../TestData/Students.json";
 
 import DateField from "../components/DateField";
 
@@ -18,6 +17,8 @@ interface ExamEditorProps {
 
 export default function ExamEditor(props: ExamEditorProps) {
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [studentData, setStudentData] = useState([]);
+  const [loading, setLoading] = useState<boolean>(true); // State for loading
   let editText = "Click to Edit";
 
   if (editMode) {
@@ -27,39 +28,80 @@ export default function ExamEditor(props: ExamEditorProps) {
   let name = "";
   let date = "";
   let duration = "";
+  let tutor = "";
 
   let registrationNumbers: string[] = [];
 
   let d = new Date(props.exam.date);
   let students: Student[] = [];
 
-  if (props.exam?.name != undefined) name = props.exam.name.toString();
+  if (props.exam?.title != undefined) name = props.exam.title.toString();
+  if (props.exam?.tutor != undefined) tutor = props.exam.tutor.toString();
   if (props.exam?.date != undefined) {
     date = moment(d).format("D MMM, YYYY HH:mm");
     duration = props.exam.duration.toString();
   }
 
-  if (props.exam?.students != undefined) {
+  /*  if (props.exam?.students != undefined) {
     registrationNumbers = props.exam.students;
+  } */
+
+  // Fetch data from Strapi API
+  const fetchStudents = async () => {
+    try {
+      const response = await fetch("http://localhost:1337/api/students");
+      const data = await response.json();
+      setStudentData(data["data"]); // Update state with fetched students
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    } finally {
+      setLoading(false); // Set loading to false when the fetch is complete
+    }
+  };
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  studentData.forEach((element) => {
+    students.push(element["attributes"]);
+  });
+
+  if (loading) {
+    return <p>Loading students...</p>; // Display loading indicator while fetching
   }
 
-  studentData.forEach((student) => {
-    registrationNumbers.forEach((num) => {
-      if (student.registrationNumber == num) {
-        students.push(student);
-      }
-    });
-  });
   if (props.exam != undefined) {
     return (
       <div className="m-5">
-        <EditField title={"Exam Name"} editMode={editMode} text={name} />
+        <EditField
+          title={"Exam Title"}
+          editMode={editMode}
+          text={name}
+          hideTitle={false}
+        />
 
-        <DateField editMode={editMode} text={date} />
+        <DateField editMode={editMode} text={date} hideTitle={false} />
 
-        <EditField title={"Duration"} editMode={editMode} text={duration} />
+        <EditField
+          title={"Duration"}
+          editMode={editMode}
+          text={duration}
+          hideTitle={false}
+        />
 
-        <MultiField title={"Students"} editMode={editMode} elements={students} />
+        <EditField
+          title={"Tutor"}
+          editMode={editMode}
+          text={tutor}
+          hideTitle={false}
+        />
+
+        <MultiField
+          title={"Students"}
+          editMode={editMode}
+          elements={students}
+        />
 
         <button
           onClick={() => {

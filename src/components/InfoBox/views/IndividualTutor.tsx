@@ -15,7 +15,7 @@ export default function IndividualTutor(props: IndividualTutorProps) {
   }
 
   return (
-    <div className="">
+    <div className="m-10 ">
       <EditField
         title={"First Name"}
         editMode={editMode}
@@ -26,18 +26,30 @@ export default function IndividualTutor(props: IndividualTutorProps) {
         editMode={editMode}
         text={props.tutor.last_name}
       />
-      <EditField title={"EMail"} editMode={editMode} text={props.tutor.email} />
-      <EditField title={"Phone"} editMode={editMode} text={props.tutor.phone} />
+      <EditField
+        title={"EMail"}
+        editMode={editMode}
+        text={props.tutor.email}
+        hideTitle={false}
+      />
+      <EditField
+        title={"Phone"}
+        editMode={editMode}
+        text={props.tutor.phone}
+        hideTitle={false}
+      />
       <EditField
         title={"Registration"}
         editMode={editMode}
         text={props.tutor.matrikel_number}
+        hideTitle={false}
       />
       <EditField
         title={"Course"}
         editMode={editMode}
         text={props.tutor.course}
-      />{" "}
+        hideTitle={false}
+      />
       <br />
       <button
         onClick={() => {

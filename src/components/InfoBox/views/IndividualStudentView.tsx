@@ -26,12 +26,23 @@ export default function IndividualStudent(props: IndividualStudentProps) {
         editMode={editMode}
         text={props.student.last_name}
       />
-      <EditField title="EMail" editMode={editMode} text={props.student.email} />
-      <EditField title="Phone" editMode={editMode} text={props.student.phone} />
+      <EditField
+        title="EMail"
+        editMode={editMode}
+        text={props.student.email}
+        hideTitle={false}
+      />
+      <EditField
+        title="Phone"
+        editMode={editMode}
+        text={props.student.phone}
+        hideTitle={false}
+      />
       <EditField
         title="Registration"
         editMode={editMode}
         text={props.student.matrikel_number}
+        hideTitle={false}
       />
       <EditField
         title="Emergency Contact"
@@ -44,13 +55,13 @@ export default function IndividualStudent(props: IndividualStudentProps) {
         hideTitle={false}
         editMode={editMode}
         text={props.student.bouns_time}
-      />{" "}
-      <br />
+      />
       <EditField
         title="Misc"
         editMode={editMode}
         text={props.student.misc}
-      />{" "}
+        hideTitle={false}
+      />
       <br />
       <button
         onClick={() => {

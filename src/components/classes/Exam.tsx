@@ -1,10 +1,15 @@
 export default class Exam {
   id!: number;
-  name!: string;
+  title!: string;
   date!: string;
   duration!: number;
-  students!: string[];
+  student!: string;
   tutor!: string;
-  subject!: string;
-  course!: string;
+  examiner!: string;
+  major!: string;
+  institute!: string;
+  mode!: string;
+  lva_num!: number;
+  student_misc!: string;
+  status!: String;
 }

@@ -25,7 +25,7 @@ const resources = {
       "Registration Number": "Martrikelnummer",
       "Bonus Time": "Extra Zeit",
       Course: "Studiengang",
-      "Exam Name": "Name",
+      "Exam Title": "Title",
       Date: "Datum",
       Topic: "Kurs",
       Username: "Benutzername",

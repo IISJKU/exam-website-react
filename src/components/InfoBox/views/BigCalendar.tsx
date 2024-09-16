@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { Calendar, momentLocalizer, Views, DateLocalizer } from "react-big-calendar";
+import {
+  Calendar,
+  momentLocalizer,
+  Views,
+  DateLocalizer,
+} from "react-big-calendar";
 import moment from "moment";
 import { Event } from "react-big-calendar";
 
@@ -16,8 +21,29 @@ interface CalendarProps {
 }
 
 export default function BigCalendar(props: CalendarProps) {
-  const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  const month = ["January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "Oktober", "November", "December"];
+  const weekdays = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+  const month = [
+    "January",
+    "Febuary",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "Oktober",
+    "November",
+    "December",
+  ];
   const times = [];
   const [events, setEvents] = useState(getExams());
 
@@ -41,7 +67,7 @@ export default function BigCalendar(props: CalendarProps) {
 
   const handleSelectEvent = useCallback((event: Event) => {
     for (var i = 0; i < examData.length; i++) {
-      if (event.title == examData[i].name) {
+      if (event.title == examData[i].title) {
         props.callback(examData[i]);
       }
     }
@@ -60,7 +86,7 @@ export default function BigCalendar(props: CalendarProps) {
 
       let date = new Date(exam.date);
       tEvents.push({
-        title: exam.name,
+        title: exam.title,
         start: start,
         end: end,
       });

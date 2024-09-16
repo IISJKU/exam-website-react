@@ -79,12 +79,9 @@ export default function ContentView<T extends { id?: number }>(
                 {typeof element[key] === "string"
                   ? !isDate(element[key] as string)
                     ? (element[key] as string)
-                    : (element[key] as string).substring(
-                        0,
-                        (element[key] as string).indexOf("T")
-                      )
+                    : formatDate(element[key] as string)
                   : Array.isArray(element[key])
-                  ? (element[key] as string[])[0]
+                  ? (element[key] as string[]).join(", ")
                   : typeof element[key] === "number"
                   ? (element[key] as number)
                   : " "}
@@ -102,3 +99,27 @@ export default function ContentView<T extends { id?: number }>(
     </div>
   );
 }
+
+// Helper function to format the date
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+
+  // Options for the date part (day/month/year)
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  };
+
+  // Options for the time part (hour/minute)
+  const timeOptions: Intl.DateTimeFormatOptions = {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false, // 24-hour format
+  };
+
+  const formattedDate = date.toLocaleDateString("en-GB", dateOptions); // DD/MM/YYYY format
+  const formattedTime = date.toLocaleTimeString("en-GB", timeOptions); // HH:mm format
+
+  return `${formattedDate} ${formattedTime}`;
+};

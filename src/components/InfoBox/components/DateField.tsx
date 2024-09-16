@@ -8,17 +8,35 @@ interface DateFieldProps {
 }
 
 export default function DateField(props: DateFieldProps) {
-  const monthArray = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
+  const monthArray = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Dec",
+  ];
 
   let dateString = props.text;
 
   let defaultDate = new Date(dateString);
 
   const [date, setDate] = useState(defaultDate);
-  const [time, setTime] = useState(props.text.substring(props.text.lastIndexOf(" "), props.text.length).replaceAll("-", ":").trim());
+  const [time, setTime] = useState(
+    props.text
+      .substring(props.text.lastIndexOf(" "), props.text.length)
+      .replaceAll("-", ":")
+      .trim()
+  );
 
   const { t } = useTranslation();
-  const title = "Date";
+  const title = "Date/Time";
   let hide = true;
   let classList = "";
 
@@ -44,7 +62,11 @@ export default function DateField(props: DateFieldProps) {
 
   return (
     <div className={classList}>
-      {props.editMode || !hide ? <div className="font-bold">{t(title) + " "}</div> : <></>}
+      {props.editMode || !hide ? (
+        <div className="font-bold">{t(title) + " "}</div>
+      ) : (
+        <></>
+      )}
       {props.editMode ? (
         <div>
           <input
@@ -54,7 +76,14 @@ export default function DateField(props: DateFieldProps) {
             value={date.toLocaleDateString("en-CA")}
             onChange={onSetDate}
           />{" "}
-          <input aria-label="Time" onChange={onSetTime} className="border-2 border-black focus:ring-2 bg-slate-100 " type="time" value={time} step="900" />
+          <input
+            aria-label="Time"
+            onChange={onSetTime}
+            className="border-2 border-black focus:ring-2 bg-slate-100 "
+            type="time"
+            value={time}
+            step="900"
+          />
         </div>
       ) : (
         <div className="mb-2 inline-block ">{props.text}</div>

@@ -24,7 +24,7 @@ export default function EditField(props: EditFieldProps) {
   if (
     (props.title === "First Name" ||
       props.title === "Last Name" ||
-      props.title === "Exam Name") &&
+      props.title === "Exam Title") &&
     !props.editMode
   )
     classList = "inline-block pr-2 text-3xl";
