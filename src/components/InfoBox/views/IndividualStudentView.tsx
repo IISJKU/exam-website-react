@@ -8,6 +8,8 @@ interface IndividualStudentProps {
 
 export default function IndividualStudent(props: IndividualStudentProps) {
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [first_name, setFirstName] = useState<string>(props.student.first_name);
+  const [last_name, setLastName] = useState<string>(props.student.last_name);
   const [email, setEmail] = useState<string>(props.student.email);
   const [phone, setPhone] = useState<string>(props.student.phone);
   const [matrikel_number, setMatrikelNum] = useState<string>(props.student.matrikel_number);
@@ -23,6 +25,8 @@ export default function IndividualStudent(props: IndividualStudentProps) {
   // Function to handle student data update
   const handleUpdate = async () => {
     const data: Partial<Student> = {
+      first_name,
+      last_name,
       email,
       phone,
       emergency_contact,
@@ -33,8 +37,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
 
     try {
       // Fetch API to send a PUT request to update the students data
-      const response = await fetch(
-        `http://localhost:1337/api/students/${props.student.id}`,
+      const response = await fetch(`http://localhost:1337/api/students/${props.student.id}`,
         {
           method: "PUT",
           headers: {
@@ -46,8 +49,10 @@ export default function IndividualStudent(props: IndividualStudentProps) {
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}`);
       }
+
 
       const result = await response.json();
       console.log(`student updated successfully: ${result.data.attributes.first_name}`);
@@ -62,11 +67,13 @@ export default function IndividualStudent(props: IndividualStudentProps) {
         title="First Name"
         editMode={editMode}
         text={props.student.first_name}
+        onChange={(e) => setFirstName(e.target.value)}
       />
       <EditField
         title="Last Name"
         editMode={editMode}
         text={props.student.last_name}
+        onChange={(e) => setLastName(e.target.value)}
       />
       <EditField
         title="EMail"
