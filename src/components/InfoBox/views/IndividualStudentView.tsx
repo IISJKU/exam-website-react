@@ -10,15 +10,9 @@ export default function IndividualStudent(props: IndividualStudentProps) {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [email, setEmail] = useState<string>(props.student.email);
   const [phone, setPhone] = useState<string>(props.student.phone);
-  const [matrikel_number, setMatrikelNum] = useState<string>(
-    props.student.matrikel_number
-  );
-  const [emergency_contact, setEmergencyContact] = useState<string>(
-    props.student.emergency_contact
-  );
-  const [bouns_time, setOvertime] = useState<number | undefined>(
-    props.student.bouns_time
-  );
+  const [matrikel_number, setMatrikelNum] = useState<string>(props.student.matrikel_number);
+  const [emergency_contact, setEmergencyContact] = useState<string>(props.student.emergency_contact);
+  const [bouns_time, setOvertime] = useState<number | undefined>(props.student.bouns_time);
   const [misc, setMisc] = useState<string>(props.student.misc);
   let editText = "Click to Edit";
 
@@ -56,11 +50,9 @@ export default function IndividualStudent(props: IndividualStudentProps) {
       }
 
       const result = await response.json();
-      console.log(
-        `User updated successfully: ${result.data.attributes.first_name}`
-      );
+      console.log(`student updated successfully: ${result.data.attributes.first_name}`);
     } catch (error) {
-      console.log(`Error updating user: ${(error as Error).message}`);
+      console.log(`Error updating student: ${(error as Error).message}`);
     }
   };
 
