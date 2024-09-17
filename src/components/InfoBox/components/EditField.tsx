@@ -6,10 +6,11 @@ interface EditFieldProps {
   text: string | number;
   title?: string;
   hideTitle?: boolean;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function EditField(props: EditFieldProps) {
-  let [value, setValue] = useState(props.text);
+  const [value, setValue] = useState<string | number>(props.text);
   const { t } = useTranslation();
   let hide = true;
   let classList = "";
@@ -17,6 +18,9 @@ export default function EditField(props: EditFieldProps) {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setValue(e.target.value);
+    if (props.onChange) {
+      props.onChange(e); // Call the onChange prop if provided
+    }
   }
 
   if (props.hideTitle != undefined) hide = props.hideTitle;
@@ -43,7 +47,7 @@ export default function EditField(props: EditFieldProps) {
           className="mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black px-1"
           type="text"
           value={value}
-        ></input>
+        />
       ) : (
         <div className="mb-2 inline-block ">
           {value}
