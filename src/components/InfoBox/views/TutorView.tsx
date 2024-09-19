@@ -23,7 +23,6 @@ export default function TutorView(props: TutorViewInterface) {
     "matrikel_number",
     "course",
   ];
-  let allTutors: Tutor[] = [];
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState<boolean>(true); // State for loading
 
@@ -32,7 +31,7 @@ export default function TutorView(props: TutorViewInterface) {
     try {
       const response = await fetch("http://localhost:1337/api/tutors");
       const data = await response.json();
-      setTutors(data["data"]); // Update state with fetched students
+      setTutors(data["data"].map((tutor: any) => tutor.attributes)); // Map to attributes // Update state with fetched tutors
     } catch (error) {
       console.error("Error fetching tutors:", error);
     } finally {
@@ -44,10 +43,6 @@ export default function TutorView(props: TutorViewInterface) {
     fetchStudents();
   }, []);
 
-  tutors.forEach((element) => {
-    allTutors.push(element["attributes"]);
-  });
-
   if (loading) {
     return <p>Loading Tutors...</p>; // Display loading indicator while fetching
   }
@@ -57,7 +52,7 @@ export default function TutorView(props: TutorViewInterface) {
       callback={props.callback}
       fields={fields}
       keys={keys}
-      data={allTutors}
+      data={tutors}
     />
   );
 }

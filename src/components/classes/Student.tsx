@@ -6,6 +6,6 @@ export default class Student {
   phone!: string;
   emergency_contact!: string;
   matrikel_number!: string;
-  bouns_time!: number;
+  bonus_time!: number;
   misc!: string;
 }

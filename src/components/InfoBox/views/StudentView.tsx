@@ -1,5 +1,4 @@
 import Student from "../../classes/Student";
-import examData from "../../../TestData/Exams.json";
 import SearchBar from "../components/SearchBar";
 import { useState, useEffect } from "react";
 import SortableHeaders from "../components/SortableHeaders";
@@ -19,6 +18,7 @@ export default function StudentView(props: StudentViewInterface) {
     "Matrikel Number",
     "Bonus Time",
   ];
+
   const keys: (keyof Student)[] = [
     "first_name",
     "last_name",
@@ -26,10 +26,10 @@ export default function StudentView(props: StudentViewInterface) {
     "phone",
     "emergency_contact",
     "matrikel_number",
-    "bouns_time",
+    "bonus_time", 
   ];
-  let allStudents: Student[] = [];
-  const [studentData, setStudentData] = useState([]);
+
+  const [studentData, setStudentData] = useState<Student[]>([]); // Added type for student data
   const [loading, setLoading] = useState<boolean>(true); // State for loading
 
   // Fetch data from Strapi API
@@ -37,7 +37,7 @@ export default function StudentView(props: StudentViewInterface) {
     try {
       const response = await fetch("http://localhost:1337/api/students");
       const data = await response.json();
-      setStudentData(data["data"]); // Update state with fetched students
+      setStudentData(data["data"].map((student: any) => student.attributes)); // Update state with fetched students
     } catch (error) {
       console.error("Error fetching students:", error);
     } finally {
@@ -49,10 +49,6 @@ export default function StudentView(props: StudentViewInterface) {
     fetchStudents();
   }, []);
 
-  studentData.forEach((element) => {
-    allStudents.push(element["attributes"]);
-  });
-
   if (loading) {
     return <p>Loading students...</p>; // Display loading indicator while fetching
   }
@@ -63,7 +59,7 @@ export default function StudentView(props: StudentViewInterface) {
       callback={props.callback}
       fields={fields}
       keys={keys}
-      data={allStudents}
+      data={studentData}
     />
   );
 }

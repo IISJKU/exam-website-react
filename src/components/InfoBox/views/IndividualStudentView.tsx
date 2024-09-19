@@ -14,7 +14,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
   const [phone, setPhone] = useState<string>(props.student.phone);
   const [matrikel_number, setMatrikelNum] = useState<string>(props.student.matrikel_number);
   const [emergency_contact, setEmergencyContact] = useState<string>(props.student.emergency_contact);
-  const [bouns_time, setOvertime] = useState<number | undefined>(props.student.bouns_time);
+  const [bonus_time, setOvertime] = useState<number | undefined>(props.student.bonus_time);
   const [misc, setMisc] = useState<string>(props.student.misc);
   let editText = "Click to Edit";
 
@@ -31,7 +31,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
       phone,
       emergency_contact,
       matrikel_number,
-      bouns_time,
+      bonus_time,
       misc,
     };
 
@@ -107,7 +107,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
         title="Overtime"
         hideTitle={false}
         editMode={editMode}
-        text={props.student.bouns_time}
+        text={props.student.bonus_time}
         onChange={(e) => setOvertime(Number(e.target.value))}
       />
       <EditField
