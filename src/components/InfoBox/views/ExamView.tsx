@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-//import examData from "../../../TestData/Exams.json";
 import ExamDate from "../components/ExamDate";
 import SearchBar from "../components/SearchBar";
 import Exam from "../../classes/Exam";
@@ -11,7 +10,6 @@ interface ExamViewProps {
 }
 
 export default function ExamView(props: ExamViewProps) {
-  //const [filteredExams, setExams] = useState<Exam[]>(examData);
   const fields = [
     "Exam Title",
     "LVA Nr.",
@@ -33,11 +31,10 @@ export default function ExamView(props: ExamViewProps) {
     "student",
     "examiner",
     "institute",
-    "student_misc", // "should be changed to status"
+    "status", // "should be changed to status"
     "student_misc",
   ];
 
-  let allExams: Exam[] = [];
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState<boolean>(true); // State for loading
 
@@ -46,7 +43,7 @@ export default function ExamView(props: ExamViewProps) {
     try {
       const response = await fetch("http://localhost:1337/api/exams");
       const data = await response.json();
-      setExams(data["data"]); // Update state with fetched students
+      setExams(data["data"].map((exam: any) => exam.attributes)); // Map to attributes
     } catch (error) {
       console.error("Error fetching exams:", error);
     } finally {
@@ -58,12 +55,8 @@ export default function ExamView(props: ExamViewProps) {
     fetchExams();
   }, []);
 
-  exams.forEach((element) => {
-    allExams.push(element["attributes"]);
-  });
-
   if (loading) {
-    return <p>Loading students...</p>; // Display loading indicator while fetching
+    return <p>Loading exams...</p>; // Display loading indicator while fetching
   }
 
   return (
@@ -72,7 +65,7 @@ export default function ExamView(props: ExamViewProps) {
       callback={props.callback}
       fields={fields}
       keys={keys}
-      data={allExams}
+      data={exams}
     />
   );
 }

@@ -4,12 +4,15 @@ export default class Exam {
   date!: string;
   duration!: number;
   student!: string;
-  tutor!: string;
-  examiner!: string;
+  tutor!: Array<string>;
+  examiner!: Array<string>;
   major!: string;
   institute!: string;
   mode!: string;
   lva_num!: number;
   student_misc!: string;
-  status!: String;
+  status!: string;
+  tutor_id!: number;
+  student_id!: number;
+  examiner_id!: number;
 }

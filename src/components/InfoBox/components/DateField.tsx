@@ -5,23 +5,11 @@ interface DateFieldProps {
   editMode: boolean;
   text: string;
   hideTitle?: boolean;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function DateField(props: DateFieldProps) {
-  const monthArray = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Okt",
-    "Nov",
-    "Dec",
-  ];
+  const monthArray = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   let dateString = props.text;
 
@@ -44,6 +32,9 @@ export default function DateField(props: DateFieldProps) {
 
   const onSetDate = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDate(new Date(event.target.value));
+    if (props.onChange) {
+      props.onChange(event); // Call the onChange prop if provided
+    }
   };
 
   const onSetTime = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,9 +47,6 @@ export default function DateField(props: DateFieldProps) {
 
     setTime(event.target.value);
   };
-
-  //<input className="mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black px-1" type="text" defaultValue={props.text}></input>
-  //<input aria-label="Time" className="border-2 border-black focus:ring-2 bg-slate-100 " type="time" value={time} />
 
   return (
     <div className={classList}>

@@ -4,14 +4,12 @@ import {
   momentLocalizer,
   Views,
   DateLocalizer,
+  Event,
 } from "react-big-calendar";
 import moment from "moment";
-import { Event } from "react-big-calendar";
 
 import { InfoBoxView } from "../InfoBox";
-
-import examData from "../../../TestData/Exams.json";
-import Exam from "../../classes/Exam";
+import Exam from "../../classes/Exam"; 
 
 const localizer = momentLocalizer(moment);
 
@@ -32,7 +30,7 @@ export default function BigCalendar(props: CalendarProps) {
   ];
   const month = [
     "January",
-    "Febuary",
+    "February",
     "March",
     "April",
     "May",
@@ -40,18 +38,16 @@ export default function BigCalendar(props: CalendarProps) {
     "July",
     "August",
     "September",
-    "Oktober",
+    "October",
     "November",
     "December",
   ];
-  const times = [];
-  const [events, setEvents] = useState(getExams());
-
-  let days: Date[] = [];
 
   const [date, setDate] = useState(props.date);
-
   const [view, setView] = useState(Views.WEEK);
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState<boolean>(true); // State for loading
 
   const { defaultDate, scrollToTime } = useMemo(
     () => ({
@@ -61,38 +57,54 @@ export default function BigCalendar(props: CalendarProps) {
     []
   );
 
+  // Fetch data from Strapi API
+  const fetchExams = async () => {
+    try {
+      const response = await fetch("http://localhost:1337/api/exams");
+      const data = await response.json();
+      setExams(data["data"].map((exam: any) => exam.attributes)); // Map to attributes
+    } catch (error) {
+      console.error("Error fetching exams:", error);
+    } finally {
+      setLoading(false); // Set loading to false when fetch is complete
+    }
+  };
+
+  // Update events after fetching exams
+  useEffect(() => {
+    fetchExams();
+  }, []);
+
+  useEffect(() => {
+    // Generate events once exams are fetched
+    const newEvents = exams.map((exam: any) => {
+      const start = new Date(exam.date);
+      const end = moment(start).add(exam.duration, "m").toDate();
+      return {
+        title: exam.title,
+        start,
+        end,
+      };
+    });
+    setEvents(newEvents);
+  }, [exams]); // This will run every time `exams` is updated
+
   useEffect(() => {
     setDate(props.date);
   }, [props]);
 
-  const handleSelectEvent = useCallback((event: Event) => {
-    for (var i = 0; i < examData.length; i++) {
-      if (event.title == examData[i].title) {
-        props.callback(examData[i]);
+  const handleSelectEvent = useCallback(
+    (event: Event) => {
+      const selectedExam = exams.find((exam) => event.title === exam.title);
+      if (selectedExam) {
+        props.callback(selectedExam);
       }
-    }
-  }, []);
-  let examsThisWeek: Exam[] = [];
+    },
+    [exams, props]
+  );
 
-  // props.callback(InfoBoxView.ExamEditor, event.start, examData[events.indexOf(event)]}
-
-  let examPositions: number[][] = [];
-
-  function getExams() {
-    let tEvents: Event[] = [];
-    examData.forEach((exam, index) => {
-      let start = new Date(exam.date);
-      let end = moment(start).add(exam.duration, "m").toDate();
-
-      let date = new Date(exam.date);
-      tEvents.push({
-        title: exam.title,
-        start: start,
-        end: end,
-      });
-    });
-
-    return tEvents;
+  if (loading) {
+    return <p>Loading exams...</p>; // Display loading indicator while fetching
   }
 
   return (
@@ -102,7 +114,7 @@ export default function BigCalendar(props: CalendarProps) {
         defaultView={view}
         scrollToTime={scrollToTime}
         localizer={localizer}
-        events={events}
+        events={events} // Use the state that holds events
         date={date}
         startAccessor="start"
         endAccessor="end"
