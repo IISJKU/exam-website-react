@@ -1,5 +1,6 @@
 import { useState } from "react";
 import EditField from "../components/EditField";
+import { showToast } from '../components/ToastMessage'; 
 import Student from "../../classes/Student";
 
 interface IndividualStudentProps {
@@ -50,14 +51,14 @@ export default function IndividualStudent(props: IndividualStudentProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: 'error' });
         throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}`);
       }
 
-
       const result = await response.json();
-      console.log(`student updated successfully: ${result.data.attributes.first_name}`);
+      showToast({ message: `${result.data.attributes.first_name} ${result.data.attributes.last_name}'s student record has been updated successfully.`, type: 'success' });
     } catch (error) {
-      console.log(`Error updating student: ${(error as Error).message}`);
+      showToast({ message: `Error updating the student record: ${(error as Error).message}.`, type: 'error' });
     }
   };
 
@@ -121,7 +122,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
       <button
         onClick={() => {
           setEditMode(!editMode);
-          handleUpdate();
+          if (editMode) handleUpdate();
         }}
         className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
       >

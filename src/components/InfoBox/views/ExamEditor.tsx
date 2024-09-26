@@ -1,9 +1,8 @@
 import { useState } from "react";
 import EditField from "../components/EditField";
-import Exam from "../../classes/Exam";
-
+import { showToast } from '../components/ToastMessage'; 
 import DateField from "../components/DateField";
-
+import Exam from "../../classes/Exam";
 import moment from "moment";
 
 
@@ -67,15 +66,15 @@ export default function ExamEditor(props: ExamEditorProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: 'error' });
         throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}`);
       }
 
       const result = await response.json();
-      console.log(
-        `Exam updated successfully: ${result.data.attributes.title}`
-      );
+      showToast({ message: `${result.data.attributes.title} exam record has been updated successfully.`, type: 'success' });
     } catch (error) {
-      console.log(`Error updating Exam: ${(error as Error).message}`);
+      showToast({ message: `Error updating the exam record: ${(error as Error).message}.`, type: 'error' });
+
     }
   };
 
@@ -171,7 +170,7 @@ export default function ExamEditor(props: ExamEditorProps) {
         <button
           onClick={() => {
             setEditMode(!editMode);
-            handleUpdate();
+            if (editMode) handleUpdate();
           }}
           className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
         >

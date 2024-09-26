@@ -1,4 +1,3 @@
-import React from "react";
 import "./App.css";
 import "./Pages/Login";
 import Login from "./Pages/Login";
@@ -7,7 +6,9 @@ import Admin from "./Pages/Admin";
 import { Views } from "./Views";
 
 import { useState } from "react";
-import { useCallback } from "react";
+import { ToastContainer } from "react-toastify";  // Import ToastContainer
+import "react-toastify/dist/ReactToastify.css";  // Import Toastify CSS
+
 
 export default function App() {
   const [view, setView] = useState<Views>(Views.Login);
@@ -16,14 +17,15 @@ export default function App() {
     setView(v);
   }
 
-  switch (view) {
-    case Views.Login:
-      return <Login callback={changePage}></Login>;
-    case Views.Register:
-      return <Register />;
-    case Views.Admin:
-      return <Admin />;
-    default:
-      return <Login callback={changePage}></Login>;
-  }
+  return (
+    <>
+      {/* Render current view */}
+      {view === Views.Login && <Login callback={changePage} />}
+      {view === Views.Register && <Register />}
+      {view === Views.Admin && <Admin />}
+
+      {/* Add the ToastContainer */}
+      <ToastContainer />
+    </>
+  );
 }

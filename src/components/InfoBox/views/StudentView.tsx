@@ -1,7 +1,5 @@
 import Student from "../../classes/Student";
-import SearchBar from "../components/SearchBar";
 import { useState, useEffect } from "react";
-import SortableHeaders from "../components/SortableHeaders";
 import ContentView from "./ContentView";
 
 interface StudentViewInterface {
