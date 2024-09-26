@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import ExamDate from "../components/ExamDate";
-import SearchBar from "../components/SearchBar";
 import Exam from "../../classes/Exam";
 
 import ContentView from "./ContentView";
