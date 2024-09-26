@@ -6,8 +6,8 @@ import Admin from "./Pages/Admin";
 import { Views } from "./Views";
 
 import { useState } from "react";
-import { ToastContainer } from "react-toastify";  // Import ToastContainer
-import "react-toastify/dist/ReactToastify.css";  // Import Toastify CSS
+import { ToastContainer } from "react-toastify";  
+import "react-toastify/dist/ReactToastify.css"; 
 
 
 export default function App() {
