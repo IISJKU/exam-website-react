@@ -36,7 +36,6 @@ export default function MultiField<T extends { first_name: string; last_name: st
   function deleteElem(index: number) {
     let t = [...elements];
     t.splice(index, 1);
-    console.log(t);
     setElements(t);
   }
 

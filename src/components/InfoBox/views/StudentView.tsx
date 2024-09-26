@@ -1,6 +1,7 @@
 import Student from "../../classes/Student";
 import { useState, useEffect } from "react";
 import ContentView from "./ContentView";
+import { showToast } from "../components/ToastMessage";
 
 interface StudentViewInterface {
   callback: Function;
@@ -37,7 +38,7 @@ export default function StudentView(props: StudentViewInterface) {
       const data = await response.json();
       setStudentData(data["data"].map((student: any) => student.attributes)); // Update state with fetched students
     } catch (error) {
-      console.error("Error fetching students:", error);
+      showToast({ message: `Error fetching students: ${error}.`, type: 'error' });
     } finally {
       setLoading(false); // Set loading to false when the fetch is complete
     }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Tutor from "../../classes/Tutor";
 import ContentView from "./ContentView";
+import { showToast } from "../components/ToastMessage";
 
 interface TutorViewInterface {
   callback: Function;
@@ -33,7 +34,7 @@ export default function TutorView(props: TutorViewInterface) {
       const data = await response.json();
       setTutors(data["data"].map((tutor: any) => tutor.attributes)); // Map to attributes // Update state with fetched tutors
     } catch (error) {
-      console.error("Error fetching tutors:", error);
+      showToast({ message: `Error fetching tutors: ${error}.`, type: 'error' });
     } finally {
       setLoading(false); // Set loading to false when the fetch is complete
     }

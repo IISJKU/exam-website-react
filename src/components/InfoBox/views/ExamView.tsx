@@ -4,6 +4,7 @@ import SearchBar from "../components/SearchBar";
 import Exam from "../../classes/Exam";
 
 import ContentView from "./ContentView";
+import { showToast } from "../components/ToastMessage";
 
 interface ExamViewProps {
   callback: Function;
@@ -45,7 +46,7 @@ export default function ExamView(props: ExamViewProps) {
       const data = await response.json();
       setExams(data["data"].map((exam: any) => exam.attributes)); // Map to attributes
     } catch (error) {
-      console.error("Error fetching exams:", error);
+      showToast({ message: `Error fetching exams: ${error}.`, type: 'error' });
     } finally {
       setLoading(false); // Set loading to false when the fetch is complete
     }
