@@ -1,10 +1,13 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import EditField from "../components/EditField";
-import { showToast } from '../components/ToastMessage'; 
 import DateField from "../components/DateField";
+import Dropdown from "../components/Dropdown";
 import Exam from "../../classes/Exam";
+import Student from "../../classes/Student";
+import Tutor from "../../classes/Tutor";
+import Examiner from "../../classes/Examiner";
 import moment from "moment";
-
+import { showToast } from '../components/ToastMessage'; 
 
 interface ExamEditorProps {
   exam: Exam;
@@ -17,32 +20,83 @@ export default function ExamEditor(props: ExamEditorProps) {
   const [lva_num, setLvaNum] = useState<number | undefined>(props.exam.lva_num);
   const [date, setDate] = useState<string>(props.exam.date);
   const [duration, setDuration] = useState<number | undefined>(props.exam.duration);
-  const [tutor_id, setTutorId] = useState<number>(props.exam.tutor_id);
-  const [student_id, setStudentId] = useState<number>(props.exam.student_id);
-  const [examiner_id, setExaminerId] = useState<number>(props.exam.examiner_id);
+  const [tutor, setTutor] = useState<number>(props.exam.tutor_id);
+  const [student, setStudent] = useState<number>(props.exam.student_id);
+  const [examiner, setExaminer] = useState<number>(props.exam.examiner_id);
   const [major, setMajor] = useState<string>(props.exam.major);
   const [institute, setInstitute] = useState<string>(props.exam.institute);
   const [mode, setMode] = useState<string>(props.exam.mode);
   const [status, setStatus] = useState<string>(props.exam.status);
+  
+  const [students, setStudents] = useState<Student[]>([]);
+  const [tutors, setTutors] = useState<Tutor[]>([]);
+  const [examiners, setExaminers] = useState<Examiner[]>([]);
 
-  let editText = "Click to Edit";
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch("http://localhost:1337/api/students");
+        const result = await response.json();
+        setStudents(result["data"].map((student: any) => student.attributes)); // Update state with fetched students
+      } catch (error) {
+        showToast({ message: "Error fetching students.", type: "error" });
+      }
+    };
 
-  if (editMode) {
-    editText = "Stop Editing";
-  }
+    fetchStudents();
+  }, []);
 
-  let tutorName = props.exam.tutor.join(", ")
-  let examinerName = props.exam.examiner.join(", ")
+  const studentOptions = students.map(student => ({
+    value: student.id,
+    title: `${student.first_name} ${student.last_name}`
+  }));
 
-  // Function to handle Tutor data update
+  useEffect(() => {
+    const fetchTutors = async () => {
+      try {
+        const response = await fetch("http://localhost:1337/api/tutors");
+        const result = await response.json();
+        setTutors(result["data"].map((tutor: any) => tutor.attributes));
+      } catch (error) {
+        showToast({ message: "Error fetching tutors.", type: "error" });
+      }
+    };
+
+    fetchTutors();
+  }, []);
+
+  const tutorOptions = tutors.map(tutor => ({
+    value: tutor.id,
+    title: `${tutor.first_name} ${tutor.last_name}`
+  }));
+
+  useEffect(() => {
+    const fetchExaminers = async () => {
+      try {
+        const response = await fetch("http://localhost:1337/api/examiners");
+        const result = await response.json();
+        setExaminers(result["data"].map((examiner: any) => examiner.attributes));
+      } catch (error) {
+        showToast({ message: "Error fetching examiners.", type: "error" });
+      }
+    };
+
+    fetchExaminers();
+  }, []);
+
+  const examinerOptions = examiners.map(examiner => ({
+    value: examiner.id,
+    title: `${examiner.first_name} ${examiner.last_name}`
+  }));
+
   const handleUpdate = async () => {
     const data: Partial<Exam> = {
       title,
       date,
       duration,
-      student_id,
-      tutor_id,
-      examiner_id,
+      student,
+      tutor,
+      examiner,
       major,
       institute,
       mode,
@@ -51,7 +105,6 @@ export default function ExamEditor(props: ExamEditorProps) {
     };
 
     try {
-      // Fetch API to send a PUT request to update the Exam data
       const response = await fetch(
         `http://localhost:1337/api/exams/${props.exam.id}`,
         {
@@ -60,21 +113,26 @@ export default function ExamEditor(props: ExamEditorProps) {
             "Content-Type": "application/json",
             Authorization: `5bad2121f82b63a7e0ba19074b66b646228a9903a550bdca6ae721ba2996be07c4afa42d15dbc1b3ac3b43cf8fc33408c9f730e3aa76533b8fe19e01acd140df0407a55d58f842dc4adc72f940c8517b6f5431ca7b5e0496eb70321c56e378ce61c99b0b52e8367aeaa7cda748961e9edee3dcb9cccd1d905260de298e8eb012`,
           },
-          body: JSON.stringify({ data }), // Send data in the request body
+          body: JSON.stringify({ data }),
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: 'error' });
-        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}`);
+        showToast({
+          message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+          type: "error",
+        });
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const result = await response.json();
-      showToast({ message: `${result.data.attributes.title} exam record has been updated successfully.`, type: 'success' });
+      showToast({
+        message: `${result.data.attributes.title} exam record has been updated successfully.`,
+        type: "success",
+      });
     } catch (error) {
-      showToast({ message: `Error updating the exam record: ${(error as Error).message}.`, type: 'error' });
-
+      showToast({ message: `Error updating the exam record: ${(error as Error).message}.`, type: "error" });
     }
   };
 
@@ -112,28 +170,28 @@ export default function ExamEditor(props: ExamEditorProps) {
           onChange={(e) => setDuration(Number(e.target.value))}
         />
 
-        <EditField
-          title={"Tutor"}
-          editMode={false}
-          text={tutorName}
-          hideTitle={false}
-          onChange={(e) => setTutorId(Number(e.target.value))}
-        />
-
-        <EditField
+        <Dropdown
           title={"Student"}
-          editMode={false}
-          text={props.exam.student}
-          hideTitle={false}
-          onChange={(e) => setStudentId(Number(e.target.value))}
+          options={studentOptions}
+          value={student}
+          onChange={(newValue) => setStudent(Number(newValue))}
+          disabled={!editMode}
         />
 
-        <EditField
+        <Dropdown
+          title={"Tutor"}
+          options={tutorOptions}
+          value={tutor}
+          onChange={(newValue) => setTutor(Number(newValue))}
+          disabled={!editMode}
+        />
+
+        <Dropdown
           title={"Examiner"}
-          editMode={false}
-          text={examinerName}
-          hideTitle={false}
-          onChange={(e) => setExaminerId(Number(e.target.value))}
+          options={examinerOptions}
+          value={examiner}
+          onChange={(newVal) => setExaminer(Number(newVal))}
+          disabled={!editMode}
         />
 
         <EditField
@@ -167,6 +225,7 @@ export default function ExamEditor(props: ExamEditorProps) {
           hideTitle={false}
           onChange={(e) => setStatus(e.target.value)}
         />
+
         <button
           onClick={() => {
             setEditMode(!editMode);
@@ -174,10 +233,11 @@ export default function ExamEditor(props: ExamEditorProps) {
           }}
           className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
         >
-          {editText}
+          {editMode ? "Stop Editing" : "Click to Edit"}
         </button>
       </div>
     );
   }
+
   return <div>Something went wrong</div>;
 }

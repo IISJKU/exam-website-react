@@ -3,9 +3,9 @@ export default class Exam {
   title!: string;
   date!: string;
   duration!: number;
-  student!: string;
-  tutor!: Array<string>;
-  examiner!: Array<string>;
+  student!: string | number;
+  tutor!: Array<string> | number;
+  examiner!: Array<string> | number;
   major!: string;
   institute!: string;
   mode!: string;
