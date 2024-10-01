@@ -8,6 +8,7 @@ import Tutor from "../../classes/Tutor";
 import Examiner from "../../classes/Examiner";
 import moment from "moment";
 import { showToast } from '../components/ToastMessage'; 
+import DropdownWithSearch from "../components/DropdownSearch";
 
 interface ExamEditorProps {
   exam: Exam;
@@ -48,7 +49,7 @@ export default function ExamEditor(props: ExamEditorProps) {
 
   const studentOptions = students.map(student => ({
     value: student.id,
-    title: `${student.first_name} ${student.last_name}`
+    label: `${student.first_name} ${student.last_name}`
   }));
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export default function ExamEditor(props: ExamEditorProps) {
 
   const tutorOptions = tutors.map(tutor => ({
     value: tutor.id,
-    title: `${tutor.first_name} ${tutor.last_name}`
+    label: `${tutor.first_name} ${tutor.last_name}`
   }));
 
   useEffect(() => {
@@ -86,7 +87,7 @@ export default function ExamEditor(props: ExamEditorProps) {
 
   const examinerOptions = examiners.map(examiner => ({
     value: examiner.id,
-    title: `${examiner.first_name} ${examiner.last_name}`
+    label: `${examiner.first_name} ${examiner.last_name}`
   }));
 
   const handleUpdate = async () => {
@@ -170,27 +171,30 @@ export default function ExamEditor(props: ExamEditorProps) {
           onChange={(e) => setDuration(Number(e.target.value))}
         />
 
-        <Dropdown
-          title={"Student"}
+        <DropdownWithSearch
+          label={"Student"}
           options={studentOptions}
           value={student}
           onChange={(newValue) => setStudent(Number(newValue))}
+          placeholder="Search student..."
           disabled={!editMode}
         />
 
-        <Dropdown
-          title={"Tutor"}
+        <DropdownWithSearch
+          label={"Tutor"}
           options={tutorOptions}
           value={tutor}
           onChange={(newValue) => setTutor(Number(newValue))}
+          placeholder="Search tutor..."
           disabled={!editMode}
         />
 
-        <Dropdown
-          title={"Examiner"}
+        <DropdownWithSearch
+          label={"Examiner"}
           options={examinerOptions}
           value={examiner}
           onChange={(newVal) => setExaminer(Number(newVal))}
+          placeholder="Search examiner..."
           disabled={!editMode}
         />
 

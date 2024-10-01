@@ -3,11 +3,11 @@ import React, { useState } from "react";
 
 interface DropdownOption {
   value: string | number;
-  title: string;
+  label: string;
 }
 
 interface DropdownProps {
-  title: string;
+  label: string;
   options: DropdownOption[];
   value: string | number;
   onChange?: (value: string | number) => void;
@@ -27,8 +27,8 @@ export default function Dropdown(props: DropdownProps) {
 
   return (
     <div className="">
-      {props.title !== undefined ? (
-        <div className="font-bold">{t(props.title) + " "}</div>
+      {props.label !== undefined ? (
+        <div className="font-bold">{t(props.label) + " "}</div>
       ) : (
         <></>
           )}
@@ -40,11 +40,11 @@ export default function Dropdown(props: DropdownProps) {
                 className="form-control"
             >
                 <option value="" disabled>
-                Select a {props.title.toLowerCase()}
+                Select a {props.label.toLowerCase()}
                 </option>
                 {props.options.map((option) => (
                 <option key={option.value} value={option.value}>
-                    {option.title}
+                    {option.label}
                 </option>
                 ))}
             </select>
