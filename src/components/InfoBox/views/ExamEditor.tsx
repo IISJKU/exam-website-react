@@ -1,21 +1,25 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import EditField from "../components/EditField";
 import DateField from "../components/DateField";
-import Dropdown from "../components/Dropdown";
 import Exam from "../../classes/Exam";
 import Student from "../../classes/Student";
 import Tutor from "../../classes/Tutor";
 import Examiner from "../../classes/Examiner";
 import moment from "moment";
-import { showToast } from '../components/ToastMessage'; 
+import { showToast } from "../components/ToastMessage";
 import DropdownWithSearch from "../components/DropdownSearch";
+import Major from "../../classes/Major";
+import ExamMode from "../../classes/ExamMode";
+import Institute from "../../classes/Institute";
+import Room from "../../classes/Room";
 
 interface ExamEditorProps {
   exam: Exam;
 }
 
 export default function ExamEditor(props: ExamEditorProps) {
-  let exDate = moment(props.exam.date).format("D MMM, YYYY HH:mm");
+  
+  const exDate = moment(props.exam.date).format("D MMM, YYYY HH:mm");
   const [editMode, setEditMode] = useState<boolean>(false);
   const [title, setTitle] = useState<string>(props.exam.title);
   const [lva_num, setLvaNum] = useState<number | undefined>(props.exam.lva_num);
@@ -24,71 +28,54 @@ export default function ExamEditor(props: ExamEditorProps) {
   const [tutor, setTutor] = useState<number>(props.exam.tutor_id);
   const [student, setStudent] = useState<number>(props.exam.student_id);
   const [examiner, setExaminer] = useState<number>(props.exam.examiner_id);
-  const [major, setMajor] = useState<string>(props.exam.major);
-  const [institute, setInstitute] = useState<string>(props.exam.institute);
-  const [mode, setMode] = useState<string>(props.exam.mode);
+  const [major, setMajor] = useState<number>(props.exam.major_id);
+  const [institute, setInstitute] = useState<number>(props.exam.institute_id);
+  const [mode, setMode] = useState<number>(props.exam.mode_id);
+  const [room, setRoom] = useState<number>(props.exam.room_id);
   const [status, setStatus] = useState<string>(props.exam.status);
-  
-  const [students, setStudents] = useState<Student[]>([]);
-  const [tutors, setTutors] = useState<Tutor[]>([]);
-  const [examiners, setExaminers] = useState<Examiner[]>([]);
+
+  const [options, setOptions] = useState({
+    students: [] as Student[],
+    tutors: [] as Tutor[],
+    examiners: [] as Examiner[],
+    majors: [] as Major[],
+    institutes: [] as Institute[],
+    modes: [] as ExamMode[],
+    rooms: [] as Room[],
+  });
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:1337/api/students");
-        const result = await response.json();
-        setStudents(result["data"].map((student: any) => student.attributes)); // Update state with fetched students
+        const [studentsRes, tutorsRes, examinersRes, majorsRes, institutesRes, modesRes, roomsRes] = await Promise.all([
+          fetch("http://localhost:1337/api/students").then((res) => res.json()),
+          fetch("http://localhost:1337/api/tutors").then((res) => res.json()),
+          fetch("http://localhost:1337/api/examiners").then((res) => res.json()),
+          fetch("http://localhost:1337/api/majors").then((res) => res.json()),
+          fetch("http://localhost:1337/api/institutes").then((res) => res.json()),
+          fetch("http://localhost:1337/api/exam-modes").then((res) => res.json()),
+          fetch("http://localhost:1337/api/rooms").then((res) => res.json())
+        ]);
+
+        setOptions({
+          students: studentsRes.data.map((student: any) => student.attributes),
+          tutors: tutorsRes.data.map((tutor: any) => tutor.attributes),
+          examiners: examinersRes.data.map((examiner: any) => examiner.attributes),
+          majors: majorsRes.data.map((major: any) => major.attributes),
+          institutes: institutesRes.data.map((institute: any) => institute.attributes),
+          modes: modesRes.data.map((mode: any) => mode.attributes),
+          rooms: roomsRes.data.map((room: any) => room.attributes),
+        });
       } catch (error) {
-        showToast({ message: "Error fetching students.", type: "error" });
+        showToast({ message: "Error fetching data", type: "error" });
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchStudents();
+    fetchData();
   }, []);
-
-  const studentOptions = students.map(student => ({
-    value: student.id,
-    label: `${student.first_name} ${student.last_name}`
-  }));
-
-  useEffect(() => {
-    const fetchTutors = async () => {
-      try {
-        const response = await fetch("http://localhost:1337/api/tutors");
-        const result = await response.json();
-        setTutors(result["data"].map((tutor: any) => tutor.attributes));
-      } catch (error) {
-        showToast({ message: "Error fetching tutors.", type: "error" });
-      }
-    };
-
-    fetchTutors();
-  }, []);
-
-  const tutorOptions = tutors.map(tutor => ({
-    value: tutor.id,
-    label: `${tutor.first_name} ${tutor.last_name}`
-  }));
-
-  useEffect(() => {
-    const fetchExaminers = async () => {
-      try {
-        const response = await fetch("http://localhost:1337/api/examiners");
-        const result = await response.json();
-        setExaminers(result["data"].map((examiner: any) => examiner.attributes));
-      } catch (error) {
-        showToast({ message: "Error fetching examiners.", type: "error" });
-      }
-    };
-
-    fetchExaminers();
-  }, []);
-
-  const examinerOptions = examiners.map(examiner => ({
-    value: examiner.id,
-    label: `${examiner.first_name} ${examiner.last_name}`
-  }));
 
   const handleUpdate = async () => {
     const data: Partial<Exam> = {
@@ -100,7 +87,8 @@ export default function ExamEditor(props: ExamEditorProps) {
       examiner,
       major,
       institute,
-      mode,
+      exam_mode: mode,
+      room,
       lva_num,
       status,
     };
@@ -112,7 +100,7 @@ export default function ExamEditor(props: ExamEditorProps) {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `5bad2121f82b63a7e0ba19074b66b646228a9903a550bdca6ae721ba2996be07c4afa42d15dbc1b3ac3b43cf8fc33408c9f730e3aa76533b8fe19e01acd140df0407a55d58f842dc4adc72f940c8517b6f5431ca7b5e0496eb70321c56e378ce61c99b0b52e8367aeaa7cda748961e9edee3dcb9cccd1d905260de298e8eb012`,
+            Authorization: `5bad2121f82b63a7e0ba19074b66b646228a9903a550bdca6ae721ba2996be07c4afa42d15dbc1b3ac3b43cf8fc33408c9f730e3aa76533b8fe19e01acd140df0407a55d58f842dc4adc72f940c8517b6f5431ca7b5e0496eb70321c56e378ce61c99b0b52e8367aeaa7cda748961e9edee3dcb9cccd1d905260de298e8eb012N`,
           },
           body: JSON.stringify({ data }),
         }
@@ -136,6 +124,19 @@ export default function ExamEditor(props: ExamEditorProps) {
       showToast({ message: `Error updating the exam record: ${(error as Error).message}.`, type: "error" });
     }
   };
+
+  const dropdownOptions = (list: any[], firstNameField: string, lastNameField?: string) =>
+    list.map((item: any) => ({
+      value: item.id,
+      label: lastNameField
+        ? `${item[firstNameField]} ${item[lastNameField]}`  // Concatenate first and last name
+        : item[firstNameField], // For fields with just one name (like 'name' for institutes or majors)
+    }));
+  
+
+  if (loading) {
+    return <p>Loading data...</p>;
+  }
 
   if (props.exam != undefined) {
     return (
@@ -171,9 +172,10 @@ export default function ExamEditor(props: ExamEditorProps) {
           onChange={(e) => setDuration(Number(e.target.value))}
         />
 
+        {/* Dropdown fields for various relations */}
         <DropdownWithSearch
           label={"Student"}
-          options={studentOptions}
+          options={dropdownOptions(options.students, "first_name", "last_name")}
           value={student}
           onChange={(newValue) => setStudent(Number(newValue))}
           placeholder="Search student..."
@@ -182,44 +184,56 @@ export default function ExamEditor(props: ExamEditorProps) {
 
         <DropdownWithSearch
           label={"Tutor"}
-          options={tutorOptions}
+          options={dropdownOptions(options.tutors, "first_name", "last_name")}
           value={tutor}
           onChange={(newValue) => setTutor(Number(newValue))}
-          placeholder="Search tutor..."
+          placeholder="Search tutors..."
           disabled={!editMode}
         />
 
         <DropdownWithSearch
           label={"Examiner"}
-          options={examinerOptions}
+          options={dropdownOptions(options.examiners, "first_name", "last_name")}
           value={examiner}
           onChange={(newVal) => setExaminer(Number(newVal))}
           placeholder="Search examiner..."
           disabled={!editMode}
         />
 
-        <EditField
-          title={"Major"}
-          editMode={editMode}
-          text={props.exam.major}
-          hideTitle={false}
-          onChange={(e) => setMajor(e.target.value)}
+        <DropdownWithSearch
+          label={"Major"}
+          options={dropdownOptions(options.majors, "name")}
+          value={major}
+          onChange={(newVal) => setMajor(Number(newVal))}
+          placeholder="Search majors..."
+          disabled={!editMode}
         />
 
-        <EditField
-          title={"Institute"}
-          editMode={editMode}
-          text={props.exam.institute}
-          hideTitle={false}
-          onChange={(e) => setInstitute(e.target.value)}
+        <DropdownWithSearch
+          label={"Institute"}
+          options={dropdownOptions(options.institutes, "name")}
+          value={institute}
+          onChange={(newVal) => setInstitute(Number(newVal))}
+          placeholder="Search institutes..."
+          disabled={!editMode}
         />
 
-        <EditField
-          title={"Mode"}
-          editMode={editMode}
-          text={props.exam.mode}
-          hideTitle={false}
-          onChange={(e) => setMode(e.target.value)}
+        <DropdownWithSearch
+          label={"Mode"}
+          options={dropdownOptions(options.modes, "name")}
+          value={mode}
+          onChange={(newVal) => setMode(Number(newVal))}
+          placeholder="Search modes..."
+          disabled={!editMode}
+        />
+
+        <DropdownWithSearch
+          label={"Room"}
+          options={dropdownOptions(options.rooms, "name")}
+          value={room}
+          onChange={(newVal) => setRoom(Number(newVal))}
+          placeholder="Search rooms..."
+          disabled={!editMode}
         />
 
         <EditField

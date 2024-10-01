@@ -8,4 +8,6 @@ export default class Student {
   matrikel_number!: string;
   bonus_time!: number;
   misc!: string;
+  major!: string| number;
+  major_id!: number;
 }

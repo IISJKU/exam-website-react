@@ -38,7 +38,7 @@ export default function CalendarEntry(props: EntryProps) {
         top: `calc(${props.y}px)`,
       }}
     >
-      <div className="text-sm">{props.exam.major}</div>
+      <div className="text-sm">{typeof props.exam.major === 'object' && props.exam.major !== null ? props.exam.major.name : props.exam.major.toString()}</div>
       <div className="text-sm">aadgfg</div>
     </div>
   );

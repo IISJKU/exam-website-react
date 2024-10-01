@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditField from "../components/EditField";
 import { showToast } from '../components/ToastMessage'; 
 import Student from "../../classes/Student";
+import Major from "../../classes/Major";
+import DropdownWithSearch from "../components/DropdownSearch";
 
 interface IndividualStudentProps {
   student: Student;
@@ -17,12 +19,30 @@ export default function IndividualStudent(props: IndividualStudentProps) {
   const [emergency_contact, setEmergencyContact] = useState<string>(props.student.emergency_contact);
   const [bonus_time, setOvertime] = useState<number | undefined>(props.student.bonus_time);
   const [misc, setMisc] = useState<string>(props.student.misc);
-  let editText = "Click to Edit";
+  const [major, setMajor] = useState<number>(props.student.major_id);
 
-  if (editMode) {
-    editText = "Stop Editing";
-  }
+  const [majors, setMajors] = useState<Major[]>([]);
 
+  
+  useEffect(() => {
+    const fetchMajors = async () => {
+      try {
+        const response = await fetch("http://localhost:1337/api/majors");
+        const result = await response.json();
+        setMajors(result["data"].map((major: any) => major.attributes)); // Update state with fetched students
+      } catch (error) {
+        showToast({ message: "Error fetching majors.", type: "error" });
+      }
+    };
+
+    fetchMajors();
+  }, []);
+
+  const majorOptions = majors.map(major => ({
+    value: major.id,
+    label: `${major.name}`
+  }));
+  
   // Function to handle student data update
   const handleUpdate = async () => {
     const data: Partial<Student> = {
@@ -34,6 +54,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
       matrikel_number,
       bonus_time,
       misc,
+      major,
     };
 
     try {
@@ -97,6 +118,14 @@ export default function IndividualStudent(props: IndividualStudentProps) {
         hideTitle={false}
         onChange={(e) => setMatrikelNum(e.target.value)}
       />
+      <DropdownWithSearch
+        label="Major"
+        options={majorOptions}
+        value={major}
+        onChange={(newValue) => setMajor(Number(newValue))}
+        placeholder="Search major..."
+        disabled={!editMode}
+      />
       <EditField
         title="Emergency Contact"
         hideTitle={false}
@@ -126,7 +155,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
         }}
         className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
       >
-        {editText}
+         {editMode ? "Stop Editing" : "Click to Edit"}
       </button>
     </div>
   );

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Exam from "../../classes/Exam";
-
 import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
 
@@ -26,11 +25,11 @@ export default function ExamView(props: ExamViewProps) {
     "lva_num",
     "date",
     "duration",
-    "mode",
+    "exam_mode",
     "student",
     "examiner",
     "institute",
-    "status", // "should be changed to status"
+    "duration", // "should be changed to status"
     "student_misc",
   ];
 

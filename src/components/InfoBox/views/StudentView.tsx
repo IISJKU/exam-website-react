@@ -15,6 +15,7 @@ export default function StudentView(props: StudentViewInterface) {
     "Phone",
     "Emergency Contact",
     "Matrikel Number",
+    "Major",
     "Bonus Time",
   ];
 
@@ -25,6 +26,7 @@ export default function StudentView(props: StudentViewInterface) {
     "phone",
     "emergency_contact",
     "matrikel_number",
+    "major",
     "bonus_time", 
   ];
 
