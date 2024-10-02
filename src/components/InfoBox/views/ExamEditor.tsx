@@ -46,15 +46,7 @@ export default function ExamEditor(props: ExamEditorProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [
-          studentsRes,
-          tutorsRes,
-          examinersRes,
-          majorsRes,
-          institutesRes,
-          modesRes,
-          roomsRes,
-        ] = await Promise.all([
+        const [studentsRes, tutorsRes, examinersRes, majorsRes, institutesRes, modesRes, roomsRes] = await Promise.all([
           fetch("http://localhost:1337/api/students").then((res) => res.json()),
           fetch("http://localhost:1337/api/tutors").then((res) => res.json()),
           fetch("http://localhost:1337/api/examiners").then((res) => res.json()),
@@ -87,9 +79,7 @@ export default function ExamEditor(props: ExamEditorProps) {
     const selectedDate = event.target.value;
     const currentTime = moment.utc(date).format("HH:mm:ss"); // Preserve time, use UTC
 
-    const updatedDate = moment(`${selectedDate} ${currentTime}`, "YYYY-MM-DD HH:mm:ss")
-      .utc()
-      .toISOString(); // Ensure toISOString in UTC
+    const updatedDate = moment(`${selectedDate} ${currentTime}`, "YYYY-MM-DD HH:mm:ss").utc().toISOString(); // Ensure toISOString in UTC
     setDate(updatedDate);
   };
 
@@ -97,16 +87,14 @@ export default function ExamEditor(props: ExamEditorProps) {
     const selectedTime = event.target.value;
     const currentDate = moment.utc(date).format("YYYY-MM-DD"); // Preserve date, use UTC
 
-    const updatedDate = moment(`${currentDate}T${selectedTime}`, "YYYY-MM-DDTHH:mm:ss")
-      .utc()
-      .toISOString(); // Convert to ISO in UTC
+    const updatedDate = moment(`${currentDate}T${selectedTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString(); // Convert to ISO in UTC
     setDate(updatedDate);
   };
 
   const handleUpdate = async () => {
     const data: Partial<Exam> = {
       title,
-      date, // Use the ISO-formatted date for the update
+      date,
       duration,
       student,
       tutor,
@@ -156,7 +144,7 @@ export default function ExamEditor(props: ExamEditorProps) {
       value: item.id,
       label: lastNameField
         ? `${item[firstNameField]} ${item[lastNameField]}` // Concatenate first and last name
-        : item[firstNameField], // For fields with just one name (like 'name' for institutes or majors)
+        : item[firstNameField], // For fields with just one field (like 'name' for institutes or majors)
     }));
 
   if (loading) {
