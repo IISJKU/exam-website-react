@@ -3,4 +3,5 @@ export enum Views {
   Register,
   Student,
   Admin,
+  DataAdmin,
 }

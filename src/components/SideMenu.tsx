@@ -1,10 +1,9 @@
 import Calendar from "./Calendar";
 import { InfoBoxView } from "./InfoBox/InfoBox";
-
 import { useTranslation } from "react-i18next";
 
 interface SidemenuProps {
-  callback: Function;
+  callback: (view: InfoBoxView) => void;
 }
 
 export default function SideMenu(props: SidemenuProps) {
@@ -24,7 +23,7 @@ export default function SideMenu(props: SidemenuProps) {
         onClick={() => {
           props.callback(InfoBoxView.Students);
         }}
-        className="w-full text-left border-2 bg-white  active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
       >
         {t("Students")}
       </button>
@@ -36,6 +35,15 @@ export default function SideMenu(props: SidemenuProps) {
       >
         {t("Tutors")}
       </button>
+      <button
+        onClick={() => {
+          props.callback(InfoBoxView.DataAdmin); // Callback for Data Administration
+        }}
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+      >
+        {t("Data Administration")}
+      </button>
+
       <Calendar callback={props.callback} />
     </div>
   );
