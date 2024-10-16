@@ -46,7 +46,7 @@ const tableConfigurations = {
     },
     users: {
         tableName: "users",
-        selectedFields: ["username", "email", "provider", "confirmed", "blocked"], //password, resetPasswordToken, confirmationToken ??
+        selectedFields: ["username", "email", "provider", "confirmed", "blocked"], //"role", "password", "resetPasswordToken", "confirmationToken" ??
         populateFields: [],
     },
 };

@@ -106,6 +106,7 @@ const fetchRelationalData = async () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `5bad2121f82b63a7e0ba19074b66b646228a9903a550bdca6ae721ba2996be07c4afa42d15dbc1b3ac3b43cf8fc33408c9f730e3aa76533b8fe19e01acd140df0407a55d58f842dc4adc72f940c8517b6f5431ca7b5e0496eb70321c56e378ce61c99b0b52e8367aeaa7cda748961e9edee3dcb9cccd1d905260de298e8eb012`,
         },
         body: JSON.stringify({
           data: record,
@@ -123,6 +124,7 @@ const fetchRelationalData = async () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `5bad2121f82b63a7e0ba19074b66b646228a9903a550bdca6ae721ba2996be07c4afa42d15dbc1b3ac3b43cf8fc33408c9f730e3aa76533b8fe19e01acd140df0407a55d58f842dc4adc72f940c8517b6f5431ca7b5e0496eb70321c56e378ce61c99b0b52e8367aeaa7cda748961e9edee3dcb9cccd1d905260de298e8eb012`,
         },
         body: JSON.stringify({
           data: record,
