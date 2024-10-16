@@ -19,7 +19,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden">
+    <div className="h-full w-full overflow-y-auto">
       <Header />
       <div className="flex flex-column h-full w-full">
         <div className="basis-1/6 h-max ">

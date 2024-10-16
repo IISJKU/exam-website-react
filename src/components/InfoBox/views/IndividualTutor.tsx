@@ -53,7 +53,7 @@ export default function IndividualTutor(props: IndividualTutorProps) {
       }
 
       const result = await response.json();
-      showToast({ message: `${result.data.attributes.first_name} ${result.data.attributes.last_name}'s tutor record has been updated successfully.`, type: 'success' });
+      showToast({ message: `${result.first_name} ${result.last_name}'s tutor record has been updated successfully.`, type: 'success' });
     } catch (error) {
       showToast({ message: `Error updating the tutor record: ${(error as Error).message}.`, type: 'error' });
     }

@@ -29,7 +29,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
       try {
         const response = await fetch("http://localhost:1337/api/majors");
         const result = await response.json();
-        setMajors(result["data"].map((major: any) => major.attributes)); // Update state with fetched students
+        setMajors(result); // Update state with fetched students
       } catch (error) {
         showToast({ message: "Error fetching majors.", type: "error" });
       }
@@ -37,7 +37,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
 
     fetchMajors();
   }, []);
-
+  console.log(majors);
   const majorOptions = majors.map(major => ({
     value: major.id,
     label: `${major.name}`
@@ -77,7 +77,7 @@ export default function IndividualStudent(props: IndividualStudentProps) {
       }
 
       const result = await response.json();
-      showToast({ message: `${result.data.attributes.first_name} ${result.data.attributes.last_name}'s student record has been updated successfully.`, type: 'success' });
+      showToast({ message: `${result.first_name} ${result.last_name}'s student record has been updated successfully.`, type: 'success' });
     } catch (error) {
       showToast({ message: `Error updating the student record: ${(error as Error).message}.`, type: 'error' });
     }

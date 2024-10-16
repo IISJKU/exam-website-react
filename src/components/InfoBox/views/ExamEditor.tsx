@@ -57,13 +57,13 @@ export default function ExamEditor(props: ExamEditorProps) {
         ]);
 
         setOptions({
-          students: studentsRes.data.map((student: any) => student.attributes),
-          tutors: tutorsRes.data.map((tutor: any) => tutor.attributes),
-          examiners: examinersRes.data.map((examiner: any) => examiner.attributes),
-          majors: majorsRes.data.map((major: any) => major.attributes),
-          institutes: institutesRes.data.map((institute: any) => institute.attributes),
-          modes: modesRes.data.map((mode: any) => mode.attributes),
-          rooms: roomsRes.data.map((room: any) => room.attributes),
+          students: studentsRes,
+          tutors: tutorsRes,
+          examiners: examinersRes,
+          majors: majorsRes,
+          institutes: institutesRes,
+          modes: modesRes,
+          rooms: roomsRes,
         });
       } catch (error) {
         showToast({ message: "Error fetching data", type: "error" });
@@ -131,7 +131,7 @@ export default function ExamEditor(props: ExamEditorProps) {
 
       const result = await response.json();
       showToast({
-        message: `${result.data.attributes.title} exam record has been updated successfully.`,
+        message: `${result.title} exam record has been updated successfully.`,
         type: "success",
       });
     } catch (error) {

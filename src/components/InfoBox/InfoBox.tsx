@@ -10,6 +10,7 @@ import Exam from "../classes/Exam";
 import IndividualStudent from "./views/IndividualStudentView";
 import Student from "../classes/Student";
 import DataAdministration from "./views/DataAdministration"; 
+import TableLinks from "./views/TableLinks";
 
 interface InfoBoxProps {
   state: InfoBoxView;
@@ -64,9 +65,7 @@ export default function InfoBox(props: InfoBoxProps) {
     case InfoBoxView.IndividualStudent:
       return <IndividualStudent student={student} />;
     case InfoBoxView.DataAdmin:
-      return <DataAdministration tableName="students" selectedFields={["first_name", "last_name", "email", "matrikel_number", "phone", "emergency_contact", "bonus_time", "misc"]} populateFields={[
-        { name: "major", endpoint: "majors" }, // Relational field 
-      ]} />
+      return <TableLinks />
     default:
       return <ExamView callback={examView} />;
   }

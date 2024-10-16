@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { InfoBoxView } from "./InfoBox/InfoBox";
 import { useTranslation } from "react-i18next";
+import { showToast } from "./InfoBox/components/ToastMessage";
 
 interface CalendarProps {
   callback: Function;
@@ -21,9 +22,9 @@ export default function Calendar(props: CalendarProps) {
     try {
       const response = await fetch("http://localhost:1337/api/exams");
       const data = await response.json();
-      setExams(data["data"].map((exam: any) => exam.attributes)); // Map to attributes
+      setExams(data);
     } catch (error) {
-      console.error("Error fetching exams:", error);
+      showToast({ message: `Error fetching exams: ${error}.`, type: 'error' });
     } finally {
       setLoading(false); // Set loading to false when the fetch is complete
     }

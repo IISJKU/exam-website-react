@@ -10,6 +10,7 @@ import moment from "moment";
 
 import { InfoBoxView } from "../InfoBox";
 import Exam from "../../classes/Exam"; 
+import { showToast } from "../components/ToastMessage";
 
 const localizer = momentLocalizer(moment);
 
@@ -62,9 +63,9 @@ export default function BigCalendar(props: CalendarProps) {
     try {
       const response = await fetch("http://localhost:1337/api/exams");
       const data = await response.json();
-      setExams(data["data"].map((exam: any) => exam.attributes)); // Map to attributes
+      setExams(data);
     } catch (error) {
-      console.error("Error fetching exams:", error);
+      showToast({ message: `Error fetching exams: ${error}.`, type: 'error' });
     } finally {
       setLoading(false); // Set loading to false when fetch is complete
     }

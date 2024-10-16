@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import RecordForm from "../../RecordForm";
+import { showToast } from "../components/ToastMessage";
 
 interface DataAdministrationProps {
   tableName: string;
   selectedFields: string[]; // The fields to display
-  populateFields?: { name: string; endpoint: string }[]; // Relational fields and their endpoints
+  populateFields?: { name: string; populateTable: string; displayField: string }[]; // Relational fields, their tableName, and the display field
 }
 
 // Define the type for your data record
@@ -16,34 +17,34 @@ interface DataRecord {
 export default function DataAdministration(props: DataAdministrationProps) {
   const [data, setData] = useState<DataRecord[]>([]); // Data for the selected table
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [fields, setFields] = useState<string[]>(props.selectedFields); // Fields to display
+  const [fields, setFields] = useState<string[]>([]); // Fields to display
   const [editingRecord, setEditingRecord] = useState<DataRecord | null>(null);
   const [relationalData, setRelationalData] = useState<{ [key: string]: any[] }>({}); // Relational data for dropdowns
 
   // Fetch data using fetch API, and filter by selected fields
   const fetchData = async () => {
-    setIsLoading(true);
+    // Clear the table by resetting the data and fields
+    setData([]); // Reset the data to clear the table before fetching new data
+    setFields([]); // Clear the fields
+    setIsLoading(true); // Indicate that loading is in progress
+
     try {
-      const query = props.selectedFields.length
-        ? props.selectedFields.map((field, index) => `fields[${index}]=${field}`).join("&")
-        : "";
-      const populateQuery = props.populateFields?.length
-        ? `&populate=${props.populateFields.map((field) => field.name).join(",")}`
-        : "";
+      const query = props.selectedFields.length ? props.selectedFields.map((field, index) => `fields[${index}]=${field}`).join("&") : "";
+      const populateQuery = props.populateFields?.length ? `&populate=${props.populateFields.map((field) => field.name).join(",")}` : "";
 
       const response = await fetch(`http://localhost:1337/api/${props.tableName}?${query}${populateQuery}`);
       const result = await response.json();
 
-      if (result && result.data && Array.isArray(result.data)) {
+      if (result && Array.isArray(result)) {
         // Map through the data to format it properly, including relational fields
-        const fetchedData = result.data.map((item: any) => {
-          const record: DataRecord = { id: item.id, ...item.attributes };
+        const fetchedData = result.map((item: any) => {
+          const record: DataRecord = { id: item.id, ...item };
 
           // Dynamically extract relational fields' names from nested attributes
           props.populateFields?.forEach((field) => {
-            if (item.attributes[field.name]?.attributes) {
-              record[field.name] = item.attributes[field.name].attributes.name || "N/A"; // Extract 'name' of the relation
-              record[`${field.name}_id`] = item.attributes[field.name].attributes.id; // Also store the relation ID
+            if (item[field.name]) {
+              record[field.name] = item[field.name][field.displayField] || "N/A"; // Extract the specified 'displayField' from the relation
+              record[`${field.name}_id`] = item[field.name].id; // Also store the relation ID
             } else {
               record[field.name] = "N/A"; // Handle missing relational data
             }
@@ -53,39 +54,51 @@ export default function DataAdministration(props: DataAdministrationProps) {
         });
 
         setData(fetchedData);
+        setFields(props.selectedFields); // Reset the fields after fetching
       } else {
-        console.error("Invalid API response", result);
+        showToast({ message: `Invalid API response: ${result}.`, type: 'error' });
+
       }
     } catch (error) {
-      console.error("Error fetching data", error);
+      showToast({ message: `Error fetching data: ${error}.`, type: 'error' });
+
     }
-    setIsLoading(false);
+    setIsLoading(false); // Data fetching is complete
   };
 
   // Fetch relational data for dropdowns
-  const fetchRelationalData = async () => {
-    const relationalPromises = props.populateFields?.map(async (field) => {
-      const response = await fetch(`http://localhost:1337/api/${field.endpoint}`);
-      const result = await response.json();
+const fetchRelationalData = async () => {
+  const relationalPromises = props.populateFields?.map(async (field) => {
+    const response = await fetch(`http://localhost:1337/api/${field.populateTable}`);
+    const result = await response.json();
 
-      // Extract the relational data from the 'attributes' object
+    // Check if result is an array directly
+    if (Array.isArray(result)) {
       return {
         fieldName: field.name,
-        data: result.data.map((item: any) => ({ id: item.id, ...item.attributes })),
+        data: result.map((item: any) => ({
+          id: item.id,
+          [field.displayField]: item[field.displayField], // Use the displayField to get the appropriate field from the result directly
+        })),
       };
-    });
-
-    try {
-      const results = await Promise.all(relationalPromises || []);
-      const relationalDataObject = results.reduce((acc, { fieldName, data }) => {
-        acc[fieldName] = data;
-        return acc;
-      }, {} as { [key: string]: any[] });
-      setRelationalData(relationalDataObject);
-    } catch (error) {
-      console.error("Error fetching relational data", error);
+    } else {
+      throw new Error(`Invalid response format for ${field.populateTable}`);
     }
-  };
+  });
+
+  try {
+    const results = await Promise.all(relationalPromises || []);
+    const relationalDataObject = results.reduce((acc, { fieldName, data }) => {
+      acc[fieldName] = data; // Fix: Use `data` instead of `results`
+      return acc;
+    }, {} as { [key: string]: any[] });
+    
+    setRelationalData(relationalDataObject);
+  } catch (error) {
+    showToast({ message: `Error fetching relational data: ${error}.`, type: 'error' });
+  }
+};
+
 
   const addRecord = async (record: DataRecord) => {
     try {
@@ -100,7 +113,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
       });
       fetchData();
     } catch (error) {
-      console.error("Error adding record", error);
+      showToast({ message: `Error adding record: ${error}.`, type: 'error' });
     }
   };
 
@@ -117,7 +130,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
       });
       fetchData();
     } catch (error) {
-      console.error("Error updating record", error);
+      showToast({ message: `Error updating record: ${error}.`, type: 'error' });
     }
   };
 
@@ -129,10 +142,11 @@ export default function DataAdministration(props: DataAdministrationProps) {
       });
       fetchData();
     } catch (error) {
-      console.error("Error deleting record", error);
+      showToast({ message: `Error deleting record: ${error}.`, type: 'error' });
     }
   };
 
+  // Clear data and fetch new data when the tableName or fields change
   useEffect(() => {
     fetchData();
     if (props.populateFields?.length) {
@@ -155,7 +169,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
 
   return (
     <div className="p-4 h-full">
-      <h1 className="text-2xl font-bold mb-4">Data Administration - {props.tableName}</h1>
+      <h1 className="text-2xl font-bold mb-4 capitalize">Data Administration - {props.tableName.replace("-", " ")}</h1>
 
       {/* Scrollable table container */}
       {isLoading ? (
@@ -177,13 +191,16 @@ export default function DataAdministration(props: DataAdministrationProps) {
             </thead>
             <tbody>
               {data.map((record) => (
-                <tr key={record.id} className="hover:bg-gray-100">
+                <tr key={record.id} className="hover:bg-gray-100 text-center">
                   <td className="border px-4 py-2">{record.id}</td>
                   {fields.map((field) => (
                     <td className="border px-4 py-2" key={`${record.id}-${field}`}>
-                      {typeof record[field] === "object" && record[field]?.attributes 
-                        ? record[field].attributes.abbreviation 
-                        : record[field]}
+                      {/* Handle boolean fields and relational objects */}
+                      {typeof record[field] === "boolean" 
+                        ? record[field] ? "True" : "False" // Display "True"/"False" for boolean fields
+                        : typeof record[field] === "object" && record[field] 
+                          ? record[field].name 
+                          : record[field] || "N/A"} {/* Handle non-boolean fields */}
                     </td>
                   ))}
                   {props.populateFields?.map((field) => (

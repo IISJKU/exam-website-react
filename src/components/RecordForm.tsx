@@ -84,7 +84,7 @@ export default function RecordForm(props: RecordFormProps) {
               className="border border-gray-300 p-2 w-full rounded-md"
               required
             >
-              <option value="">Select {relationalField.name}</option>
+              <option value="">Select {relationalField.name.charAt(0).toUpperCase() + relationalField.name.slice(1)}</option>
               {relationalField.options.map((option: any) => (
                 <option key={option.id} value={option.id}>
                   {option.name || option.id} {/* Display the name or id */}

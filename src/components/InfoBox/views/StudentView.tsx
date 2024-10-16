@@ -38,7 +38,21 @@ export default function StudentView(props: StudentViewInterface) {
     try {
       const response = await fetch("http://localhost:1337/api/students");
       const data = await response.json();
-      setStudentData(data["data"].map((student: any) => student.attributes)); // Update state with fetched students
+      // Modify the data array before setting it to exams
+      const updatedData = data.map((studentData: any) => {
+        // Create a copy of the exam object to modify
+        let updatedStudents = { ...studentData };
+
+        // Check if exam has a student and matrikel_number, and update it if needed
+        if (studentData.major && studentData.major.name) {
+          updatedStudents.major = studentData.major.name; // Set student to matrikel_number
+        }
+        // Return the modified exam object
+        return updatedStudents;
+      });
+
+      // Set the updated data
+      setStudentData(updatedData); // Update state with fetched students
     } catch (error) {
       showToast({ message: `Error fetching students: ${error}.`, type: 'error' });
     } finally {

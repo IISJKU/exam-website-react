@@ -32,7 +32,7 @@ export default function TutorView(props: TutorViewInterface) {
     try {
       const response = await fetch("http://localhost:1337/api/tutors");
       const data = await response.json();
-      setTutors(data["data"].map((tutor: any) => tutor.attributes)); // Map to attributes // Update state with fetched tutors
+      setTutors(data);
     } catch (error) {
       showToast({ message: `Error fetching tutors: ${error}.`, type: 'error' });
     } finally {
