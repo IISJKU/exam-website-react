@@ -5,7 +5,7 @@ import { showToast } from "../components/ToastMessage";
 interface DataAdministrationProps {
   tableName: string;
   selectedFields: string[]; // The fields to display
-  populateFields?: { name: string; populateTable: string; displayField: string }[]; // Relational fields, their tableName, and the display field
+  populateFields?: { name: string; populateTable: string; displayField: string[] }[]; // Relational fields, their tableName, and the display fields
 }
 
 interface DataRecord {
@@ -55,7 +55,12 @@ export default function DataAdministration(props: DataAdministrationProps) {
           // Handle relational fields
           props.populateFields?.forEach((field) => {
             if (item[field.name]) {
-              record[field.name] = item[field.name][field.displayField] || "N/A";
+              // Concatenate multiple display fields
+              const displayValue = field.displayField
+                .map((df) => item[field.name][df])
+                .filter(Boolean)
+                .join(" ");
+              record[field.name] = displayValue || "N/A";
               record[`${field.name}_id`] = item[field.name].id;
             } else {
               record[field.name] = "N/A";
@@ -87,7 +92,11 @@ export default function DataAdministration(props: DataAdministrationProps) {
           fieldName: field.name,
           data: result.map((item: any) => ({
             id: item.id,
-            [field.displayField]: item[field.displayField],
+            // Concatenate display fields for dropdown options
+            displayValue: field.displayField
+              .map((df) => item[df])
+              .filter(Boolean)
+              .join(" "),
           })),
         };
       } else {
@@ -101,7 +110,6 @@ export default function DataAdministration(props: DataAdministrationProps) {
         acc[fieldName] = data;
         return acc;
       }, {} as { [key: string]: any[] });
-
       setRelationalData(relationalDataObject);
     } catch (error) {
       showToast({ message: `Error fetching relational data: ${error}.`, type: "error" });
@@ -114,7 +122,6 @@ export default function DataAdministration(props: DataAdministrationProps) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `5bad2121f82b63a7e0ba19074b66b646228a9903a550bdca6ae721ba2996be07c4afa42d15dbc1b3ac3b43cf8fc33408c9f730e3aa76533b8fe19e01acd140df0407a55d58f842dc4adc72f940c8517b6f5431ca7b5e0496eb70321c56e378ce61c99b0b52e8367aeaa7cda748961e9edee3dcb9cccd1d905260de298e8eb012`,
         },
         body: JSON.stringify({ data: record }),
       });
@@ -130,7 +137,6 @@ export default function DataAdministration(props: DataAdministrationProps) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `5bad2121f82b63a7e0ba19074b66b646228a9903a550bdca6ae721ba2996be07c4afa42d15dbc1b3ac3b43cf8fc33408c9f730e3aa76533b8fe19e01acd140df0407a55d58f842dc4adc72f940c8517b6f5431ca7b5e0496eb70321c56e378ce61c99b0b52e8367aeaa7cda748961e9edee3dcb9cccd1d905260de298e8eb012`,
         },
         body: JSON.stringify({ data: record }),
       });
@@ -242,9 +248,10 @@ export default function DataAdministration(props: DataAdministrationProps) {
           booleanFields={booleanFields}
           relationalFields={props.populateFields?.map((field) => ({
             name: field.name,
+            displayField: field.displayField, // Pass display fields for concatenation
             options: relationalData[field.name] || [],
             selectedValue: editingRecord ? editingRecord[`${field.name}_id`] : null,
-          }))}
+          }))} 
         />
       </div>
     </div>

@@ -6,7 +6,7 @@ interface RecordFormProps {
   onCancel: () => void;
   fields: string[]; // Fields to render in the form
   booleanFields?: string[]; // Boolean fields to render as dropdowns
-  relationalFields?: { name: string; options: any[], selectedValue?: any }[]; // Relational fields with options and selected value
+  relationalFields?: { name: string; options: any[], selectedValue?: any, displayField: string[] }[]; // Relational fields with options and displayField as array
 }
 
 interface DataRecord {
@@ -32,9 +32,7 @@ export default function RecordForm(props: RecordFormProps) {
     }
   }, [props.record, props.relationalFields]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -76,33 +74,8 @@ export default function RecordForm(props: RecordFormProps) {
             </div>
           );
         }
-        // Check if the field is a relational field
-        const relationalField = props.relationalFields?.find(rField => rField.name === field);
-        if (relationalField) {
-          return (
-            <div className="mb-4" key={field}>
-              <label className="block text-gray-700 capitalize">
-                {relationalField.name.replace("_", " ")}:
-              </label>
-              <select
-                name={relationalField.name}
-                value={formData[relationalField.name] || ""}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 w-full rounded-md"
-                required
-              >
-                <option value="">Select {relationalField.name.charAt(0).toUpperCase() + relationalField.name.slice(1)}</option>
-                {relationalField.options.map((option: any) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name || option.id}
-                  </option>
-                ))}
-              </select>
-            </div>
-          );
-        }
 
-        // render a text input for normal fields
+        // Render a text input for normal fields
         return (
           <div className="mb-4" key={field}>
             <label className="block text-gray-700 capitalize">
@@ -119,6 +92,29 @@ export default function RecordForm(props: RecordFormProps) {
           </div>
         );
       })}
+
+      {/* Render relational fields */}
+      {(props.relationalFields ?? []).filter(field => !props.fields.includes(field.name)).map((field) => (
+        <div className="mb-4" key={field.name}>
+          <label className="block text-gray-700 capitalize">
+            {field.name.replace("_", " ")}:
+          </label>
+          <select
+            name={field.name}
+            value={formData[field.name] || ""}
+            onChange={handleChange}
+            className="border border-gray-300 p-2 w-full rounded-md"
+            required
+          >
+            <option value="">Select {(field.name.charAt(0).toUpperCase() + field.name.slice(1)).replace("_", " ")}</option>
+            {field.options.map((option: any) => (
+              <option key={option.id} value={option.id}>
+                {option.displayValue}
+              </option>
+            ))}
+          </select>
+        </div>
+      ))}
 
       <div className="flex justify-between">
         <button
