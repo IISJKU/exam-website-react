@@ -1,57 +1,40 @@
 import SearchBar from "../components/SearchBar";
 import { useState } from "react";
 import SortableHeaders from "../components/SortableHeaders";
-
 import { useTranslation } from "react-i18next";
-
 import Pagination from "../components/Pagination";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
 interface ContentViewInterface<T> {
   title: string;
-  callback: Function;
   fields: string[];
   keys: (keyof T)[];
   data: T[];
+  onRowClick?: (id: number) => void; // Add this prop for handling row clicks
 }
 
 export default function ContentView<T extends { id?: number }>(
   props: ContentViewInterface<T>
 ) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [filtered, setFiltered] = useState<T[]>(props.data);
   const entriesPerPage = 20;
-
   const [page, setPage] = useState(1);
-
-  //<div>▲▼</div>
 
   function setFilteredData(data: T[]) {
     setFiltered(data);
   }
 
   function isDate(t: string): boolean {
-    if (!isNaN(Date.parse(t))) {
-      if (t.includes("T")) return true;
-    }
-
-    return false;
+    return !isNaN(Date.parse(t)) && t.includes("T");
   }
 
-  let entries: T[] = [];
-  let start = (page - 1) * entriesPerPage;
+  const start = (page - 1) * entriesPerPage;
+  const numPages = Math.ceil(filtered.length / entriesPerPage);
+  const entries: T[] = filtered.slice(start, start + entriesPerPage);
 
-  let numPages = Math.ceil(filtered.length / entriesPerPage);
+  const pages = Array.from({ length: numPages }, (_, i) => i + 1);
 
-  let pages = [];
-
-  for (let i = start; i < entriesPerPage + start; i++) {
-    if (filtered[i] == undefined) break;
-    entries.push(filtered[i]);
-  }
-
-  for (let i = 0; i < numPages; i++) {
-    pages.push(i + 1);
-  }
   return (
     <div className="w-full h-full overflow-hidden p-5 select-none">
       <div className="flex w-full content-center items-center ">
@@ -67,32 +50,41 @@ export default function ContentView<T extends { id?: number }>(
           setElements={setFilteredData}
         />
 
-        {entries.map((element: T) => (
-          <tr
-            className="hover:bg-slate-300 even:bg-slate-200 odd:bg-slate-100"
-            onClick={() => {
-              props.callback(element);
-            }}
-          >
-            {props.keys.map((key) => (
-              <td className="pl-2">
-                {typeof element[key] === "string"
-                  ? !isDate(element[key] as string)
-                    ? (element[key] as string)
-                    : formatDate(element[key] as string)
-                  : Array.isArray(element[key])
-                  ? (element[key] as string[]).join(", ")
-                  : typeof element[key] === "number"
-                  ? (element[key] as number)
-                  : " "}
-              </td>
-            ))}
+        <tbody>
+          {entries.map((element: T) => (
+            <tr
+              key={element.id} // Add key for each row
+              className="hover:bg-slate-300 even:bg-slate-200 odd:bg-slate-100 cursor-pointer"
+              onClick={() => {
+                if (element.id && props.onRowClick) {
+                  props.onRowClick(element.id); // Use the onRowClick prop if available
+                }
+              }}
+            >
+              {props.keys.map((key) => (
+                <td key={key as string} className="pl-2">
+                  {typeof element[key] === "string" ? (
+                    !isDate(element[key] as string) ? (
+                      element[key] as string
+                    ) : (
+                      formatDate(element[key] as string)
+                    )
+                  ) : Array.isArray(element[key]) ? (
+                    (element[key] as string[]).join(", ")
+                  ) : typeof element[key] === "number" ? (
+                    element[key] as number
+                  ) : (
+                    " "
+                  )}
+                </td>
+              ))}
 
-            <td>
-              <button>Edit</button>
-            </td>
-          </tr>
-        ))}
+              <td>
+                <button>Edit</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
       </table>
 
       <Pagination callback={setPage} pageNames={pages} activePage={page} />

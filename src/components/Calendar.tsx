@@ -1,20 +1,17 @@
 import { useState, useEffect } from "react";
-import { InfoBoxView } from "./InfoBox/InfoBox";
 import { useTranslation } from "react-i18next";
 import { showToast } from "./InfoBox/components/ToastMessage";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
-interface CalendarProps {
-  callback: Function;
-}
-
-export default function Calendar(props: CalendarProps) {
+export default function Calendar() {
   const { t } = useTranslation();
+  const navigate = useNavigate(); // Initialize useNavigate for navigation
   const [date, setDate] = useState(new Date());
   const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const month = [
     "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
   ];
-  const [exams, setExams] = useState<any[]>([]);  
+  const [exams, setExams] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // State for loading
 
   // Fetch data from Strapi API
@@ -121,10 +118,8 @@ export default function Calendar(props: CalendarProps) {
                     key={dayIndex}
                     onClick={() => {
                       if (day[1] !== "invisible" && day[0]) {
-                        props.callback(
-                          InfoBoxView.CalendarBig,
-                          new Date(date.getFullYear(), date.getMonth(), parseInt(day[0]))
-                        );
+                        // Use navigate to move to a new route for the specific date
+                        navigate(`admin/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
                       }
                     }}
                     className={`hover:bg-slate-500 active:bg-slate-700 align-top border-2 border-black aspect-square ${day[1]}`}

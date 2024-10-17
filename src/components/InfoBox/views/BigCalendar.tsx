@@ -1,54 +1,19 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import {
-  Calendar,
-  momentLocalizer,
-  Views,
-  DateLocalizer,
-  Event,
-} from "react-big-calendar";
+import { Calendar, momentLocalizer, Views, Event } from "react-big-calendar";
 import moment from "moment";
-
-import { InfoBoxView } from "../InfoBox";
-import Exam from "../../classes/Exam"; 
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { showToast } from "../components/ToastMessage";
+import Exam from "../../classes/Exam";
 
 const localizer = momentLocalizer(moment);
 
-interface CalendarProps {
-  date?: Date;
-  callback: Function;
-}
-
-export default function BigCalendar(props: CalendarProps) {
-  const weekdays = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
-  const month = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const [date, setDate] = useState(props.date);
+export default function BigCalendar() {
+  const [date, setDate] = useState(new Date());
   const [view, setView] = useState(Views.WEEK);
   const [exams, setExams] = useState<Exam[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // State for loading
+  const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
 
   const { defaultDate, scrollToTime } = useMemo(
     () => ({
@@ -65,13 +30,12 @@ export default function BigCalendar(props: CalendarProps) {
       const data = await response.json();
       setExams(data);
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: 'error' });
+      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
     } finally {
       setLoading(false); // Set loading to false when fetch is complete
     }
   };
 
-  // Update events after fetching exams
   useEffect(() => {
     fetchExams();
   }, []);
@@ -88,20 +52,17 @@ export default function BigCalendar(props: CalendarProps) {
       };
     });
     setEvents(newEvents);
-  }, [exams]); // This will run every time `exams` is updated
-
-  useEffect(() => {
-    setDate(props.date);
-  }, [props]);
+  }, [exams]);
 
   const handleSelectEvent = useCallback(
     (event: Event) => {
       const selectedExam = exams.find((exam) => event.title === exam.title);
       if (selectedExam) {
-        props.callback(selectedExam);
+        // Use navigate to go to the exam details route (you can adjust the route as needed)
+        navigate(`/admin/exams/${selectedExam.id}`);
       }
     },
-    [exams, props]
+    [exams, navigate]
   );
 
   if (loading) {
@@ -115,15 +76,13 @@ export default function BigCalendar(props: CalendarProps) {
         defaultView={view}
         scrollToTime={scrollToTime}
         localizer={localizer}
-        events={events} // Use the state that holds events
+        events={events}
         date={date}
         startAccessor="start"
         endAccessor="end"
         onSelectEvent={handleSelectEvent}
         style={{ height: 700 }}
-        onNavigate={(date) => {
-          setDate(new Date(date));
-        }}
+        onNavigate={(newDate) => setDate(newDate)}
         popup
       />
     </div>

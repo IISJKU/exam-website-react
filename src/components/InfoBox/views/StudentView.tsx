@@ -2,12 +2,11 @@ import Student from "../../classes/Student";
 import { useState, useEffect } from "react";
 import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
+import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 
-interface StudentViewInterface {
-  callback: Function;
-}
+export default function StudentView() {
+  const navigate = useNavigate(); // Initialize navigate for navigation
 
-export default function StudentView(props: StudentViewInterface) {
   const fields = [
     "First Name",
     "Last Name",
@@ -27,54 +26,51 @@ export default function StudentView(props: StudentViewInterface) {
     "emergency_contact",
     "matrikel_number",
     "major",
-    "bonus_time", 
+    "bonus_time",
   ];
 
-  const [studentData, setStudentData] = useState<Student[]>([]); // Added type for student data
+  const [studentData, setStudentData] = useState<Student[]>([]); // State for students data
   const [loading, setLoading] = useState<boolean>(true); // State for loading
 
-  // Fetch data from Strapi API
+  // Fetch data from API
   const fetchStudents = async () => {
     try {
       const response = await fetch("http://localhost:1337/api/students");
       const data = await response.json();
-      // Modify the data array before setting it to exams
-      const updatedData = data.map((studentData: any) => {
-        // Create a copy of the exam object to modify
-        let updatedStudents = { ...studentData };
 
-        // Check if exam has a student and matrikel_number, and update it if needed
-        if (studentData.major && studentData.major.name) {
-          updatedStudents.major = studentData.major.name; // Set student to matrikel_number
-        }
-        // Return the modified exam object
-        return updatedStudents;
-      });
+      // Map and modify data to extract the 'major' name
+      const updatedData = data.map((student: any) => ({
+        ...student,
+        major: student.major?.name || "N/A", // Set major name or "N/A" if not available
+      }));
 
-      // Set the updated data
-      setStudentData(updatedData); // Update state with fetched students
+      setStudentData(updatedData); // Update state with the fetched students
     } catch (error) {
       showToast({ message: `Error fetching students: ${error}.`, type: 'error' });
     } finally {
-      setLoading(false); // Set loading to false when the fetch is complete
+      setLoading(false); // Set loading to false once data fetching is done
     }
   };
 
   useEffect(() => {
-    fetchStudents();
+    fetchStudents(); // Fetch students on component mount
   }, []);
 
+  const handleStudentClick = (studentId: number) => {
+    navigate(`/admin/students/${studentId}`); // Navigate to individual student view with ID
+  };
+
   if (loading) {
-    return <p>Loading students...</p>; // Display loading indicator while fetching
+    return <p>Loading students...</p>; // Display loading state while fetching data
   }
 
   return (
     <ContentView
       title={"Students"}
-      callback={props.callback}
+      onRowClick={handleStudentClick} // Pass the row click handler for student navigation
       fields={fields}
       keys={keys}
-      data={studentData}
+      data={studentData} // Pass the student data to ContentView
     />
   );
 }

@@ -1,26 +1,47 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom"; // useParams to get the route params
 import EditField from "../components/EditField";
 import { showToast } from '../components/ToastMessage'; 
 import Tutor from "../../classes/Tutor";
 
-interface IndividualTutorProps {
-  tutor: Tutor;
-}
-
-export default function IndividualTutor(props: IndividualTutorProps) {
+export default function IndividualTutor() {
+  const { id } = useParams(); // Extract the tutor ID from the route parameters
+  const navigate = useNavigate(); // For navigation
+  const [loading, setLoading] = useState<boolean>(true);
+  const [tutor, setTutor] = useState<Tutor | null>(null); // Initially null until the data is fetched
   const [editMode, setEditMode] = useState<boolean>(false);
-  const [first_name, setFirstName] = useState<string>(props.tutor.first_name);
-  const [last_name, setLastName] = useState<string>(props.tutor.last_name);
-  const [email, setEmail] = useState<string>(props.tutor.email);
-  const [phone, setPhone] = useState<string>(props.tutor.phone);
-  const [matrikel_number, setMatrikelNum] = useState<string>(props.tutor.matrikel_number);
-  const [course, setCourse] = useState<string>(props.tutor.course);
+  const [first_name, setFirstName] = useState<string>("");
+  const [last_name, setLastName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [matrikel_number, setMatrikelNum] = useState<string>("");
+  const [course, setCourse] = useState<string>("");
 
-  let editText = "Click to Edit";
+  // Fetch the tutor data by ID
+  useEffect(() => {
+    const fetchTutor = async () => {
+      try {
+        const response = await fetch(`http://localhost:1337/api/tutors/${id}`);
+        const tutorData = await response.json();
+        setTutor(tutorData); // Set the fetched tutor data
+        setLoading(false); // Stop loading
+        setFirstName(tutorData.first_name);
+        setLastName(tutorData.last_name);
+        setEmail(tutorData.email);
+        setPhone(tutorData.phone);
+        setMatrikelNum(tutorData.matrikel_number);
+        setCourse(tutorData.course);
+      } catch (error) {
+        showToast({ message: `Error fetching tutor data: ${(error as Error).message}.`, type: 'error' });
+      }finally {
+        setLoading(false);
+      }
+    };
 
-  if (editMode) {
-    editText = "Stop Editing";
-  }
+    if (id) {
+      fetchTutor(); // Fetch tutor data only if ID is present
+    }
+  }, [id]);
 
   // Function to handle Tutor data update
   const handleUpdate = async () => {
@@ -34,13 +55,11 @@ export default function IndividualTutor(props: IndividualTutorProps) {
     };
 
     try {
-      // Fetch API to send a PUT request to update the tutor data
-      const response = await fetch(`http://localhost:1337/api/tutors/${props.tutor.id}`,
+      const response = await fetch(`http://localhost:1337/api/tutors/${id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `5bad2121f82b63a7e0ba19074b66b646228a9903a550bdca6ae721ba2996be07c4afa42d15dbc1b3ac3b43cf8fc33408c9f730e3aa76533b8fe19e01acd140df0407a55d58f842dc4adc72f940c8517b6f5431ca7b5e0496eb70321c56e378ce61c99b0b52e8367aeaa7cda748961e9edee3dcb9cccd1d905260de298e8eb012`,
           },
           body: JSON.stringify({ data }), // Send data in the request body
         }
@@ -54,50 +73,57 @@ export default function IndividualTutor(props: IndividualTutorProps) {
 
       const result = await response.json();
       showToast({ message: `${result.first_name} ${result.last_name}'s tutor record has been updated successfully.`, type: 'success' });
+
+      // Navigate back to tutor list or any other page
+      navigate("/admin/tutors");
     } catch (error) {
       showToast({ message: `Error updating the tutor record: ${(error as Error).message}.`, type: 'error' });
     }
   };
 
+  if (loading || !tutor) {
+    return <p>Loading tutor data...</p>;
+  }
+
   return (
-    <div className="m-10 ">
+    <div className="m-10">
       <EditField
-        title={"First Name"}
+        title="First Name"
         editMode={editMode}
-        text={props.tutor.first_name}
+        text={first_name}
         onChange={(e) => setFirstName(e.target.value)}
       />
       <EditField
-        title={"Last Name"}
+        title="Last Name"
         editMode={editMode}
-        text={props.tutor.last_name}
+        text={last_name}
         onChange={(e) => setLastName(e.target.value)}
       />
       <EditField
-        title={"EMail"}
+        title="EMail"
         editMode={editMode}
-        text={props.tutor.email}
+        text={email}
         hideTitle={false}
         onChange={(e) => setEmail(e.target.value)}
       />
       <EditField
-        title={"Phone"}
+        title="Phone"
         editMode={editMode}
-        text={props.tutor.phone}
+        text={phone}
         hideTitle={false}
         onChange={(e) => setPhone(e.target.value)}
       />
       <EditField
-        title={"Matrikel Nr"}
+        title="Matrikel Nr"
         editMode={editMode}
-        text={props.tutor.matrikel_number}
+        text={matrikel_number}
         hideTitle={false}
         onChange={(e) => setMatrikelNum(e.target.value)}
       />
       <EditField
-        title={"Course"}
+        title="Course"
         editMode={editMode}
-        text={props.tutor.course}
+        text={course}
         hideTitle={false}
         onChange={(e) => setCourse(e.target.value)}
       />
@@ -109,7 +135,13 @@ export default function IndividualTutor(props: IndividualTutorProps) {
         }}
         className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
       >
-        {editText}
+        {editMode ? "Save" : "Edit"}
+      </button>
+      <button
+        onClick={() => navigate("/admin/tutors")} // Navigate back to tutors list
+        className="ml-4 border-2 border-red-500 p-1 hover:bg-red-400 hover:underline"
+      >
+        Cancel
       </button>
     </div>
   );
