@@ -28,7 +28,7 @@ export default function ExamView() {
     "student",
     "examiner",
     "institute",
-    "duration", // "should be changed to status"
+    "status",
     "student_misc",
   ];
 
