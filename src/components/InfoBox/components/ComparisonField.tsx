@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import EntryBase from "../../classes/EntryBase";
 
 interface DropdownOption {
   value: string | number;
@@ -9,16 +10,28 @@ interface ComparisonField {
   label: string;
   options: DropdownOption[];
   value: string | number;
-  proposedVal: string | number | undefined;
+  proposedVal: string;
 }
 
 export default function ComparisonField(props: ComparisonField) {
   // Get the label of the currently selected value (if any)
-  const selectedOptionLabel = props.options.find((option) => option.value === props.value)?.label || "";
+  let selectedOptionLabel: string | number | undefined = props.options.find((option) => option.value === props.value)?.label || "";
 
-  console.log(props.proposedVal);
+  if (props.options.length == 0) selectedOptionLabel = props.value;
 
-  if (props.proposedVal != undefined)
+  //console.log(props.proposedVal);
+
+  const makeString = (t: any) => {
+    if (t == undefined || t == null) return "";
+
+    if (typeof t === "string") return t;
+    if (t["name"] != undefined) return t["name"];
+    if (t["first_name"] && t["last_name"]) return t["first_name"] + " " + t["last_name"];
+
+    return t.getName();
+  };
+
+  if (props.proposedVal != undefined && props.proposedVal != "")
     return (
       <div className="relative w-96">
         {/* Add ref to the dropdown container */}

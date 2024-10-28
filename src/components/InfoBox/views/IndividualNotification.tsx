@@ -17,6 +17,7 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import Notification from "../../classes/Notification";
 import ComparisonField from "../components/ComparisonField";
+import EntryBase from "../../classes/EntryBase";
 
 export default function IndividualNotification() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -82,8 +83,6 @@ export default function IndividualNotification() {
         });
 
         const examData = await examResponse.json();
-
-        console.log(examData);
 
         if (examData) {
           let ex = new Exam();
@@ -348,61 +347,93 @@ export default function IndividualNotification() {
         : item[firstNameField], // For fields with just one field (like 'name' for institutes or majors)
     }));
 
+  console.log(options.students);
+
+  const match = (arr: any[], val: any): string => {
+    let t;
+
+    arr.forEach((entr) => {
+      if (entr.id == val) {
+        t = entr;
+      }
+    });
+
+    if (t == undefined || t == null) return "";
+
+    if (t["name"] != undefined) return t["name"];
+    if (t["first_name"] && t["last_name"]) return t["first_name"] + " " + t["last_name"];
+
+    return "";
+  };
+
   return (
     <div className="m-5">
       <div className="text-4xl font-bold">{t("Proposed Changes")}</div>
 
-      <EditField
-        title={t("LVA Num")}
-        editMode={editMode}
-        text={lva_num ? lva_num.toString() : ""}
-        hideTitle={false}
-        onChange={(e) => setLvaNum(Number(e.target.value))}
+      <ComparisonField
+        label={"LVA Num"}
+        options={[]}
+        value={lva_num ? lva_num.toString() : ""}
+        proposedVal={proposedExam.lva_num ? proposedExam.lva_num.toString() : ""}
       />
 
-      <DateField editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
-
-      <EditField
-        title={t("Duration")}
-        editMode={editMode}
-        text={duration ? duration.toString() : ""}
-        hideTitle={false}
-        onChange={(e) => setDuration(Number(e.target.value))}
+      <ComparisonField
+        label={"Date"}
+        options={[]}
+        value={moment(date).utc().format("YYYY-MM-DD")}
+        proposedVal={proposedExam.date ? moment(proposedExam.date).utc().format("YYYY-MM-DD") : ""}
       />
+
+      <ComparisonField label={"Duration"} options={[]} value={duration ?? ""} proposedVal={proposedExam.duration ? proposedExam.duration.toString() : ""} />
 
       <ComparisonField
         label={"Student"}
         options={dropdownOptions(options.students, "first_name", "last_name")}
         value={student ?? ""}
-        proposedVal={proposedExam.student_id}
+        proposedVal={match(options.students, proposedExam.student_id)}
       />
 
       <ComparisonField
         label={"Tutor"}
         options={dropdownOptions(options.tutors, "first_name", "last_name")}
         value={tutor ?? ""}
-        proposedVal={proposedExam.tutor_id}
+        proposedVal={match(options.tutors, proposedExam.tutor)}
       />
 
       <ComparisonField
         label={t("Examiner")}
         options={dropdownOptions(options.examiners, "first_name", "last_name")}
         value={examiner ?? ""}
-        proposedVal={proposedExam.examiner_id}
+        proposedVal={match(options.examiners, proposedExam.examiner_id)}
       />
 
-      <ComparisonField label={t("Major")} options={dropdownOptions(options.majors, "name")} value={major ?? ""} proposedVal={proposedExam.major_id} />
+      <ComparisonField
+        label={t("Major")}
+        options={dropdownOptions(options.majors, "name")}
+        value={major ?? ""}
+        proposedVal={match(options.majors, proposedExam.major_id)}
+      />
 
       <ComparisonField
         label={t("Institute")}
         options={dropdownOptions(options.institutes, "name")}
         value={institute ?? ""}
-        proposedVal={proposedExam.institute_id}
+        proposedVal={match(options.institutes, proposedExam.institute_id)}
       />
 
-      <ComparisonField label={t("Mode")} options={dropdownOptions(options.modes, "name")} value={mode ?? ""} proposedVal={proposedExam.mode_id} />
+      <ComparisonField
+        label={t("Mode")}
+        options={dropdownOptions(options.modes, "name")}
+        value={mode ?? ""}
+        proposedVal={match(options.modes, proposedExam.mode_id)}
+      />
 
-      <ComparisonField label={t("Room")} options={dropdownOptions(options.rooms, "name")} value={room ?? ""} proposedVal={proposedExam.room_id} />
+      <ComparisonField
+        label={t("Room")}
+        options={dropdownOptions(options.rooms, "name")}
+        value={room ?? ""}
+        proposedVal={match(options.rooms, proposedExam.room_id)}
+      />
 
       <EditField title={"Status"} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus(e.target.value)} />
 
