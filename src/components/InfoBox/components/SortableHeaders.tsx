@@ -9,9 +9,7 @@ interface SHProps<T> {
   setElements: Function;
 }
 
-export default function SortableHeaders<T extends { id?: number }>(
-  props: SHProps<T>
-) {
+export default function SortableHeaders<T extends { id?: number }>(props: SHProps<T>) {
   //<div>▲▼</div>
 
   const [activeKey, setKey] = useState<string>("");
@@ -95,8 +93,7 @@ export default function SortableHeaders<T extends { id?: number }>(
     });
 
     keyStates.forEach((keyState, index) => {
-      if (skip === undefined || skip !== index)
-        keyStates[index] = SorterState.off;
+      if (skip === undefined || skip !== index) keyStates[index] = SorterState.off;
     });
 
     setStates(keyStates);
@@ -108,6 +105,7 @@ export default function SortableHeaders<T extends { id?: number }>(
       <tr className="select-none border-2 border-black">
         {props.fields.map((field, index) => (
           <Sorter
+            key={index}
             onClick={() => setActiveKey(props.keys[index])}
             id={props.keys[index]}
             name={props.fields[index].toString()}

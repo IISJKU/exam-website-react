@@ -11,6 +11,16 @@ export default function SideMenu() {
       {/* Exams Overview Button */}
       <button
         onClick={() => {
+          navigate("admin/notifications"); // Navigate to the exams route
+        }}
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+      >
+        {t("Notifications")}
+      </button>
+
+      {/* Exams Overview Button */}
+      <button
+        onClick={() => {
           navigate("admin/exams"); // Navigate to the exams route
         }}
         className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
@@ -20,7 +30,7 @@ export default function SideMenu() {
 
       {/* Students Button */}
       <button
-        onClick={()=> {
+        onClick={() => {
           navigate("admin/students"); // Navigate to the students route
         }}
         className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"

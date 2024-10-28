@@ -10,27 +10,17 @@ interface EntryProps {
 }
 
 export default function CalendarEntry(props: EntryProps) {
-  const classNames = [
-    "bg-orange-400",
-    "bg-amber-300",
-    "bg-red-300",
-    "bg-teal-200",
-  ];
+  const classNames = ["bg-orange-400", "bg-amber-300", "bg-red-300", "bg-teal-200"];
 
   let width = 0;
   let y = 0;
 
-  let staticCSS =
-    "absolute overflow-hidden border-2 border-black hover:opacity-70 hover:ring-4";
+  let staticCSS = "absolute overflow-hidden border-2 border-black hover:opacity-70 hover:ring-4";
 
   if (props.width != undefined) width = props.width - 2;
   return (
     <div
-      className={
-        classNames[Math.floor(Math.random() * classNames.length)] +
-        " " +
-        staticCSS
-      }
+      className={classNames[Math.floor(Math.random() * classNames.length)] + " " + staticCSS}
       style={{
         width: `calc(${props.width}px - 3px)`,
         height: `calc(${props.height}px )`,
@@ -38,7 +28,7 @@ export default function CalendarEntry(props: EntryProps) {
         top: `calc(${props.y}px)`,
       }}
     >
-      <div className="text-sm">{typeof props.exam.major === 'object' && props.exam.major !== null ? props.exam.major.name : props.exam.major.toString()}</div>
+      <div className="text-sm">{props.exam.major.toString()}</div>
       <div className="text-sm">aadgfg</div>
     </div>
   );

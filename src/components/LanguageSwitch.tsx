@@ -7,7 +7,9 @@ enum Language {
 }
 
 export default function LanguageSwitch() {
-  const [lang, setLang] = useState<Language>(Language.EN);
+  let initLang = i18n.language == "en" ? Language.EN : Language.DE; //this is so that the actual button depends on global langugae
+
+  const [lang, setLang] = useState<Language>(initLang);
 
   function switchLang(lang: Language) {
     if (lang === Language.EN) i18n.changeLanguage("en");

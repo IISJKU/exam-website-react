@@ -23,7 +23,7 @@ export default function Sorter(props: SorterProps) {
 
   const [symbol, setSymbol] = useState(" ");
 
-  let className = "hover:bg-slate-300 pl-2";
+  let className = "hover:bg-slate-300 pl-2 whitespace-nowrap ";
 
   //const sorterText = ["", "▲", "▼"];
 
@@ -39,7 +39,8 @@ export default function Sorter(props: SorterProps) {
 
   return (
     <th id={String(props.id)} className={className} onClick={() => props.onClick(props.id)}>
-      {t(props.name)} <div className="inline-block w-1">{symbol}</div>
+      {t(props.name)}
+      <div className="w-4 inline-block ">{symbol}</div>
     </th>
   );
 }

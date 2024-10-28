@@ -3,39 +3,29 @@ import { useState, useEffect } from "react";
 import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
+import { useAuth } from "../../../hooks/AuthProvider";
 
 export default function StudentView() {
   const navigate = useNavigate(); // Initialize navigate for navigation
 
-  const fields = [
-    "First Name",
-    "Last Name",
-    "eMail",
-    "Phone",
-    "Emergency Contact",
-    "Matrikel Number",
-    "Major",
-    "Bonus Time",
-  ];
+  const fields = ["First Name", "Last Name", "eMail", "Phone", "Emergency Contact", "Matrikel Number", "Major", "Bonus Time"];
 
-  const keys: (keyof Student)[] = [
-    "first_name",
-    "last_name",
-    "email",
-    "phone",
-    "emergency_contact",
-    "matrikel_number",
-    "major",
-    "bonus_time",
-  ];
+  const keys: (keyof Student)[] = ["first_name", "last_name", "email", "phone", "emergency_contact", "matrikel_number", "major", "bonus_time"];
 
   const [studentData, setStudentData] = useState<Student[]>([]); // State for students data
   const [loading, setLoading] = useState<boolean>(true); // State for loading
 
+  const user = useAuth();
+
   // Fetch data from API
   const fetchStudents = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/students");
+      const response = await fetch("http://localhost:1337/api/students", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       const data = await response.json();
 
       // Map and modify data to extract the 'major' name
@@ -46,7 +36,7 @@ export default function StudentView() {
 
       setStudentData(updatedData); // Update state with the fetched students
     } catch (error) {
-      showToast({ message: `Error fetching students: ${error}.`, type: 'error' });
+      showToast({ message: `Error fetching students: ${error}.`, type: "error" });
     } finally {
       setLoading(false); // Set loading to false once data fetching is done
     }

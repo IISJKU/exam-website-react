@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import RecordForm from "../../RecordForm";
 import { showToast } from "../components/ToastMessage";
+import { useAuth } from "../../../hooks/AuthProvider";
 
 interface DataAdministrationProps {
   tableName: string;
@@ -20,6 +21,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
   const [editingRecord, setEditingRecord] = useState<DataRecord | null>(null);
   const [relationalData, setRelationalData] = useState<{ [key: string]: any[] }>({}); // Relational data for dropdowns
   const [booleanFields, setBooleanFields] = useState<string[]>([]); // Boolean fields
+  const user = useAuth();
 
   // Fetch data using fetch API, and filter by selected fields
   const fetchData = async () => {
@@ -28,14 +30,15 @@ export default function DataAdministration(props: DataAdministrationProps) {
     setIsLoading(true);
 
     try {
-      const query = props.selectedFields.length
-        ? props.selectedFields.map((field, index) => `fields[${index}]=${field}`).join("&")
-        : "";
-      const populateQuery = props.populateFields?.length
-        ? `&populate=${props.populateFields.map((field) => field.name).join(",")}`
-        : "";
+      const query = props.selectedFields.length ? props.selectedFields.map((field, index) => `fields[${index}]=${field}`).join("&") : "";
+      const populateQuery = props.populateFields?.length ? `&populate=${props.populateFields.map((field) => field.name).join(",")}` : "";
 
-      const response = await fetch(`http://localhost:1337/api/${props.tableName}?${query}${populateQuery}`);
+      const response = await fetch(`http://localhost:1337/api/${props.tableName}?${query}${populateQuery}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       const result = await response.json();
 
       if (result && Array.isArray(result)) {
@@ -84,7 +87,12 @@ export default function DataAdministration(props: DataAdministrationProps) {
   // Fetch relational data for dropdowns
   const fetchRelationalData = async () => {
     const relationalPromises = props.populateFields?.map(async (field) => {
-      const response = await fetch(`http://localhost:1337/api/${field.populateTable}`);
+      const response = await fetch(`http://localhost:1337/api/${field.populateTable}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       const result = await response.json();
 
       if (Array.isArray(result)) {
@@ -121,6 +129,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
       await fetch(`http://localhost:1337/api/${props.tableName}`, {
         method: "POST",
         headers: {
+          Authorization: `Bearer ${user.token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ data: record }),
@@ -136,6 +145,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
       await fetch(`http://localhost:1337/api/${props.tableName}/${record.id}`, {
         method: "PUT",
         headers: {
+          Authorization: `Bearer ${user.token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ data: record }),
@@ -151,6 +161,9 @@ export default function DataAdministration(props: DataAdministrationProps) {
     try {
       await fetch(`http://localhost:1337/api/${props.tableName}/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
       });
       fetchData();
     } catch (error) {
@@ -180,9 +193,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
 
   return (
     <div className="p-4 h-full">
-      <h1 className="text-2xl font-bold mb-4 capitalize">
-        Data Administration - {props.tableName.replace("-", " ")}
-      </h1>
+      <h1 className="text-2xl font-bold mb-4 capitalize">Data Administration - {props.tableName.replace("-", " ")}</h1>
 
       {isLoading ? (
         <p>Loading...</p>
@@ -212,7 +223,9 @@ export default function DataAdministration(props: DataAdministrationProps) {
                   {fields.map((field) => (
                     <td className="border px-4 py-2" key={`${record.id}-${field}`}>
                       {typeof record[field] === "boolean"
-                        ? record[field] ? "True" : "False"
+                        ? record[field]
+                          ? "True"
+                          : "False"
                         : typeof record[field] === "object" && record[field]
                         ? record[field].name
                         : record[field] || "N/A"}
@@ -251,7 +264,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
             displayField: field.displayField, // Pass display fields for concatenation
             options: relationalData[field.name] || [],
             selectedValue: editingRecord ? editingRecord[`${field.name}_id`] : null,
-          }))} 
+          }))}
         />
       </div>
     </div>

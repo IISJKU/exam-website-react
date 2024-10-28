@@ -13,9 +13,7 @@ interface ContentViewInterface<T> {
   onRowClick?: (id: number) => void; // Add this prop for handling row clicks
 }
 
-export default function ContentView<T extends { id?: number }>(
-  props: ContentViewInterface<T>
-) {
+export default function ContentView<T extends { id?: number; confirmed?: boolean }>(props: ContentViewInterface<T>) {
   const { t } = useTranslation();
   const [filtered, setFiltered] = useState<T[]>(props.data);
   const entriesPerPage = 20;
@@ -35,54 +33,49 @@ export default function ContentView<T extends { id?: number }>(
 
   const pages = Array.from({ length: numPages }, (_, i) => i + 1);
 
+  const className = "hover:bg-slate-300 even:bg-slate-200 odd:bg-slate-100 cursor-pointer ";
+  const dashedBorder = "hover:bg-red-100 border-dashed border-black border-2 bg-red-200  cursor-pointer ";
+
   return (
-    <div className="w-full h-full overflow-hidden p-5 select-none">
+    <div className="w-full h-full p-5 select-none">
       <div className="flex w-full content-center items-center ">
         <h2 className="text-4xl w-1/3 my-2 ">{t(props.title)}</h2>
         <SearchBar items={props.data} filter={setFilteredData} />
       </div>
       <div className="h-5"></div>
       <table className="w-full table-auto text-left border-2">
-        <SortableHeaders
-          fields={props.fields}
-          keys={props.keys}
-          elements={filtered}
-          setElements={setFilteredData}
-        />
+        <tbody key={"tableBody"}>
+          <SortableHeaders fields={props.fields} keys={props.keys} elements={filtered} setElements={setFilteredData} />
+          {entries.map((element: T, index) => (
+            <>
+              <tr
+                key={element.id + "" + index} // Add key for each row
+                className={element["confirmed"] != undefined ? (element["confirmed"] === false ? dashedBorder : className) : className}
+                onClick={() => {
+                  if (element.id && props.onRowClick) {
+                    props.onRowClick(element.id); // Use the onRowClick prop if available
+                  }
+                }}
+              >
+                {props.keys.map((key, index) => (
+                  <td key={(key as string) + index} className="pl-2">
+                    {typeof element[key] === "string"
+                      ? !isDate(element[key] as string)
+                        ? (element[key] as string)
+                        : formatDate(element[key] as string)
+                      : Array.isArray(element[key])
+                      ? (element[key] as string[]).join(", ")
+                      : typeof element[key] === "number"
+                      ? (element[key] as number)
+                      : " "}
+                  </td>
+                ))}
 
-        <tbody>
-          {entries.map((element: T) => (
-            <tr
-              key={element.id} // Add key for each row
-              className="hover:bg-slate-300 even:bg-slate-200 odd:bg-slate-100 cursor-pointer"
-              onClick={() => {
-                if (element.id && props.onRowClick) {
-                  props.onRowClick(element.id); // Use the onRowClick prop if available
-                }
-              }}
-            >
-              {props.keys.map((key) => (
-                <td key={key as string} className="pl-2">
-                  {typeof element[key] === "string" ? (
-                    !isDate(element[key] as string) ? (
-                      element[key] as string
-                    ) : (
-                      formatDate(element[key] as string)
-                    )
-                  ) : Array.isArray(element[key]) ? (
-                    (element[key] as string[]).join(", ")
-                  ) : typeof element[key] === "number" ? (
-                    element[key] as number
-                  ) : (
-                    " "
-                  )}
+                <td key="editButton">
+                  <button>Edit</button>
                 </td>
-              ))}
-
-              <td>
-                <button>Edit</button>
-              </td>
-            </tr>
+              </tr>
+            </>
           ))}
         </tbody>
       </table>

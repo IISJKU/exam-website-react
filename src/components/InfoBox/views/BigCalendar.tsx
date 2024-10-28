@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { Calendar, momentLocalizer, Views, Event } from "react-big-calendar";
 import moment from "moment";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { showToast } from "../components/ToastMessage";
 import Exam from "../../classes/Exam";
+import { useAuth } from "../../../hooks/AuthProvider";
 
 const localizer = momentLocalizer(moment);
 
@@ -14,6 +16,7 @@ export default function BigCalendar() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const user = useAuth();
 
   const { defaultDate, scrollToTime } = useMemo(
     () => ({
@@ -23,10 +26,25 @@ export default function BigCalendar() {
     []
   );
 
+  const location = useLocation();
+  useEffect(() => {
+    if (location.pathname.includes("calendar")) {
+      let path = location.pathname;
+      let dateString = path.substring(path.indexOf("/", path.indexOf("calendar")) + 1, path.length);
+
+      setDate(new Date(dateString));
+    }
+  }, [location]);
+
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/exams");
+      const response = await fetch("http://localhost:1337/api/exams", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       const data = await response.json();
       setExams(data);
     } catch (error) {

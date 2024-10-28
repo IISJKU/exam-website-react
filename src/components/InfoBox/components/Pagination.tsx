@@ -40,9 +40,11 @@ export default function Pagination(props: PaginationInterface) {
         p === "..." ? (
           <div className="w-7 aspect-square text-slate-700 text-center">{p}</div>
         ) : p === props.activePage ? (
-          <button className="w-7 aspect-square underline hover:opacity-60 border-2">{p}</button>
+          <button key={index} className="w-7 aspect-square underline hover:opacity-60 border-2">
+            {p}
+          </button>
         ) : (
-          <button onClick={() => props.callback(p)} className="w-7 aspect-square hover:opacity-60 text-slate-700 border-2">
+          <button key={index} onClick={() => props.callback(p)} className="w-7 aspect-square hover:opacity-60 text-slate-700 border-2">
             {p}
           </button>
         )

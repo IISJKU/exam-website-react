@@ -3,42 +3,28 @@ import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
+import { useAuth } from "../../../hooks/AuthProvider";
 
 export default function ExamView() {
   const navigate = useNavigate(); // Initialize navigate
-  const fields = [
-    "Exam Title",
-    "LVA Nr.",
-    "Date/Time",
-    "Duration",
-    "Mode",
-    "Student",
-    "Examiner",
-    "Institute",
-    "Status",
-    "Student Misc",
-  ];
-  
-  const keys: (keyof Exam)[] = [
-    "title",
-    "lva_num",
-    "date",
-    "duration",
-    "exam_mode",
-    "student",
-    "examiner",
-    "institute",
-    "status",
-    "student_misc",
-  ];
+  const fields = ["Exam Title", "LVA Nr.", "Date/Time", "Duration", "Mode", "Student", "Examiner", "Institute", "Status", "Student Misc"];
+
+  const keys: (keyof Exam)[] = ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute", "status", "student_misc"];
 
   const [exams, setExams] = useState([]); // Store exams
   const [loading, setLoading] = useState<boolean>(true); // State for loading
 
+  const user = useAuth();
+
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/exams");
+      const response = await fetch("http://localhost:1337/api/exams", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       const data = await response.json();
 
       // Modify the data array before setting it to exams
@@ -75,7 +61,7 @@ export default function ExamView() {
 
       setExams(updatedData); // Set the updated data to exams
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: 'error' });
+      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
     } finally {
       setLoading(false); // Set loading to false when the fetch is complete
     }

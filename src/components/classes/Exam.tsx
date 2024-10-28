@@ -1,3 +1,4 @@
+import EntryBase from "./EntryBase";
 import Examiner from "./Examiner";
 import ExamMode from "./ExamMode";
 import Institute from "./Institute";
@@ -11,13 +12,13 @@ export default class Exam {
   title!: string;
   date!: string;
   duration!: number;
-  student!: Student | number; // Student name or ID
-  tutor!: Tutor | number; // List of tutor names or ID
-  examiner!: Examiner | number; // List of examiners or ID
-  major!: Major | number; // Major name or ID
-  institute!: Institute | number; // Institute name or ID
-  exam_mode!: ExamMode | number; // ExamMode object or ID (number)
-  room!: Room | number; // ExamMode object or ID (number)
+  student!: number; // Student name or ID
+  tutor!: number; // List of tutor names or ID
+  examiner!: number; // List of examiners or ID
+  major!: number; // Major name or ID
+  institute!: number; // Institute name or ID
+  exam_mode!: number; // ExamMode object or ID (number)
+  room!: number; // ExamMode object or ID (number)
   lva_num!: number;
   student_misc!: string;
   status!: string;
@@ -28,4 +29,5 @@ export default class Exam {
   institute_id!: number;
   mode_id!: number;
   room_id!: number;
+  confirmed!: boolean;
 }

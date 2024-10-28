@@ -16,11 +16,14 @@ import Room from "../../classes/Room";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import Notification from "../../classes/Notification";
+import ComparisonField from "../components/ComparisonField";
 
-export default function ExamEditor() {
+export default function IndividualNotification() {
   const { id } = useParams(); // Get exam ID from URL params
 
   const { t } = useTranslation();
+
+  const [proposedExam, setProposedExam] = useState<Exam>(new Exam());
 
   const [loading, setLoading] = useState<boolean>(true);
   const [editMode, setEditMode] = useState<boolean>(false);
@@ -53,6 +56,68 @@ export default function ExamEditor() {
 
   // Fetch exam data based on ID from URL
   useEffect(() => {
+    const fetchNotification = async () => {
+      try {
+        const response = await fetch(`http://localhost:1337/api/notifications/${id}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        const data = (await response.json()).data;
+
+        let t = new Notification(data.attributes.information, data.attributes.seenBy, data.attributes.examName);
+
+        let propEx: Exam = JSON.parse(t.information);
+
+        setProposedExam(propEx);
+        let x = JSON.parse(t.information);
+
+        const examResponse = await fetch(`http://localhost:1337/api/exams/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        const examData = await examResponse.json();
+
+        console.log(examData);
+
+        if (examData) {
+          let ex = new Exam();
+
+          examData.forEach((element: Exam) => {
+            if (element.title == t.examName) {
+              ex = element;
+            }
+          });
+          if (ex) {
+            setExam(ex);
+            setTitle(ex.title);
+            setLvaNum(ex.lva_num);
+            setDate(ex.date);
+            setDuration(ex.duration);
+            setTutor(ex.tutor_id);
+            setStudent(ex.student_id);
+            setExaminer(ex.examiner_id);
+            setMajor(ex.major_id);
+            setInstitute(ex.institute_id);
+            setMode(ex.mode_id);
+            setRoom(ex.room_id);
+            setStatus(ex.status);
+          }
+        } else {
+          showToast({ message: "No exam data found", type: "error" });
+        }
+      } catch (error) {
+        showToast({ message: "Error fetching Notification", type: "error" });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     const fetchExam = async () => {
       try {
         const examResponse = await fetch(`http://localhost:1337/api/exams/${id}`, {
@@ -148,7 +213,8 @@ export default function ExamEditor() {
       }
     };
 
-    fetchExam();
+    fetchNotification();
+
     fetchDropdownOptions();
   }, [id]);
 
@@ -284,7 +350,7 @@ export default function ExamEditor() {
 
   return (
     <div className="m-5">
-      <EditField title={t("Exam Title")} editMode={editMode} text={title} hideTitle={false} onChange={(e) => setTitle(e.target.value)} />
+      <div className="text-4xl font-bold">{t("Proposed Changes")}</div>
 
       <EditField
         title={t("LVA Num")}
@@ -304,68 +370,39 @@ export default function ExamEditor() {
         onChange={(e) => setDuration(Number(e.target.value))}
       />
 
-      <DropdownWithSearch
+      <ComparisonField
         label={"Student"}
         options={dropdownOptions(options.students, "first_name", "last_name")}
         value={student ?? ""}
-        onChange={(newValue) => setStudent(Number(newValue))}
-        placeholder={t("Search student...")}
-        disabled={!editMode}
+        proposedVal={proposedExam.student_id}
       />
 
-      <DropdownWithSearch
+      <ComparisonField
         label={"Tutor"}
         options={dropdownOptions(options.tutors, "first_name", "last_name")}
         value={tutor ?? ""}
-        onChange={(newValue) => setTutor(Number(newValue))}
-        placeholder={t("Search tutors...")}
-        disabled={!editMode}
+        proposedVal={proposedExam.tutor_id}
       />
 
-      <DropdownWithSearch
+      <ComparisonField
         label={t("Examiner")}
         options={dropdownOptions(options.examiners, "first_name", "last_name")}
         value={examiner ?? ""}
-        onChange={(newVal) => setExaminer(Number(newVal))}
-        placeholder={t("Search examiner...")}
-        disabled={!editMode}
+        proposedVal={proposedExam.examiner_id}
       />
 
-      <DropdownWithSearch
-        label={t("Major")}
-        options={dropdownOptions(options.majors, "name")}
-        value={major ?? ""}
-        onChange={(newVal) => setMajor(Number(newVal))}
-        placeholder={t("Search majors...")}
-        disabled={!editMode}
-      />
+      <ComparisonField label={t("Major")} options={dropdownOptions(options.majors, "name")} value={major ?? ""} proposedVal={proposedExam.major_id} />
 
-      <DropdownWithSearch
+      <ComparisonField
         label={t("Institute")}
         options={dropdownOptions(options.institutes, "name")}
         value={institute ?? ""}
-        onChange={(newVal) => setInstitute(Number(newVal))}
-        placeholder={t("Search institutes...")}
-        disabled={!editMode}
+        proposedVal={proposedExam.institute_id}
       />
 
-      <DropdownWithSearch
-        label={t("Mode")}
-        options={dropdownOptions(options.modes, "name")}
-        value={mode ?? ""}
-        onChange={(newVal) => setMode(Number(newVal))}
-        placeholder={t("Search modes...")}
-        disabled={!editMode}
-      />
+      <ComparisonField label={t("Mode")} options={dropdownOptions(options.modes, "name")} value={mode ?? ""} proposedVal={proposedExam.mode_id} />
 
-      <DropdownWithSearch
-        label={t("Room")}
-        options={dropdownOptions(options.rooms, "name")}
-        value={room ?? ""}
-        onChange={(newVal) => setRoom(Number(newVal))}
-        placeholder={t("Search rooms...")}
-        disabled={!editMode}
-      />
+      <ComparisonField label={t("Room")} options={dropdownOptions(options.rooms, "name")} value={room ?? ""} proposedVal={proposedExam.room_id} />
 
       <EditField title={"Status"} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus(e.target.value)} />
 
@@ -376,20 +413,17 @@ export default function ExamEditor() {
         }}
         className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
       >
-        {editMode ? t("Save") : t("Edit")}
+        {t("Accept Changes")}
       </button>
-      {editMode ? (
-        <button
-          className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline"
-          onClick={() => {
-            setEditMode(!editMode);
-          }}
-        >
-          Cancel
-        </button>
-      ) : (
-        <></>
-      )}
+      <button
+        onClick={() => {
+          setEditMode(!editMode);
+          if (editMode) handleUpdate();
+        }}
+        className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
+      >
+        {t("Discard")}
+      </button>
     </div>
   );
 }

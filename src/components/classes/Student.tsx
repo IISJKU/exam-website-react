@@ -1,4 +1,6 @@
-export default class Student {
+import EntryBase from "./EntryBase";
+
+export default class Student extends EntryBase {
   id!: number;
   first_name!: string;
   last_name!: string;
@@ -8,6 +10,10 @@ export default class Student {
   matrikel_number!: string;
   bonus_time!: number;
   misc!: string;
-  major!: string| number;
+  major!: string | number;
   major_id!: number;
+
+  getName(): string {
+    return this.first_name + " " + this.last_name;
+  }
 }
