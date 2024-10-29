@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import RecordForm from "../../RecordForm";
 import { showToast } from "../components/ToastMessage";
 import { useAuth } from "../../../hooks/AuthProvider";
@@ -6,6 +6,7 @@ import { useAuth } from "../../../hooks/AuthProvider";
 interface DataAdministrationProps {
   tableName: string;
   selectedFields: string[]; // The fields to display
+  optionalFields?: string[]; 
   populateFields?: { name: string; populateTable: string; displayField: string[] }[]; // Relational fields, their tableName, and the display fields
 }
 
@@ -23,14 +24,15 @@ export default function DataAdministration(props: DataAdministrationProps) {
   const [booleanFields, setBooleanFields] = useState<string[]>([]); // Boolean fields
   const user = useAuth();
 
-  // Fetch data using fetch API, and filter by selected fields
   const fetchData = async () => {
     setData([]);
     setFields([]);
     setIsLoading(true);
 
     try {
-      const query = props.selectedFields.length ? props.selectedFields.map((field, index) => `fields[${index}]=${field}`).join("&") : "";
+      // Exclude 'password' from selectedFields if tableName is 'users'
+      const filteredFields = props.tableName === "users" ? props.selectedFields.filter(field => field !== "password") : props.selectedFields;
+      const query = filteredFields.length ? filteredFields.map((field, index) => `fields[${index}]=${field}`).join("&") : "";
       const populateQuery = props.populateFields?.length ? `&populate=${props.populateFields.map((field) => field.name).join(",")}` : "";
 
       const response = await fetch(`http://localhost:1337/api/${props.tableName}?${query}${populateQuery}`, {
@@ -47,7 +49,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
 
           // Identify boolean fields dynamically
           const detectedBooleanFields: string[] = [];
-          props.selectedFields.forEach((field) => {
+          filteredFields.forEach((field) => {
             if (typeof item[field] === "boolean") {
               detectedBooleanFields.push(field);
             }
@@ -73,8 +75,11 @@ export default function DataAdministration(props: DataAdministrationProps) {
           return record;
         });
 
+        // Add 'password' back to fields for users form, if applicable
+        const finalFields = props.tableName === "users" ? [...filteredFields, "password"] : filteredFields;
+
         setData(fetchedData);
-        setFields(props.selectedFields);
+        setFields(finalFields);  // Include 'password' for form fields if table is 'users'
       } else {
         showToast({ message: `Invalid API response: ${result}.`, type: "error" });
       }
@@ -83,6 +88,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
     }
     setIsLoading(false);
   };
+
 
   // Fetch relational data for dropdowns
   const fetchRelationalData = async () => {
@@ -95,10 +101,13 @@ export default function DataAdministration(props: DataAdministrationProps) {
       });
       const result = await response.json();
 
-      if (Array.isArray(result)) {
+      // fix user roles update issue 
+      const records = result.roles || result; // If roles array exists, use it; otherwise use result
+
+      if (Array.isArray(records)) {
         return {
           fieldName: field.name,
-          data: result.map((item: any) => ({
+          data: records.map((item: any) => ({
             id: item.id,
             // Concatenate display fields for dropdown options
             displayValue: field.displayField
@@ -126,13 +135,15 @@ export default function DataAdministration(props: DataAdministrationProps) {
 
   const addRecord = async (record: DataRecord) => {
     try {
+       // fix user add issue 
+       const bodyContent = props.tableName == "users" ? record : { data: record };
       await fetch(`http://localhost:1337/api/${props.tableName}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${user.token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ data: record }),
+        body: JSON.stringify(bodyContent),
       });
       fetchData();
     } catch (error) {
@@ -141,14 +152,16 @@ export default function DataAdministration(props: DataAdministrationProps) {
   };
 
   const updateRecord = async (record: DataRecord) => {
-    try {
+    try { 
+      // fix user roles update issue 
+      const bodyContent = props.tableName == "users" ? record : { data: record };
       await fetch(`http://localhost:1337/api/${props.tableName}/${record.id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${user.token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ data: record }),
+        body: JSON.stringify(bodyContent),
       });
       fetchData();
     } catch (error) {
@@ -176,6 +189,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
     if (props.populateFields?.length) {
       fetchRelationalData();
     }
+
   }, [props.tableName, props.selectedFields, props.populateFields]);
 
   const handleEditClick = (record: DataRecord) => {
@@ -258,6 +272,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
           onSubmit={handleFormSubmit}
           onCancel={() => setEditingRecord(null)}
           fields={fields}
+          optionalFields={props.optionalFields} 
           booleanFields={booleanFields}
           relationalFields={props.populateFields?.map((field) => ({
             name: field.name,

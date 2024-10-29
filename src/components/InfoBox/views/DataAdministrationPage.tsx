@@ -8,16 +8,19 @@ const tableConfigurations = {
     students: {
       tableName: "students",
       selectedFields: ["first_name", "last_name", "email", "matrikel_number", "phone", "emergency_contact", "bonus_time", "misc"],
+      optionalFields: ["misc"],
       populateFields: [{ name: "major", populateTable: "majors", displayField: ["name"] }],
     },
     tutors: {
       tableName: "tutors",
       selectedFields: ["first_name", "last_name", "email", "matrikel_number", "phone"],
+      optionalFields: [],
       populateFields: [],
     },
     exams: {
       tableName: "exams",
       selectedFields: ["title", "date", "duration", "lva_num", "status"],
+      optionalFields: [],
       populateFields: [
         { name: "student", populateTable: "students", displayField: ["matrikel_number"] },
         { name: "tutor", populateTable: "tutors", displayField: ["first_name", "last_name"] },
@@ -30,32 +33,40 @@ const tableConfigurations = {
     examiners: {
       tableName: "examiners",
       selectedFields: ["first_name", "last_name", "email", "phone"],
+      optionalFields: [],
       populateFields: [],
     },
     exam_modes: {
       tableName: "exam-modes",
       selectedFields: ["name", "description"],
+      optionalFields: ["description"],
       populateFields: [],
     },
     institutes: {
       tableName: "institutes",
       selectedFields: ["name", "abbreviation", "email", "faculty", "city", "department"],
+      optionalFields: ["city", "department"],
       populateFields: [],
     },
     majors: {
       tableName: "majors",
       selectedFields: ["name", "abbreviation", "faculty"],
+      optionalFields: [],
       populateFields: [],
     },
     rooms: {
       tableName: "rooms",
       selectedFields: ["name", "building", "capacity", "location", "isAvailable"],
+      optionalFields: [],
       populateFields: [],
     },
     users: {
       tableName: "users",
-      selectedFields: ["username", "email", "provider", "confirmed", "blocked"],
-      populateFields: [],
+      selectedFields: ["username", "email", "provider", "confirmed", "blocked", "password"],
+      optionalFields: ["provider","password"],
+      populateFields: [
+        { name: "role", populateTable: "users-permissions/roles", displayField: ["name"] },
+      ],
     },
 };
 
@@ -99,6 +110,7 @@ export default function DataAdministrationPage() {
         <DataAdministration
           tableName={config.tableName}
           selectedFields={config.selectedFields}
+          optionalFields={config.optionalFields}
           populateFields={config.populateFields}
         />
       </div>

@@ -5,6 +5,7 @@ interface RecordFormProps {
   onSubmit: (record: DataRecord) => void;
   onCancel: () => void;
   fields: string[]; // Fields to render in the form
+  optionalFields?: string[];
   booleanFields?: string[]; // Boolean fields to render as dropdowns
   relationalFields?: { name: string; options: any[], selectedValue?: any, displayField: string[] }[]; // Relational fields with options and displayField as array
 }
@@ -53,6 +54,7 @@ export default function RecordForm(props: RecordFormProps) {
   return (
     <form onSubmit={handleSubmit} className="mt-4">
       {props.fields.map((field) => {
+        const isRequired = !(props.optionalFields ?? []).includes(field);
         // Check if the field is a boolean field
         if (props.booleanFields?.includes(field)) {
           return (
@@ -65,7 +67,7 @@ export default function RecordForm(props: RecordFormProps) {
                 value={formData[field] !== undefined ? String(formData[field]) : ""}
                 onChange={handleChange}
                 className="border border-gray-300 p-2 w-full rounded-md"
-                required
+                required={isRequired}
               >
                 <option value="">Select {field}</option>
                 <option value="true">True</option>
@@ -87,7 +89,7 @@ export default function RecordForm(props: RecordFormProps) {
               value={formData[field] || ""}
               onChange={handleChange}
               className="border border-gray-300 p-2 w-full rounded-md"
-              required
+              required={isRequired} // Set required dynamically based on optionalFields
             />
           </div>
         );
