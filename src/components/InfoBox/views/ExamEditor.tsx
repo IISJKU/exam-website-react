@@ -5,7 +5,7 @@ import DateField from "../components/DateField";
 import Exam from "../../classes/Exam";
 import moment from "moment";
 import { showToast } from "../components/ToastMessage";
-import DropdownWithSearch from "../components/DropdownSearch";
+import DropdownWithSearch from "../components/DropdownWithSearch";
 import Student from "../../classes/Student";
 import Tutor from "../../classes/Tutor";
 import Examiner from "../../classes/Examiner";
@@ -305,6 +305,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
+        tableName = "students"
         label={"Student"}
         options={dropdownOptions(options.students, "first_name", "last_name")}
         value={student ?? ""}
@@ -314,6 +315,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
+        tableName = "tutors"
         label={"Tutor"}
         options={dropdownOptions(options.tutors, "first_name", "last_name")}
         value={tutor ?? ""}
@@ -323,6 +325,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
+        tableName = "examiners"
         label={t("Examiner")}
         options={dropdownOptions(options.examiners, "first_name", "last_name")}
         value={examiner ?? ""}
@@ -332,6 +335,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
+        tableName = "majors"
         label={t("Major")}
         options={dropdownOptions(options.majors, "name")}
         value={major ?? ""}
@@ -341,6 +345,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
+        tableName = "institutes"
         label={t("Institute")}
         options={dropdownOptions(options.institutes, "name")}
         value={institute ?? ""}
@@ -350,6 +355,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
+        tableName = "exam-modes"
         label={t("Mode")}
         options={dropdownOptions(options.modes, "name")}
         value={mode ?? ""}
@@ -359,6 +365,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
+        tableName = "rooms"
         label={t("Room")}
         options={dropdownOptions(options.rooms, "name")}
         value={room ?? ""}

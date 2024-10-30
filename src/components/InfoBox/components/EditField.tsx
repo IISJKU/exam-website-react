@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface EditFieldProps {
@@ -16,14 +16,19 @@ export default function EditField(props: EditFieldProps) {
   let classList = "";
   let additionalText = "";
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  // Synchronize internal state with props.text whenever it changes
+  useEffect(() => {
+    setValue(props.text);
+  }, [props.text]);
+
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setValue(e.target.value);
     if (props.onChange) {
       props.onChange(e); // Call the onChange prop if provided
     }
   }
 
-  if (props.hideTitle != undefined) hide = props.hideTitle;
+  if (props.hideTitle !== undefined) hide = props.hideTitle;
 
   if (
     (props.title === "First Name" ||
@@ -36,14 +41,12 @@ export default function EditField(props: EditFieldProps) {
 
   return (
     <div className={classList}>
-      {props.title != undefined && (props.editMode || !hide) ? (
+      {props.title && (props.editMode || !hide) && (
         <div className="font-bold">{t(props.title) + " "}</div>
-      ) : (
-        <></>
       )}
       {props.editMode ? (
         <input
-          onChange={(e) => handleChange(e)}
+          onChange={handleChange}
           className="mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black px-1"
           type="text"
           value={value}

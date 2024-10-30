@@ -19,6 +19,11 @@ import IndividualNotification from "./components/InfoBox/views/IndividualNotific
 
 import AuthProvider from "./hooks/AuthProvider";
 import NotificationView from "./components/InfoBox/views/NotificationView";
+import StudentLayout from "./components/StudentLayout";
+import RequestExam from "./components/InfoBox/views/RequestExam";
+import StudentExamView from "./components/InfoBox/views/StudentExamView";
+import StudentExamEditor from "./components/InfoBox/views/StudentExamEditor";
+import StudentBigCalender from "./components/InfoBox/views/StudentBigCalendar";
 
 export default function App() {
   return (
@@ -46,7 +51,14 @@ export default function App() {
               <Route path="/admin/exams/:id" element={<ExamEditor />} />
               <Route path="/admin/data-administration" element={<TableLinks />} />
               <Route path="/admin/data-administration/:tableName" element={<DataAdministrationPage />} />
-              <Route path="admin/calendar/:year/:month/:day" element={<BigCalendar />} /> {/* BigCalendar Route */}
+              <Route path="/admin/calendar/:year/:month/:day" element={<BigCalendar />} /> {/* BigCalendar Route */}
+            </Route>
+
+            <Route element={<StudentLayout />}>
+              <Route path="/student/request-exam" element={<RequestExam />} />
+              <Route path="/student/all-exams" element={<StudentExamView />} />
+              <Route path="/student/exams/:id" element={<StudentExamEditor />} />
+              <Route path="/student/calendar/:year/:month/:day" element={<StudentBigCalender />} />
             </Route>
           </Routes>
 

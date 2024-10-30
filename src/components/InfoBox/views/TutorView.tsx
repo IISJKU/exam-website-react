@@ -10,9 +10,9 @@ export default function TutorView() {
 
   const user = useAuth();
 
-  const fields = ["First Name", "Last Name", "eMail", "Phone", "Matrikel Number", "Course"];
+  const fields = ["First Name", "Last Name", "Phone", "Matrikel Number", "Course"];
 
-  const keys: (keyof Tutor)[] = ["first_name", "last_name", "email", "phone", "matrikel_number", "course"];
+  const keys: (keyof Tutor)[] = ["first_name", "last_name", "phone", "matrikel_number", "course"];
 
   const [tutors, setTutors] = useState<Tutor[]>([]); // Type tutors as Tutor array
   const [loading, setLoading] = useState<boolean>(true); // State for loading

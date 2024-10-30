@@ -4,7 +4,7 @@ import EditField from "../components/EditField";
 import { showToast } from "../components/ToastMessage";
 import Student from "../../classes/Student";
 import Major from "../../classes/Major";
-import DropdownWithSearch from "../components/DropdownSearch";
+import DropdownWithSearch from "../components/DropdownWithSearch";
 
 import { useAuth } from "../../../hooks/AuthProvider";
 
@@ -16,7 +16,6 @@ export default function IndividualStudent() {
   const [student, setStudent] = useState<Student | null>(null); // Store student data
   const [first_name, setFirstName] = useState<string>("");
   const [last_name, setLastName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [matrikel_number, setMatrikelNum] = useState<string>("");
   const [emergency_contact, setEmergencyContact] = useState<string>("");
@@ -43,7 +42,6 @@ export default function IndividualStudent() {
         setStudent(studentData);
         setFirstName(studentData.first_name);
         setLastName(studentData.last_name);
-        setEmail(studentData.email);
         setPhone(studentData.phone);
         setMatrikelNum(studentData.matrikel_number);
         setEmergencyContact(studentData.emergency_contact);
@@ -82,7 +80,6 @@ export default function IndividualStudent() {
     const data: Partial<Student> = {
       first_name,
       last_name,
-      email,
       phone,
       emergency_contact,
       matrikel_number,
@@ -129,10 +126,10 @@ export default function IndividualStudent() {
     <div className="m-10">
       <EditField title="First Name" editMode={editMode} text={first_name} onChange={(e) => setFirstName(e.target.value)} />
       <EditField title="Last Name" editMode={editMode} text={last_name} onChange={(e) => setLastName(e.target.value)} />
-      <EditField title="Email" editMode={editMode} text={email} onChange={(e) => setEmail(e.target.value)} />
       <EditField title="Phone" editMode={editMode} text={phone} onChange={(e) => setPhone(e.target.value)} />
       <EditField title="Matrikel Number" editMode={editMode} text={matrikel_number} onChange={(e) => setMatrikelNum(e.target.value)} />
       <DropdownWithSearch
+        tableName = "majors"
         label="Major"
         options={majorOptions}
         value={major ?? ""}

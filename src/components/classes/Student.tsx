@@ -4,7 +4,6 @@ export default class Student extends EntryBase {
   id!: number;
   first_name!: string;
   last_name!: string;
-  email!: string;
   phone!: string;
   emergency_contact!: string;
   matrikel_number!: string;

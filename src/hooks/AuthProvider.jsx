@@ -7,10 +7,11 @@ const url = "http://localhost:1337";
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("site") || "");
+  const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
   const userData = async () => {
-    const response = await fetch(url + "/api/users/me?populate=role", {
+    const response = await fetch(url + "/api/users/me?populate=*", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,7 +23,7 @@ const AuthProvider = ({ children }) => {
 
   const loginAction = async (data) => {
     try {
-      const response = await fetch(url + "/api/auth/local", {
+      const response = await fetch(url + "/api/auth/local?populate=*", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,11 +36,14 @@ const AuthProvider = ({ children }) => {
         //localStorage.setItem("site", res.jwt);
 
         const userRes = await userData();
-
         if (userRes) {
           setUser(userRes.username);
           if (userRes.role.name == "Admin") {
+            setUserId(userRes.id)
             navigate("/admin/exams");
+          } else if (userRes.role.name == "Student") {
+            setUserId(userRes.student.id)
+            navigate("/student/all-exams");
           }
         }
 
@@ -53,12 +57,13 @@ const AuthProvider = ({ children }) => {
 
   const logOut = () => {
     setUser(null);
+    setUserId(null);
     setToken("");
     localStorage.removeItem("site");
     navigate("/");
   };
 
-  return <AuthContext.Provider value={{ token, user, loginAction, logOut }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ token, user, userId ,loginAction, logOut }}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;

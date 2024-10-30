@@ -3,6 +3,7 @@ import React from "react";
 
 interface DateFieldProps {
   editMode: boolean;
+  title?: string;
   dateValue: string; // The full ISO date-time string
   onDateChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onTimeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -15,6 +16,7 @@ export default function DateField(props: DateFieldProps) {
 
   return (
     <div>
+      {props.title !== undefined ? <div className="font-bold">{props.title + " "}</div> : null}
       {props.editMode ? (
         <div>
           {/* Date Input */}
@@ -22,14 +24,14 @@ export default function DateField(props: DateFieldProps) {
             type="date"
             value={moment(props.dateValue).utc().format("YYYY-MM-DD")} // Input expects YYYY-MM-DD format
             onChange={props.onDateChange}
-            className="border-2 border-black p-1"
+            className="mb-2 border-2 border-black p-1"
           />
           {/* Time Input */}
           <input
             type="time"
             value={formattedTime}
             onChange={props.onTimeChange}
-            className="border-2 border-black p-1 ml-2"
+            className="mb-2 border-2 border-black p-1 ml-2"
           />
         </div>
       ) : (

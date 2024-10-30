@@ -13,7 +13,6 @@ export default function IndividualTutor() {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [first_name, setFirstName] = useState<string>("");
   const [last_name, setLastName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [matrikel_number, setMatrikelNum] = useState<string>("");
   const [course, setCourse] = useState<string>("");
@@ -35,7 +34,6 @@ export default function IndividualTutor() {
         setLoading(false); // Stop loading
         setFirstName(tutorData.first_name);
         setLastName(tutorData.last_name);
-        setEmail(tutorData.email);
         setPhone(tutorData.phone);
         setMatrikelNum(tutorData.matrikel_number);
         setCourse(tutorData.course);
@@ -56,7 +54,6 @@ export default function IndividualTutor() {
     const data: Partial<Tutor> = {
       first_name,
       last_name,
-      email,
       phone,
       matrikel_number,
       course,
@@ -96,7 +93,6 @@ export default function IndividualTutor() {
     <div className="m-10">
       <EditField title="First Name" editMode={editMode} text={first_name} onChange={(e) => setFirstName(e.target.value)} />
       <EditField title="Last Name" editMode={editMode} text={last_name} onChange={(e) => setLastName(e.target.value)} />
-      <EditField title="EMail" editMode={editMode} text={email} hideTitle={false} onChange={(e) => setEmail(e.target.value)} />
       <EditField title="Phone" editMode={editMode} text={phone} hideTitle={false} onChange={(e) => setPhone(e.target.value)} />
       <EditField title="Matrikel Nr" editMode={editMode} text={matrikel_number} hideTitle={false} onChange={(e) => setMatrikelNum(e.target.value)} />
       <EditField title="Course" editMode={editMode} text={course} hideTitle={false} onChange={(e) => setCourse(e.target.value)} />

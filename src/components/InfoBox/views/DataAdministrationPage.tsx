@@ -7,13 +7,13 @@ import { useEffect } from "react";
 const tableConfigurations = {
     students: {
       tableName: "students",
-      selectedFields: ["first_name", "last_name", "email", "matrikel_number", "phone", "emergency_contact", "bonus_time", "misc"],
+      selectedFields: ["first_name", "last_name", "matrikel_number", "phone", "emergency_contact", "bonus_time", "misc"],
       optionalFields: ["misc"],
       populateFields: [{ name: "major", populateTable: "majors", displayField: ["name"] }],
     },
     tutors: {
       tableName: "tutors",
-      selectedFields: ["first_name", "last_name", "email", "matrikel_number", "phone"],
+      selectedFields: ["first_name", "last_name", "matrikel_number", "phone"],
       optionalFields: [],
       populateFields: [],
     },

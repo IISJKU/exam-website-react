@@ -5,7 +5,7 @@ import DateField from "../components/DateField";
 import Exam from "../../classes/Exam";
 import moment from "moment";
 import { showToast } from "../components/ToastMessage";
-import DropdownWithSearch from "../components/DropdownSearch";
+import DropdownWithSearch from "../components/DropdownWithSearch";
 import Student from "../../classes/Student";
 import Tutor from "../../classes/Tutor";
 import Examiner from "../../classes/Examiner";

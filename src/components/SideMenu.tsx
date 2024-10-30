@@ -58,7 +58,7 @@ export default function SideMenu() {
         {t("Data Administration")}
       </button>
 
-      {/* Calendar Component (assuming it has its own logic for navigation) */}
+      {/* Calendar Component */}
       <Calendar />
     </div>
   );
