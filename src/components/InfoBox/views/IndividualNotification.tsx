@@ -1,7 +1,6 @@
 import { useState, useEffect, useTransition } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // Import useParams and useNavigate
-import EditField from "../components/EditField";
-import DateField from "../components/DateField";
+
 import Exam from "../../classes/Exam";
 import moment from "moment";
 import { showToast } from "../components/ToastMessage";
@@ -15,9 +14,8 @@ import Institute from "../../classes/Institute";
 import Room from "../../classes/Room";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
-import Notification from "../../classes/Notification";
+import Notification, { NotificationType } from "../../classes/Notification";
 import ComparisonField from "../components/ComparisonField";
-import EntryBase from "../../classes/EntryBase";
 
 export default function IndividualNotification() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -25,7 +23,7 @@ export default function IndividualNotification() {
   const { t } = useTranslation();
 
   const [proposedExam, setProposedExam] = useState<Exam>(new Exam());
-
+  const navigate = useNavigate(); // Initialize useNavigate for navigation
   const [loading, setLoading] = useState<boolean>(true);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [exam, setExam] = useState<Exam | null>(null); // Store exam data
@@ -55,25 +53,80 @@ export default function IndividualNotification() {
     rooms: [] as Room[],
   });
 
+  const convertToExam = (partial: Partial<Exam>): Exam => {
+    let ex = new Exam();
+
+    if (partial.title != undefined) ex.title = partial.title;
+    if (partial.student_id != undefined) ex.student_id = partial.student_id;
+    if (partial.tutor_id != undefined) ex.tutor_id = partial.tutor_id;
+    if (partial.room_id != undefined) ex.room_id = partial.room_id;
+    if (partial.examiner_id != undefined) ex.examiner_id = partial.examiner_id;
+    if (partial.duration != undefined) ex.duration = partial.duration;
+    if (partial.date != undefined) ex.date = partial.date;
+    if (partial.institute_id != undefined) ex.institute_id = partial.institute_id;
+    if (partial.lva_num != undefined) ex.lva_num = partial.lva_num;
+    if (partial.status != undefined) ex.status = partial.status;
+    if (partial.major_id != undefined) ex.major_id = partial.major_id;
+
+    if (partial.exam_mode != undefined) ex.exam_mode = partial.exam_mode;
+
+    return ex;
+  };
+
   // Fetch exam data based on ID from URL
   useEffect(() => {
     const fetchNotification = async () => {
       try {
-        const response = await fetch(`http://localhost:1337/api/notifications/${id}`, {
-          method: "GET",
+        const response = await fetch("http://localhost:1337/api/notifications", {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         });
-
         const data = (await response.json()).data;
 
-        let t = new Notification(data.attributes.information, data.attributes.seenBy, data.attributes.examName);
+        let proposedExams: Notification[] = [];
 
-        let propEx: Exam = JSON.parse(t.information);
+        let exam_id = 0;
 
-        setProposedExam(propEx);
-        let x = JSON.parse(t.information);
+        data.forEach((element: any) => {
+          if (element.id == Number(id)) {
+            exam_id = Number(element.attributes.exam_id);
+          }
+        });
+
+        data.forEach((element: any) => {
+          if (element.attributes.exam_id == Number(exam_id)) {
+            let t = new Notification(element.attributes.information, element.attributes.oldInformation, element.attributes.seenBy, element.attributes.exam_id);
+            t.sentBy = element.attributes.sentBy;
+
+            if (element.attributes.type == NotificationType.confirmChange || element.attributes.type == NotificationType.confirmChange) proposedExams = [];
+            else proposedExams.push(t);
+          }
+        });
+
+        //sort out old ones, that are preceded by either a
+
+        interface LooseObject {
+          [key: string]: any;
+        }
+
+        const propEx: Partial<Exam> = {};
+
+        for (let i = 0; i < proposedExams.length; i++) {
+          const examInfo = proposedExams[i].information;
+          const parsedExam = JSON.parse(examInfo) as Exam;
+
+          Object.entries(parsedExam).forEach(([key, value]) => {
+            // Check if key is a valid property of Exam
+            if (value != undefined) {
+              propEx[key as keyof Exam] = value; // Type assertion to keyof Exam
+            }
+          });
+        }
+
+        let converted = convertToExam(propEx);
+
+        setProposedExam(converted);
 
         const examResponse = await fetch(`http://localhost:1337/api/exams/`, {
           method: "GET",
@@ -88,10 +141,11 @@ export default function IndividualNotification() {
           let ex = new Exam();
 
           examData.forEach((element: Exam) => {
-            if (element.title == t.examName) {
+            if (Number(element.id) == Number(exam_id)) {
               ex = element;
             }
           });
+
           if (ex) {
             setExam(ex);
             setTitle(ex.title);
@@ -112,40 +166,6 @@ export default function IndividualNotification() {
         }
       } catch (error) {
         showToast({ message: "Error fetching Notification", type: "error" });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchExam = async () => {
-      try {
-        const examResponse = await fetch(`http://localhost:1337/api/exams/${id}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
-        const examData = await examResponse.json();
-
-        if (examData) {
-          setExam(examData);
-          setTitle(examData.title);
-          setLvaNum(examData.lva_num);
-          setDate(examData.date);
-          setDuration(examData.duration);
-          setTutor(examData.tutor_id);
-          setStudent(examData.student_id);
-          setExaminer(examData.examiner_id);
-          setMajor(examData.major_id);
-          setInstitute(examData.institute_id);
-          setMode(examData.mode_id);
-          setRoom(examData.room_id);
-          setStatus(examData.status);
-        } else {
-          showToast({ message: "No exam data found", type: "error" });
-        }
-      } catch (error) {
-        showToast({ message: "Error fetching exam data", type: "error" });
       } finally {
         setLoading(false);
       }
@@ -217,122 +237,62 @@ export default function IndividualNotification() {
     fetchDropdownOptions();
   }, [id]);
 
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedDate = event.target.value;
-    const currentTime = moment.utc(date).format("HH:mm:ss"); // Preserve time, use UTC
+  const handleUpdate = async (accept: boolean) => {
+    if (accept) {
+      //reset notif, set to passive & apply changes
 
-    const updatedDate = moment(`${selectedDate} ${currentTime}`, "YYYY-MM-DD HH:mm:ss").utc().toISOString(); // Ensure toISOString in UTC
-    setDate(updatedDate);
-  };
-
-  const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedTime = event.target.value;
-    const currentDate = moment.utc(date).format("YYYY-MM-DD"); // Preserve date, use UTC
-
-    const updatedDate = moment(`${currentDate}T${selectedTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString(); // Convert to ISO in UTC
-    setDate(updatedDate);
-  };
-
-  //if any field was changed, this should return false
-  function compareField(field: string, value: number | undefined) {
-    const key = field as keyof Exam;
-
-    if (exam != null && exam[key] != undefined) {
-      if (typeof exam[key] === "number") {
-        if (exam[key] != value) return false;
-        // @ts-ignore
-      } else if (exam[key].id != value) return false;
-    } else return false;
-
-    return true;
-  }
-
-  function examChanged() {
-    let t = "";
-
-    if (exam != null) {
-      if (title != exam.title) t = t + ' "title" : "' + title + '",';
-      if (lva_num != exam.lva_num) t = t + ' "lva_num" : "' + lva_num + '",';
-      if (date != exam.date) t = t + ' "date" : "' + date + '",';
-      if (duration != exam.duration) t = t + ' "duration" : "' + duration + '",';
-      if (status != exam.status) t = t + ' "status" : "' + status + '",';
-
-      if (!compareField("student", student)) t = t + ' "student_id" : "' + student + '",';
-      if (!compareField("tutor", tutor)) t = t + ' "tutor_id" : "' + tutor + '",';
-      if (!compareField("room", room)) t = t + ' "room_id" : "' + room + '",';
-      if (!compareField("examiner", examiner)) t = t + ' "examiner_id" : "' + examiner + '",';
-      if (!compareField("major", major)) t = t + ' "major_id" : "' + major + '",';
-      if (!compareField("institute", institute)) t = t + ' "institute_id" : "' + institute + '",';
-      if (!compareField("exam_mode", mode)) t = t + ' "exam_mode" : "' + mode + '",';
-    }
-
-    if (t != "") {
-      t = t.substring(0, t.length - 1);
-      t = "{" + t + "}";
-    }
-    return t;
-  }
-
-  const handleUpdate = async () => {
-    const data: Partial<Exam> = {
-      title,
-      date,
-      duration,
-      student,
-      tutor,
-      examiner,
-      major,
-      institute,
-      exam_mode: mode,
-      room,
-      lva_num,
-      status,
-    };
-
-    try {
-      const response = await fetch(`http://localhost:1337/api/exams/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ data }),
-      });
-
-      let change = examChanged();
-      if (change != "") {
-        const notify = await fetch(`http://localhost:1337/api/notifications`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ data: new Notification(change, user.user, exam?.title) }),
-        });
-
-        if (!notify.ok) {
-          const errorData = await response.json();
-          showToast({
-            message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
-            type: "error",
+      try {
+        if (exam != null) {
+          const response = await fetch(`http://localhost:1337/api/exams/${exam.id}`, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ data: proposedExam }),
           });
-          return;
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            showToast({
+              message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+              type: "error",
+            });
+            return;
+          }
+
+          showToast({ message: "Exam updated successfully", type: "success" });
         }
+      } catch (error) {
+        showToast({ message: "Error updating exam", type: "error" });
       }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        showToast({
-          message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
-          type: "error",
-        });
-        return;
-      }
-
-      showToast({ message: "Exam updated successfully", type: "success" });
-      //navigate("/admin/exams");
-    } catch (error) {
-      showToast({ message: "Error updating exam", type: "error" });
+    } else {
+      //set notif to passive, discard changes
     }
+
+    let notif = new Notification("", JSON.stringify(proposedExam), user.user, exam?.id);
+
+    notif.type = NotificationType.confirmChange;
+    if (!accept) notif.type = NotificationType.discardChange;
+
+    const notify = await fetch(`http://localhost:1337/api/notifications`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data: notif }),
+    });
+
+    if (!notify.ok) {
+      const errorData = await notify.json();
+      showToast({
+        message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+        type: "error",
+      });
+      return;
+    }
+
+    navigate("/admin/notifications");
   };
 
   if (loading || !exam) {
@@ -346,8 +306,6 @@ export default function IndividualNotification() {
         ? `${item[firstNameField]} ${item[lastNameField]}` // Concatenate first and last name
         : item[firstNameField], // For fields with just one field (like 'name' for institutes or majors)
     }));
-
-  console.log(options.students);
 
   const match = (arr: any[], val: any): string => {
     let t;
@@ -371,6 +329,12 @@ export default function IndividualNotification() {
       <div className="text-4xl font-bold">{t("Proposed Changes")}</div>
 
       <ComparisonField
+        label={"Title"}
+        options={[]}
+        value={title ? title.toString() : ""}
+        proposedVal={proposedExam.title ? proposedExam.title.toString() : ""}
+      />
+      <ComparisonField
         label={"LVA Num"}
         options={[]}
         value={lva_num ? lva_num.toString() : ""}
@@ -380,8 +344,8 @@ export default function IndividualNotification() {
       <ComparisonField
         label={"Date"}
         options={[]}
-        value={moment(date).utc().format("YYYY-MM-DD")}
-        proposedVal={proposedExam.date ? moment(proposedExam.date).utc().format("YYYY-MM-DD") : ""}
+        value={moment(date).utc().format("DD.MM.YYYY HH:mm")}
+        proposedVal={proposedExam.date ? moment(proposedExam.date).utc().format("DD.MM.YYYY HH:mm") : ""}
       />
 
       <ComparisonField label={"Duration"} options={[]} value={duration ?? ""} proposedVal={proposedExam.duration ? proposedExam.duration.toString() : ""} />
@@ -397,7 +361,7 @@ export default function IndividualNotification() {
         label={"Tutor"}
         options={dropdownOptions(options.tutors, "first_name", "last_name")}
         value={tutor ?? ""}
-        proposedVal={match(options.tutors, proposedExam.tutor)}
+        proposedVal={match(options.tutors, proposedExam.tutor_id)}
       />
 
       <ComparisonField
@@ -425,7 +389,7 @@ export default function IndividualNotification() {
         label={t("Mode")}
         options={dropdownOptions(options.modes, "name")}
         value={mode ?? ""}
-        proposedVal={match(options.modes, proposedExam.mode_id)}
+        proposedVal={match(options.modes, proposedExam.exam_mode)}
       />
 
       <ComparisonField
@@ -435,12 +399,11 @@ export default function IndividualNotification() {
         proposedVal={match(options.rooms, proposedExam.room_id)}
       />
 
-      <EditField title={"Status"} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus(e.target.value)} />
+      <ComparisonField label={"Status"} options={[]} value={status ?? ""} proposedVal={proposedExam.status} />
 
       <button
         onClick={() => {
-          setEditMode(!editMode);
-          if (editMode) handleUpdate();
+          handleUpdate(true);
         }}
         className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
       >
@@ -448,8 +411,7 @@ export default function IndividualNotification() {
       </button>
       <button
         onClick={() => {
-          setEditMode(!editMode);
-          if (editMode) handleUpdate();
+          handleUpdate(false);
         }}
         className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
       >

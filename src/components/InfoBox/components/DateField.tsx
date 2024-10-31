@@ -12,7 +12,7 @@ interface DateFieldProps {
 export default function DateField(props: DateFieldProps) {
   // Format the date and time as per "en-GB" (DD/MM/YYYY HH:mm)
   const formattedDate = props.dateValue ? moment(props.dateValue).format("DD/MM/YYYY") : "";
-  const formattedTime = props.dateValue ? moment(props.dateValue).format("HH:mm"): "";
+  const formattedTime = props.dateValue ? moment(props.dateValue).format("HH:mm") : "";
 
   return (
     <div>
@@ -27,16 +27,13 @@ export default function DateField(props: DateFieldProps) {
             className="mb-2 border-2 border-black p-1"
           />
           {/* Time Input */}
-          <input
-            type="time"
-            value={formattedTime}
-            onChange={props.onTimeChange}
-            className="mb-2 border-2 border-black p-1 ml-2"
-          />
+          <input type="time" value={formattedTime} onChange={props.onTimeChange} className="mb-2 border-2 border-black p-1 ml-2" />
         </div>
       ) : (
         <div>
-          <span>{formattedDate} {formattedTime}</span>
+          <span>
+            {formattedDate} {formattedTime}
+          </span>
         </div>
       )}
     </div>

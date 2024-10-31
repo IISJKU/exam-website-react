@@ -15,7 +15,7 @@ import Institute from "../../classes/Institute";
 import Room from "../../classes/Room";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
-import Notification from "../../classes/Notification";
+import Notification, { NotificationType } from "../../classes/Notification";
 
 export default function ExamEditor() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -38,6 +38,8 @@ export default function ExamEditor() {
   const [mode, setMode] = useState<number | undefined>();
   const [room, setRoom] = useState<number | undefined>();
   const [status, setStatus] = useState<string>("");
+
+  const [originalExam, setOriginalExam] = useState<Exam>(new Exam());
 
   const user = useAuth();
 
@@ -65,6 +67,7 @@ export default function ExamEditor() {
 
         if (examData) {
           setExam(examData);
+          setOriginalExam(examData);
           setTitle(examData.title);
           setLvaNum(examData.lva_num);
           setDate(examData.date);
@@ -156,15 +159,15 @@ export default function ExamEditor() {
     const selectedDate = event.target.value;
     const currentTime = moment.utc(date).format("HH:mm:ss"); // Preserve time, use UTC
 
-    const updatedDate = moment(`${selectedDate} ${currentTime}`, "YYYY-MM-DD HH:mm:ss").utc().toISOString(); // Ensure toISOString in UTC
+    const updatedDate = moment(`${selectedDate} ${currentTime}`, "DD.MM.YYYY HH:mm").utc().toISOString(); // Ensure toISOString in UTC
     setDate(updatedDate);
   };
 
   const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedTime = event.target.value;
-    const currentDate = moment.utc(date).format("YYYY-MM-DD"); // Preserve date, use UTC
+    const currentDate = moment.utc(date).format("DD-MM-YYYY"); // Preserve date, use UTC
 
-    const updatedDate = moment(`${currentDate}T${selectedTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString(); // Convert to ISO in UTC
+    const updatedDate = moment(`${currentDate}T${selectedTime}`, "DD.MM.YYYY HH:mm").utc().toISOString(); // Convert to ISO in UTC
     setDate(updatedDate);
   };
 
@@ -235,13 +238,17 @@ export default function ExamEditor() {
       });
 
       let change = examChanged();
-      if (change != "") {
+
+      if (change != "" && exam) {
+        let notif = new Notification(change, JSON.stringify(originalExam), user.user, exam.id);
+        notif.type = NotificationType.adminChange;
+
         const notify = await fetch(`http://localhost:1337/api/notifications`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ data: new Notification(change, user.user, exam?.title) }),
+          body: JSON.stringify({ data: notif }),
         });
 
         if (!notify.ok) {

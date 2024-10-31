@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import bellImage from "../img/notification.png";
 import { useAuth } from "../hooks/AuthProvider";
+import Exam from "./classes/Exam";
 import { showToast } from "./InfoBox/components/ToastMessage";
-import Notification from "./classes/Notification";
+import Notification, { NotificationType } from "./classes/Notification";
 import useInterval from "../hooks/UseInterval";
 
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[] | null>(null);
+  const [exams, setExams] = useState<Exam[]>([]);
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
   const user = useAuth();
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
@@ -21,14 +23,28 @@ export default function NotificationBell() {
 
       let t: Notification[] = [];
 
-      data.forEach((element: any) => {
-        let e = new Notification(element["attributes"]["text"], element["attributes"]["sentBy"], element["attributes"]["examName"]);
+      const exResponse = await fetch("http://localhost:1337/api/exams", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      const exData = await exResponse.json();
 
-        t.push(e);
+      data.forEach((element: any) => {
+        let e = new Notification(element.attributes.information, element.attributes.oldInformation, element.attributes.sentBy, element.attributes.exam_id);
+
+        e.seenBy = element.attributes.seenBy;
+        e.type = element.attributes.type;
+
+        if (e.seenBy == undefined || !e.seenBy.includes(user.user) || !e.sentBy == user.user) {
+          t.push(e);
+        }
       });
 
       calcNotifications(t);
       setNotifications(t);
+
+      setExams(exData);
     } catch (error) {
       showToast({ message: `Error fetching notifications: ${error}.`, type: "error" });
     }
@@ -51,21 +67,33 @@ export default function NotificationBell() {
 
   useInterval(() => {
     if (user.token != undefined && user.token.length > 1) fetchNotifications();
-  }, 10000); //check once every minute
+  }, 1000); //check once every minute
 
   function parseChangeMessage() {}
   //setInterval(fetchExams, 5000);
 
   const handleBlur = () => {
-    console.log("yeadaf");
     setDropdownVisible(false);
+  };
+
+  const getName = (id: number): string => {
+    let str = "";
+    if (exams.length != 0) {
+      exams.forEach((ex) => {
+        if (Number(ex.id) == Number(id)) {
+          str = ex.title;
+        }
+      });
+    } else {
+    }
+
+    return str;
   };
 
   return (
     <div
       className="relative focus:border-double h-10 ml-5 hover:border hover:border-black transition"
       onMouseDown={() => {
-        console.log(document.activeElement);
         setDropdownVisible(!dropdownVisible);
       }}
     >
@@ -74,13 +102,23 @@ export default function NotificationBell() {
         <p>{unreadNotifications}</p>
       </div>
       {dropdownVisible && notifications ? (
-        <ul className="absolute -translate-x-32 mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black z-50 w-80">
-          {notifications?.map((notification, index) => (
-            <li key={index} className={`cursor-pointer select-none relative py-2 hover:bg-indigo-500 hover:text-white`}>
-              {notification.sentBy} changed {notification.examName}
-            </li>
-          ))}
-        </ul>
+        notifications.length != 0 ? (
+          <ul className="absolute -translate-x-32 mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black z-50 w-80">
+            {notifications?.map((notification, index) => (
+              <li key={index} className={`cursor-pointer select-none relative py-2 hover:bg-indigo-500 hover:text-white`}>
+                {notification.type == NotificationType.adminChange || notification.type == NotificationType.proposeChange
+                  ? notification.sentBy + " changed " + getName(notification.exam_id)
+                  : ""}
+                {notification.type == NotificationType.confirmChange ? notification.sentBy + " approved " + getName(notification.exam_id) : ""}
+                {notification.type == NotificationType.discardChange ? notification.sentBy + " rejected changes in " + getName(notification.exam_id) : ""}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="absolute p-2 -translate-x-32 mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black z-50 w-80">
+            No new notifications :)
+          </div>
+        )
       ) : (
         <></>
       )}

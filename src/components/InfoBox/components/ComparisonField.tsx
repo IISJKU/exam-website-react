@@ -17,9 +17,9 @@ export default function ComparisonField(props: ComparisonField) {
   // Get the label of the currently selected value (if any)
   let selectedOptionLabel: string | number | undefined = props.options.find((option) => option.value === props.value)?.label || "";
 
-  if (props.options.length == 0) selectedOptionLabel = props.value;
-
-  //console.log(props.proposedVal);
+  if (props.options.length == 0) {
+    selectedOptionLabel = props.value;
+  }
 
   const makeString = (t: any) => {
     if (t == undefined || t == null) return "";
