@@ -9,7 +9,7 @@ const tableConfigurations = {
       tableName: "students",
       selectedFields: ["first_name", "last_name", "matrikel_number", "phone", "emergency_contact", "bonus_time", "misc"],
       optionalFields: ["misc"],
-      populateFields: [{ name: "major", populateTable: "majors", displayField: ["name"] }],
+      populateFields: [{ name: "major", populateTable: "majors", displayField: ["name"] },],
     },
     tutors: {
       tableName: "tutors",
@@ -63,9 +63,11 @@ const tableConfigurations = {
     users: {
       tableName: "users",
       selectedFields: ["username", "email", "provider", "confirmed", "blocked", "password"],
-      optionalFields: ["provider","password"],
+      optionalFields: ["provider","password", "student", "tutor"],
       populateFields: [
         { name: "role", populateTable: "users-permissions/roles", displayField: ["name"] },
+        { name: "student", populateTable: "students", displayField: ["first_name", "last_name"] },
+        { name: "tutor", populateTable: "tutors", displayField: ["first_name", "last_name"] },
       ],
     },
 };
