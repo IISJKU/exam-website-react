@@ -7,6 +7,7 @@ const url = "http://localhost:1337";
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("site") || "");
+  const [role, setRole] = useState("");
   const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
@@ -38,11 +39,12 @@ const AuthProvider = ({ children }) => {
         const userRes = await userData();
         if (userRes) {
           setUser(userRes.username);
+          setRole(userRes.role.name);
           if (userRes.role.name == "Admin") {
-            setUserId(userRes.id)
+            setUserId(userRes.id);
             navigate("/admin/exams");
           } else if (userRes.role.name == "Student") {
-            setUserId(userRes.student.id)
+            setUserId(userRes.student.id);
             navigate("/student/all-exams");
           }
         }
@@ -59,11 +61,12 @@ const AuthProvider = ({ children }) => {
     setUser(null);
     setUserId(null);
     setToken("");
+    setRole("");
     localStorage.removeItem("site");
     navigate("/");
   };
 
-  return <AuthContext.Provider value={{ token, user, userId ,loginAction, logOut }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ token, user, role, userId, loginAction, logOut }}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;

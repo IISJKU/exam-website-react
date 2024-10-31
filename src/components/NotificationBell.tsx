@@ -62,12 +62,12 @@ export default function NotificationBell() {
   }
 
   useEffect(() => {
-    if (user.token != undefined && user.token.length > 1) fetchNotifications();
+    if (user.token != undefined && user.token.length > 1 && user.role == "Admin") fetchNotifications();
   }, []);
 
   useInterval(() => {
-    if (user.token != undefined && user.token.length > 1) fetchNotifications();
-  }, 1000); //check once every minute
+    if (user.token != undefined && user.token.length > 1 && user.role == "Admin") fetchNotifications();
+  }, 100000); //check once every minute
 
   function parseChangeMessage() {}
   //setInterval(fetchExams, 5000);
@@ -111,6 +111,7 @@ export default function NotificationBell() {
                   : ""}
                 {notification.type == NotificationType.confirmChange ? notification.sentBy + " approved " + getName(notification.exam_id) : ""}
                 {notification.type == NotificationType.discardChange ? notification.sentBy + " rejected changes in " + getName(notification.exam_id) : ""}
+                {notification.type == NotificationType.createExam ? notification.sentBy + " added a new Exam" : ""}
               </li>
             ))}
           </ul>

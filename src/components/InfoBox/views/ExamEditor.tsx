@@ -65,7 +65,7 @@ export default function ExamEditor() {
         });
         const examData = await examResponse.json();
         if (!examResponse.ok) {
-          showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error", });
+          showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error" });
         }
         if (examData) {
           setExam(examData);
@@ -314,7 +314,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
-        tableName = "students"
+        tableName="students"
         label={"Student"}
         options={dropdownOptions(options.students, "first_name", "last_name")}
         value={student ?? ""}
@@ -324,7 +324,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
-        tableName = "tutors"
+        tableName="tutors"
         label={"Tutor"}
         options={dropdownOptions(options.tutors, "first_name", "last_name")}
         value={tutor ?? ""}
@@ -334,7 +334,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
-        tableName = "examiners"
+        tableName="examiners"
         label={t("Examiner")}
         options={dropdownOptions(options.examiners, "first_name", "last_name")}
         value={examiner ?? ""}
@@ -344,7 +344,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
-        tableName = "majors"
+        tableName="majors"
         label={t("Major")}
         options={dropdownOptions(options.majors, "name")}
         value={major ?? ""}
@@ -354,7 +354,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
-        tableName = "institutes"
+        tableName="institutes"
         label={t("Institute")}
         options={dropdownOptions(options.institutes, "name")}
         value={institute ?? ""}
@@ -364,7 +364,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
-        tableName = "exam-modes"
+        tableName="exam-modes"
         label={t("Mode")}
         options={dropdownOptions(options.modes, "name")}
         value={mode ?? ""}
@@ -374,7 +374,7 @@ export default function ExamEditor() {
       />
 
       <DropdownWithSearch
-        tableName = "rooms"
+        tableName="rooms"
         label={t("Room")}
         options={dropdownOptions(options.rooms, "name")}
         value={room ?? ""}

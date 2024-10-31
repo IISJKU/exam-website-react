@@ -88,21 +88,44 @@ export default function IndividualNotification() {
 
         let exam_id = 0;
 
+        //Check type of notif first... if its a new exam proposal, you should not collect all others
         data.forEach((element: any) => {
           if (element.id == Number(id)) {
             exam_id = Number(element.attributes.exam_id);
           }
         });
 
-        data.forEach((element: any) => {
-          if (element.attributes.exam_id == Number(exam_id)) {
-            let t = new Notification(element.attributes.information, element.attributes.oldInformation, element.attributes.seenBy, element.attributes.exam_id);
-            t.sentBy = element.attributes.sentBy;
+        if (exam_id != 0) {
+          data.forEach((element: any) => {
+            if (element.attributes.exam_id == Number(exam_id)) {
+              let t = new Notification(
+                element.attributes.information,
+                element.attributes.oldInformation,
+                element.attributes.seenBy,
+                element.attributes.exam_id
+              );
+              t.sentBy = element.attributes.sentBy;
 
-            if (element.attributes.type == NotificationType.confirmChange || element.attributes.type == NotificationType.confirmChange) proposedExams = [];
-            else proposedExams.push(t);
-          }
-        });
+              if (element.attributes.type == NotificationType.confirmChange || element.attributes.type == NotificationType.confirmChange) proposedExams = [];
+              else proposedExams.push(t);
+            }
+          });
+        } else {
+          data.forEach((element: any) => {
+            if (element.id == Number(id)) {
+              let t = new Notification(
+                element.attributes.information,
+                element.attributes.oldInformation,
+                element.attributes.seenBy,
+                element.attributes.exam_id
+              );
+              t.sentBy = element.attributes.sentBy;
+
+              t.type = element.attributes.type;
+              proposedExams.push(t);
+            }
+          });
+        }
 
         //sort out old ones, that are preceded by either a
 
@@ -112,21 +135,24 @@ export default function IndividualNotification() {
 
         const propEx: Partial<Exam> = {};
 
-        for (let i = 0; i < proposedExams.length; i++) {
-          const examInfo = proposedExams[i].information;
-          const parsedExam = JSON.parse(examInfo) as Exam;
+        if (proposedExams.length != 1) {
+          for (let i = 0; i < proposedExams.length; i++) {
+            const examInfo = proposedExams[i].information;
+            const parsedExam = JSON.parse(examInfo) as Exam;
 
-          Object.entries(parsedExam).forEach(([key, value]) => {
-            // Check if key is a valid property of Exam
-            if (value != undefined) {
-              propEx[key as keyof Exam] = value; // Type assertion to keyof Exam
-            }
-          });
+            Object.entries(parsedExam).forEach(([key, value]) => {
+              // Check if key is a valid property of Exam
+              if (value != undefined) {
+                propEx[key as keyof Exam] = value; // Type assertion to keyof Exam
+              }
+            });
+          }
+
+          let converted = convertToExam(propEx);
+          setProposedExam(converted);
+        } else {
+          setProposedExam(JSON.parse(proposedExams[0].information) as Exam);
         }
-
-        let converted = convertToExam(propEx);
-
-        setProposedExam(converted);
 
         const examResponse = await fetch(`http://localhost:1337/api/exams/`, {
           method: "GET",
@@ -137,7 +163,7 @@ export default function IndividualNotification() {
 
         const examData = await examResponse.json();
         if (!response.ok) {
-          showToast({ message: `HTTP error! Status: ${response.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error", });
+          showToast({ message: `HTTP error! Status: ${response.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error" });
         }
 
         if (examData) {
@@ -245,7 +271,7 @@ export default function IndividualNotification() {
       //reset notif, set to passive & apply changes
 
       try {
-        if (exam != null) {
+        if (exam != null && exam.id != undefined) {
           const response = await fetch(`http://localhost:1337/api/exams/${exam.id}`, {
             method: "PUT",
             headers: {
@@ -265,34 +291,65 @@ export default function IndividualNotification() {
           }
 
           showToast({ message: "Exam updated successfully", type: "success" });
+
+          let notif = new Notification("", JSON.stringify(proposedExam), user.user, exam?.id);
+
+          notif.type = NotificationType.confirmChange;
+          if (!accept) notif.type = NotificationType.discardChange;
+
+          const notify = await fetch(`http://localhost:1337/api/notifications`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ data: notif }),
+          });
+
+          if (!notify.ok) {
+            const errorData = await notify.json();
+            showToast({
+              message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+              type: "error",
+            });
+            return;
+          }
+        } else {
+          const response = await fetch(`http://localhost:1337/api/exams/`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ data: proposedExam }),
+          });
+
+          const examRes = await fetch(`http://localhost:1337/api/exams/`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          let ex = await examRes.json;
+          console.log(examRes);
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            showToast({
+              message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+              type: "error",
+            });
+            return;
+          } else {
+            showToast({ message: "Successfully posted Exam", type: "success" });
+          }
         }
       } catch (error) {
         showToast({ message: "Error updating exam", type: "error" });
       }
     } else {
       //set notif to passive, discard changes
-    }
-
-    let notif = new Notification("", JSON.stringify(proposedExam), user.user, exam?.id);
-
-    notif.type = NotificationType.confirmChange;
-    if (!accept) notif.type = NotificationType.discardChange;
-
-    const notify = await fetch(`http://localhost:1337/api/notifications`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ data: notif }),
-    });
-
-    if (!notify.ok) {
-      const errorData = await notify.json();
-      showToast({
-        message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
-        type: "error",
-      });
-      return;
     }
 
     navigate("/admin/notifications");
@@ -347,8 +404,8 @@ export default function IndividualNotification() {
       <ComparisonField
         label={"Date"}
         options={[]}
-        value={moment(date).utc().format("DD.MM.YYYY HH:mm")}
-        proposedVal={proposedExam.date ? moment(proposedExam.date).utc().format("DD.MM.YYYY HH:mm") : ""}
+        value={moment(date).format("DD.MM.YYYY HH:mm")}
+        proposedVal={proposedExam.date ? moment(proposedExam.date).format("DD.MM.YYYY HH:mm") : ""}
       />
 
       <ComparisonField label={"Duration"} options={[]} value={duration ?? ""} proposedVal={proposedExam.duration ? proposedExam.duration.toString() : ""} />

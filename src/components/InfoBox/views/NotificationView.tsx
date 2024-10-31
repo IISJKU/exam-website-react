@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Pagination from "../components/Pagination";
 import SearchBar from "../components/SearchBar";
 import { useTranslation } from "react-i18next";
-import Notification from "../../classes/Notification";
+import Notification, { NotificationType } from "../../classes/Notification";
 import NotificationComponent from "../components/NotificationComponent";
 import Exam from "../../classes/Exam";
 import Student from "../../classes/Student";
@@ -20,6 +20,8 @@ export default function NotificationView() {
   const { t } = useTranslation();
 
   const [exams, setExams] = useState<Exam[]>();
+
+  const [proposals, setProposals] = useState<Notification[]>([]);
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [seenNotifications, setSeenNotifications] = useState<Notification[]>([]);
@@ -73,18 +75,20 @@ export default function NotificationView() {
       const data = (await response.json()).data;
 
       if (!response.ok) {
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
       }
 
       const examData = await examRes.json();
 
       if (!examRes.ok) {
-        showToast({ message: `HTTP error! Status: ${examRes.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error", });
+        showToast({ message: `HTTP error! Status: ${examRes.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error" });
       }
 
       let tempNew: Notification[] = [];
       let tempOld: Notification[] = [];
       let all: Notification[] = [];
+
+      let prop: Notification[] = [];
 
       data.forEach((element: any) => {
         let el = new Notification(element.attributes.information, element.attributes.oldInformation, element.attributes.sentBy, element.attributes.exam_id);
@@ -93,7 +97,8 @@ export default function NotificationView() {
         el.createdAt = element.attributes.createdAt;
         el.seenBy = element.attributes.seenBy || "";
 
-        all.push(el);
+        if (el.type != NotificationType.createExam) all.push(el);
+        else prop.push(el);
       });
 
       let threads: Notification[][] = [];
@@ -133,6 +138,7 @@ export default function NotificationView() {
       if (tempNew.length != 0) setNewNotifications(tempNew.reverse());
       if (tempOld.length != 0) setSeenNotifications(tempOld.reverse());
       if (all.length != 0) setNotifications(all);
+      if (prop.length != 0) setProposals(prop.reverse());
       if (examData != undefined) setExams(examData);
     } catch (error) {}
   };
@@ -204,6 +210,8 @@ export default function NotificationView() {
   }, []);
 
   const getExam = (id: number): Exam => {
+    if (id == 0) return new Exam();
+
     let x = new Exam();
 
     exams?.forEach((element) => {
@@ -213,19 +221,6 @@ export default function NotificationView() {
       }
     });
     return x;
-  };
-
-  const getNotification = (id: number): Notification => {
-    let n = new Notification();
-
-    newNotifications.forEach((element) => {
-      if (Number(element.id) == Number(id)) {
-        n = element;
-        return element;
-      }
-    });
-
-    return n;
   };
 
   const getNotifications = (id: number): Notification[] => {
@@ -258,6 +253,26 @@ export default function NotificationView() {
         {/*<SearchBar items={props.data} filter={setFilteredData} /> */}
       </div>
       <div className="h-5"></div>
+
+      {proposals.length != 0 ? (
+        <div>
+          <div className="text-2xl font-bold">Proposed Exams</div>
+          <ul className="w-full text-left border-2">
+            {proposals.map((elem) => (
+              <NotificationComponent
+                exam={getExam(elem.exam_id)}
+                options={options}
+                notification={[elem]}
+                id={elem.id}
+                exam_id={elem.exam_id}
+                sentBy={elem.sentBy}
+              />
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <></>
+      )}
       {newNotifications.length != 0 ? (
         <div>
           <div className="text-2xl font-bold">New Notifications</div>

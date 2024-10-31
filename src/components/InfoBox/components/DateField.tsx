@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from "moment-timezone";
 import React from "react";
 
 interface DateFieldProps {
@@ -22,7 +22,7 @@ export default function DateField(props: DateFieldProps) {
           {/* Date Input */}
           <input
             type="date"
-            value={moment(props.dateValue).utc().format("YYYY-MM-DD")} // Input expects YYYY-MM-DD format
+            value={moment(props.dateValue).format("YYYY-MM-DD")} // Input expects YYYY-MM-DD format
             onChange={props.onDateChange}
             className="mb-2 border-2 border-black p-1"
           />

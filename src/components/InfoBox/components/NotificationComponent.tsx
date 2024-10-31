@@ -6,6 +6,7 @@ import Notification, { NotificationType } from "../../classes/Notification";
 import EntryBase from "../../classes/EntryBase";
 import moment from "moment";
 import { useAuth } from "../../../hooks/AuthProvider";
+import { stat } from "fs";
 
 interface NotificationComponentProps {
   sentBy: string;
@@ -44,20 +45,34 @@ export default function NotificationComponent(props: NotificationComponentProps)
     navigate(`/admin/notifications/${notifId}`); // Navigate to ExamEditor with the exam ID
   };
 
+  const staticTitles = ["title", "date", "lva_num", "duration", "status"];
+
+  const hasStaticTitle = (title: string): boolean => {
+    let isStatic = false;
+
+    staticTitles.forEach((elem) => {
+      if (elem == title) isStatic = true;
+    });
+
+    return isStatic;
+  };
+
   const getElem = (index: any, type: string): string => {
     if (index.id != undefined) {
       index = index.id;
     }
 
-    if (!type.includes("_id") && !type.includes("exam_mode")) {
-      if (type == "date") return moment(index).utc().format("YYYY-MM-DD HH:MM");
+    if (!type.includes("_id") && !type.includes("exam_mode") && hasStaticTitle(type)) {
+      if (type == "date") return moment(index).tz("Europe/Vienna").format("YYYY-MM-DD HH:MM");
       return index + "";
     }
 
     let k = type;
 
-    if (type != "exam_mode") k = type.replace("_id", "") + "s";
-    else k = "modes";
+    if (type != "exam_mode") {
+      if (type.includes("_id")) k = type.replace("_id", "") + "s";
+      else k = type + "s";
+    } else k = "modes";
 
     let arr = props.options[k as keyof typeof props.options];
 
@@ -109,6 +124,16 @@ export default function NotificationComponent(props: NotificationComponentProps)
     });
   };
 
+  const getTitle = (index: any, type: string): string => {
+    let str = type[0].toUpperCase() + type.substring(1, type.length);
+    str = str.replace("_id", "");
+
+    str = str.replaceAll("_", " ");
+    str = str.substring(0, str.indexOf(" ") + 1) + str[str.indexOf(" ") + 1].toUpperCase() + str.substring(str.indexOf(" ") + 2, str.length);
+
+    return str;
+  };
+
   let color = "";
   if (notifications[0].type == NotificationType.createExam || notifications[0].type == NotificationType.proposeChange)
     color = " even:bg-red-400 odd:bg-red-400 border border-striped";
@@ -123,29 +148,46 @@ export default function NotificationComponent(props: NotificationComponentProps)
       className={"even:bg-slate-200 odd:bg-slate-100 cursor-pointer border border-white hover:border-black" + color.toString()}
       onClick={() => toggleInfoPannel()}
     >
-      <div className=" relative">
-        {props.exam.title} was edited by {notifications[0].sentBy}
-        {notifications[0].type == NotificationType.confirmChange || notifications[0].type == NotificationType.discardChange ? (
-          <></>
-        ) : (
-          <a className="inline-block absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>
-            Edit
-          </a>
-        )}
-      </div>
+      {props.notification[0].type == NotificationType.createExam ? (
+        <div className=" relative">
+          {notifications[0].sentBy} proposed a new Exam
+          {notifications[0].type == NotificationType.confirmChange || notifications[0].type == NotificationType.discardChange ? (
+            <></>
+          ) : (
+            <a className="inline-block absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>
+              Edit
+            </a>
+          )}
+        </div>
+      ) : (
+        <div className=" relative">
+          {props.exam.title} was edited by {notifications[0].sentBy}
+          {notifications[0].type == NotificationType.confirmChange || notifications[0].type == NotificationType.discardChange ? (
+            <></>
+          ) : (
+            <a className="inline-block absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>
+              Edit
+            </a>
+          )}
+        </div>
+      )}
 
       {infoOpen ? (
         <div className="">
           {notifications.map((notification: Notification, index) => (
             <div className="cursor-default">
               <ul className="p-4">
-                {notification.type == NotificationType.proposeChange || notification.type == NotificationType.adminChange ? (
+                {notification.type == NotificationType.proposeChange ||
+                notification.type == NotificationType.adminChange ||
+                notification.type == NotificationType.createExam ? (
                   <div className={("pl-" + tabs[index]).toString()}>
-                    At {moment(notification.createdAt).utc().format("DD.MM.YYYY HH:mm") ?? ""} {notification.sentBy}{" "}
+                    At {moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm") ?? ""} {notification.sentBy}{" "}
                     {notification.type == NotificationType.adminChange ? "changed" : "proposed a change"}:
                     {Object.keys(JSON.parse(notification.information)).map((elem: string) => (
                       <li className="bg-white border border-black p-1">
-                        {getElem(JSON.parse(notification.oldInformation)[elem], elem) + " -> " + getElem(JSON.parse(notification.information)[elem], elem)}
+                        {notification.type == NotificationType.createExam
+                          ? getTitle(JSON.parse(notification.information)[elem], elem) + ": " + getElem(JSON.parse(notification.information)[elem], elem)
+                          : getElem(JSON.parse(notification.oldInformation)[elem], elem) + " -> " + getElem(JSON.parse(notification.information)[elem], elem)}
                       </li>
                     ))}
                   </div>
