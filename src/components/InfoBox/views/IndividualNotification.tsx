@@ -136,6 +136,9 @@ export default function IndividualNotification() {
         });
 
         const examData = await examResponse.json();
+        if (!response.ok) {
+          showToast({ message: `HTTP error! Status: ${response.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error", });
+        }
 
         if (examData) {
           let ex = new Exam();

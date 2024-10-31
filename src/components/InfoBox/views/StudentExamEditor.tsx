@@ -13,19 +13,6 @@ import Institute from "../../classes/Institute";
 import Room from "../../classes/Room";
 import Exam from "../../classes/Exam";
 
-// Define initial state type to include all properties
-interface InitialState {
-  title: string;
-  lva_num?: number;
-  student: number;
-  date: string;
-  duration?: number;
-  examiner?: number;
-  institute?: number;
-  mode?: number;
-  room?: number;
-  status: string;
-}
 
 export default function RequestExam() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -49,20 +36,6 @@ export default function RequestExam() {
   const [room, setRoom] = useState<number | undefined>();
   const [status, setStatus] = useState<string>("Pending");
 
-  // Define initial state with the correct type
-  const [initialState, setInitialState] = useState<InitialState>({
-    title: "",
-    lva_num: undefined,
-    student: student,
-    date: "",
-    duration: undefined,
-    examiner: undefined,
-    institute: undefined,
-    mode: undefined,
-    room: undefined,
-    status: "Pending",
-  });
-
   const [options, setOptions] = useState({
     examiners: [] as Examiner[],
     institutes: [] as Institute[],
@@ -81,6 +54,9 @@ export default function RequestExam() {
         });
         const examData = await examResponse.json();
 
+        if (!examResponse.ok) {
+          showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error", });
+         }
         if (examData) {
           setExam(examData);
           setTitle(examData.title);
@@ -117,19 +93,6 @@ export default function RequestExam() {
           institutes: institutesRes ?? [],
           modes: modesRes ?? [],
           rooms: roomsRes ?? [],
-        });
-
-        setInitialState({
-          title,
-          lva_num,
-          student,
-          date,
-          duration,
-          examiner,
-          institute,
-          mode,
-          room,
-          status,
         });
       } catch (error) {
         showToast({ message: "Error fetching dropdown options", type: "error" });
@@ -194,19 +157,6 @@ export default function RequestExam() {
     } catch (error) {
       showToast({ message: "Error creating exam", type: "error" });
     }
-  };
-
-  const handleCancel = () => {
-    setTitle(initialState.title);
-    setLvaNum(initialState.lva_num);
-    setDate(initialState.date);
-    setStudent(initialState.student);
-    setDuration(initialState.duration);
-    setExaminer(initialState.examiner);
-    setInstitute(initialState.institute);
-    setMode(initialState.mode);
-    setRoom(initialState.room);
-    setStatus(initialState.status);
   };
 
   const dropdownOptions = (list: any[] = [], firstNameField: string, lastNameField?: string) =>

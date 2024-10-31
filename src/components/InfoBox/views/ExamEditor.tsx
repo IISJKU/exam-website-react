@@ -64,7 +64,9 @@ export default function ExamEditor() {
           },
         });
         const examData = await examResponse.json();
-
+        if (!examResponse.ok) {
+          showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error", });
+        }
         if (examData) {
           setExam(examData);
           setOriginalExam(examData);

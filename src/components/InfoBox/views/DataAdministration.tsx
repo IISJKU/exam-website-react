@@ -43,6 +43,10 @@ export default function DataAdministration(props: DataAdministrationProps) {
       });
       const result = await response.json();
 
+      if (!response.ok) {
+       showToast({ message: `HTTP error! Status: ${response.status}, Message: ${result.error.message || "Unknown error"}.`, type: "error", });
+      }
+
       if (result && Array.isArray(result)) {
         const fetchedData = result.map((item: any) => {
           const record: DataRecord = { id: item.id, ...item };
@@ -101,6 +105,10 @@ export default function DataAdministration(props: DataAdministrationProps) {
       });
       const result = await response.json();
 
+      if (!response.ok) {
+       showToast({ message: `HTTP error! Status: ${response.status}, Message: ${result.error.message || "Unknown error"}.`, type: "error", });
+      }
+      
       // fix user roles update issue 
       const records = result.roles || result; // If roles array exists, use it; otherwise use result
 
@@ -137,14 +145,18 @@ export default function DataAdministration(props: DataAdministrationProps) {
     try {
        // fix user add issue 
        const bodyContent = props.tableName == "users" ? record : { data: record };
-      await fetch(`http://localhost:1337/api/${props.tableName}`, {
+       const response = await fetch(`http://localhost:1337/api/${props.tableName}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${user.token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(bodyContent),
-      });
+       });
+       if (!response.ok) {
+          const errorData = await response.json();
+         showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error", });
+        }
       fetchData();
     } catch (error) {
       showToast({ message: `Error adding record: ${error}.`, type: "error" });
@@ -155,7 +167,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
     try { 
       // fix user roles update issue 
       const bodyContent = props.tableName == "users" ? record : { data: record };
-      await fetch(`http://localhost:1337/api/${props.tableName}/${record.id}`, {
+      const response = await fetch(`http://localhost:1337/api/${props.tableName}/${record.id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -163,6 +175,10 @@ export default function DataAdministration(props: DataAdministrationProps) {
         },
         body: JSON.stringify(bodyContent),
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+       showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error", });
+      }
       fetchData();
     } catch (error) {
       showToast({ message: `Error updating record: ${error}.`, type: "error" });
@@ -172,12 +188,16 @@ export default function DataAdministration(props: DataAdministrationProps) {
   const deleteRecord = async (id: number) => {
     if (!id) return;
     try {
-      await fetch(`http://localhost:1337/api/${props.tableName}/${id}`, {
+      const response = await fetch(`http://localhost:1337/api/${props.tableName}/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+       showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error", });
+      }
       fetchData();
     } catch (error) {
       showToast({ message: `Error deleting record: ${error}.`, type: "error" });

@@ -27,6 +27,9 @@ export default function TutorView() {
         },
       });
       const data = await response.json();
+      if (!response.ok) {
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+      }
       setTutors(data); // Update tutors with fetched data
     } catch (error) {
       showToast({ message: `Error fetching tutors: ${error}.`, type: "error" });

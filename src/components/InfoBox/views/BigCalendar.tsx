@@ -46,6 +46,9 @@ export default function BigCalendar() {
         },
       });
       const data = await response.json();
+      if (!response.ok) {
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+       }
       setExams(data);
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });

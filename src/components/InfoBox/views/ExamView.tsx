@@ -26,6 +26,10 @@ export default function ExamView() {
         },
       });
       const data = await response.json();
+      
+      if (!response.ok) {
+       showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+      }
 
       // Modify the data array before setting it to exams
       const updatedData = data.map((exam: any) => {

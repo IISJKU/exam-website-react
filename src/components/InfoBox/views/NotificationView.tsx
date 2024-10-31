@@ -72,7 +72,15 @@ export default function NotificationView() {
       });
       const data = (await response.json()).data;
 
+      if (!response.ok) {
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+      }
+
       const examData = await examRes.json();
+
+      if (!examRes.ok) {
+        showToast({ message: `HTTP error! Status: ${examRes.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error", });
+      }
 
       let tempNew: Notification[] = [];
       let tempOld: Notification[] = [];

@@ -27,7 +27,10 @@ export default function StudentView() {
         },
       });
       const data = await response.json();
-
+      
+      if (!response.ok) {
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+       }
       // Map and modify data to extract the 'major' name
       const updatedData = data.map((student: any) => ({
         ...student,

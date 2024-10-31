@@ -30,6 +30,9 @@ export default function IndividualTutor() {
           },
         });
         const tutorData = await response.json();
+        if (!response.ok) {
+          showToast({ message: `HTTP error! Status: ${response.status}, Message: ${tutorData.error.message || "Unknown error"}.`, type: "error", });
+        }
         setTutor(tutorData); // Set the fetched tutor data
         setLoading(false); // Stop loading
         setFirstName(tutorData.first_name);

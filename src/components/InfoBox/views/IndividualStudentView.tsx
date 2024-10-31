@@ -65,6 +65,9 @@ export default function IndividualStudent() {
           },
         });
         const result = await response.json();
+        if (!response.ok) {
+          showToast({ message: `HTTP error! Status: ${response.status}, Message: ${result.error.message || "Unknown error"}.`, type: "error", });
+        }
         setMajors(result);
       } catch (error) {
         showToast({ message: "Error fetching majors.", type: "error" });
