@@ -21,7 +21,7 @@ export default function ExamEditor() {
   const { id } = useParams(); // Get exam ID from URL params
 
   const { t } = useTranslation();
-
+ const user = useAuth();
   const [loading, setLoading] = useState<boolean>(true);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [exam, setExam] = useState<Exam | null>(null); // Store exam data
@@ -40,8 +40,6 @@ export default function ExamEditor() {
   const [status, setStatus] = useState<string>("");
 
   const [originalExam, setOriginalExam] = useState<Exam>(new Exam());
-
-  const user = useAuth();
 
   const [options, setOptions] = useState({
     students: [] as Student[],
@@ -256,7 +254,7 @@ export default function ExamEditor() {
         if (!notify.ok) {
           const errorData = await response.json();
           showToast({
-            message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+            message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
             type: "error",
           });
           return;
@@ -384,16 +382,17 @@ export default function ExamEditor() {
       />
 
       <EditField title={"Status"} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus(e.target.value)} />
-
-      <button
-        onClick={() => {
-          setEditMode(!editMode);
-          if (editMode) handleUpdate();
-        }}
-        className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
-      >
-        {editMode ? t("Save") : t("Edit")}
-      </button>
+      {user.role !== "Tutor" && (
+        <button
+          onClick={() => {
+            setEditMode(!editMode);
+            if (editMode) handleUpdate();
+          }}
+          className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
+        >
+          {editMode ? t("Save") : t("Edit")}
+        </button>
+      )}
       {editMode ? (
         <button
           className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline"

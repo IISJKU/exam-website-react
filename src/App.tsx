@@ -24,6 +24,12 @@ import RequestExam from "./components/InfoBox/views/RequestExam";
 import StudentExamView from "./components/InfoBox/views/StudentExamView";
 import StudentExamEditor from "./components/InfoBox/views/StudentExamEditor";
 import StudentBigCalender from "./components/InfoBox/views/StudentBigCalendar";
+import TutorLayout from "./components/TutorLayout";
+import TutorExamView from "./components/InfoBox/views/TutorExamView";
+import TutorBigCalender from "./components/InfoBox/views/TutorBigCalendar";
+import ExamWithoutTutor from "./components/InfoBox/views/ExamWithoutTutor";
+import TutorExamRequest from "./components/InfoBox/views/TutorExamRequest";
+import RemoveTutor from "./components/InfoBox/views/RemoveTutor";
 
 export default function App() {
   return (
@@ -59,6 +65,16 @@ export default function App() {
               <Route path="/student/all-exams" element={<StudentExamView />} />
               <Route path="/student/exams/:id" element={<StudentExamEditor />} />
               <Route path="/student/calendar/:year/:month/:day" element={<StudentBigCalender />} />
+            </Route>
+
+            <Route element={<TutorLayout />}>
+              <Route path="/tutor/exams" element={<ExamView />} />
+              <Route path="/tutor/exams/:id" element={<ExamEditor />} />
+              <Route path="/tutor/upcoming-exams" element={<TutorExamView />} />
+              <Route path="/tutor/remove-tutor/:id" element={<RemoveTutor />} />
+              <Route path="/tutor/exams/without-tutor" element={<ExamWithoutTutor />} />
+              <Route path="/tutor/exams/monitor-request/:id" element={<TutorExamRequest />} />
+              <Route path="/tutor/calendar/:year/:month/:day" element={<TutorBigCalender />} />
             </Route>
           </Routes>
 

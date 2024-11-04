@@ -5,31 +5,31 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
 
-export default function ExamView() {
+export default function TutorExamView() {
   const navigate = useNavigate(); // Initialize navigate
   const fields = ["Exam Title", "LVA Nr.", "Date/Time", "Duration", "Mode", "Student", "Examiner", "Institute", "Status", "Student Misc"];
-
   const keys: (keyof Exam)[] = ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute", "status", "student_misc"];
 
   const [exams, setExams] = useState([]); // Store exams
   const [loading, setLoading] = useState<boolean>(true); // State for loading
 
   const user = useAuth();
+  const tutorId = user.userId;
 
   // Fetch data from Strapi API
-  const fetchExams = async () => {
+  const fetchTutorExams = async (tutorId: number) => {
+
     try {
-      const response = await fetch("http://localhost:1337/api/exams", {
+      const response = await fetch(`http://localhost:1337/api/exams/tutor/${tutorId}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
       const data = await response.json();
-      
       if (!response.ok) {
-       showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
-      }
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+       }
 
       // Modify the data array before setting it to exams
       const updatedData = data.map((exam: any) => {
@@ -38,11 +38,6 @@ export default function ExamView() {
         // Update student to matrikel_number if exists
         if (exam.student?.matrikel_number) {
           updatedExam.student = exam.student.matrikel_number;
-        }
-
-        // Update tutor to first and last name if exists
-        if (exam.tutor?.first_name && exam.tutor?.last_name) {
-          updatedExam.tutor = `${exam.tutor.first_name} ${exam.tutor.last_name}`;
         }
 
         // Update examiner to first and last name if exists
@@ -72,16 +67,11 @@ export default function ExamView() {
   };
 
   useEffect(() => {
-    fetchExams();
+    fetchTutorExams(tutorId);
   }, []);
 
   const handleExamClick = (examId: number) => {
-    if (user.role === "Tutor") {
-      navigate(`/tutor/exams/${examId}`); // Navigate to ExamEditor with the exam ID
-    } else if (user.role === "Admin") {
-      navigate(`/admin/exams/${examId}`); // Navigate to ExamEditor with the exam ID
-    } 
-    
+    navigate(`/tutor/remove-tutor/${examId}`); // Navigate to ExamEditor with the exam ID
   };
 
   if (loading) {
@@ -90,11 +80,11 @@ export default function ExamView() {
 
   return (
     <ContentView
-      title={"Upcoming Exams"}
-      onRowClick={handleExamClick} 
+      title={"Upcoming Monitored Exams"}
+      onRowClick={handleExamClick} // Pass the click handler for navigation
       fields={fields}
       keys={keys}
-      buttonName={user.role === "Tutor" ? "View" : "Edit"}
+      buttonName="Remove"
       data={exams} // Pass the fetched and updated exam data here
     />
   );

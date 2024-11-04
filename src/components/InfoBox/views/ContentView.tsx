@@ -3,14 +3,14 @@ import { useState } from "react";
 import SortableHeaders from "../components/SortableHeaders";
 import { useTranslation } from "react-i18next";
 import Pagination from "../components/Pagination";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
 interface ContentViewInterface<T> {
   title: string;
   fields: string[];
   keys: (keyof T)[];
   data: T[];
-  onRowClick?: (id: number) => void; // Add this prop for handling row clicks
+  buttonName?: string; // New prop for the button text
+  onRowClick?: (id: number) => void;
 }
 
 export default function ContentView<T extends { id?: number; confirmed?: boolean }>(props: ContentViewInterface<T>) {
@@ -34,7 +34,7 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
   const pages = Array.from({ length: numPages }, (_, i) => i + 1);
 
   const className = "hover:bg-slate-300 even:bg-slate-200 odd:bg-slate-100 cursor-pointer ";
-  const dashedBorder = "hover:bg-red-100 border-dashed border-black border-2 bg-red-200  cursor-pointer ";
+  const dashedBorder = "hover:bg-red-100 border-dashed border-black border-2 bg-red-200 cursor-pointer ";
 
   return (
     <div className="w-full h-full p-5 select-none">
@@ -47,35 +47,33 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
         <tbody key={"tableBody"}>
           <SortableHeaders fields={props.fields} keys={props.keys} elements={filtered} setElements={setFilteredData} />
           {entries.map((element: T, index) => (
-            <>
-              <tr
-                key={element.id + "" + index} // Add key for each row
-                className={element["confirmed"] != undefined ? (element["confirmed"] === false ? dashedBorder : className) : className}
-                onClick={() => {
-                  if (element.id && props.onRowClick) {
-                    props.onRowClick(element.id); // Use the onRowClick prop if available
-                  }
-                }}
-              >
-                {props.keys.map((key, index) => (
-                  <td key={(key as string) + index} className="pl-2">
-                    {typeof element[key] === "string"
-                      ? !isDate(element[key] as string)
-                        ? (element[key] as string)
-                        : formatDate(element[key] as string)
-                      : Array.isArray(element[key])
-                      ? (element[key] as string[]).join(", ")
-                      : typeof element[key] === "number"
-                      ? (element[key] as number)
-                      : " "}
-                  </td>
-                ))}
-
-                <td key="editButton">
-                  <button>Edit</button>
+            <tr
+              key={`${element.id}-${index}`} // Add key for each row
+              className={element["confirmed"] != undefined ? (element["confirmed"] === false ? dashedBorder : className) : className}
+              onClick={() => {
+                if (element.id && props.onRowClick) {
+                  props.onRowClick(element.id); // Use the onRowClick prop if available
+                }
+              }}
+            >
+              {props.keys.map((key, idx) => (
+                <td key={`${String(key)}-${idx}`} className="pl-2">
+                  {typeof element[key] === "string"
+                    ? !isDate(element[key] as string)
+                      ? (element[key] as string)
+                      : formatDate(element[key] as string)
+                    : Array.isArray(element[key])
+                    ? (element[key] as string[]).join(", ")
+                    : typeof element[key] === "number"
+                    ? (element[key] as number)
+                    : " "}
                 </td>
-              </tr>
-            </>
+              ))}
+
+              <td className="pr-3" key="editButton">
+                <button>{props.buttonName || "Edit"}</button> {/* Use buttonName or default to "Edit" */}
+              </td>
+            </tr>
           ))}
         </tbody>
       </table>
@@ -89,22 +87,20 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
 
-  // Options for the date part (day/month/year)
   const dateOptions: Intl.DateTimeFormatOptions = {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   };
 
-  // Options for the time part (hour/minute)
   const timeOptions: Intl.DateTimeFormatOptions = {
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false, // 24-hour format
+    hour12: false,
   };
 
-  const formattedDate = date.toLocaleDateString("en-GB", dateOptions); // DD/MM/YYYY format
-  const formattedTime = date.toLocaleTimeString("en-GB", timeOptions); // HH:mm format
+  const formattedDate = date.toLocaleDateString("en-GB", dateOptions);
+  const formattedTime = date.toLocaleTimeString("en-GB", timeOptions);
 
   return `${formattedDate} ${formattedTime}`;
 };

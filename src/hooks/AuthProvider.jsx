@@ -46,6 +46,9 @@ const AuthProvider = ({ children }) => {
           } else if (userRes.role.name == "Student") {
             setUserId(userRes.student.id);
             navigate("/student/all-exams");
+          }else if (userRes.role.name == "Tutor") {
+            setUserId(userRes.tutor.id);
+            navigate("/tutor/exams");
           }
         }
 

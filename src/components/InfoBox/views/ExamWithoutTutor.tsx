@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
 
-export default function ExamView() {
+export default function ExamWithoutTutor() {
   const navigate = useNavigate(); // Initialize navigate
   const fields = ["Exam Title", "LVA Nr.", "Date/Time", "Duration", "Mode", "Student", "Examiner", "Institute", "Status", "Student Misc"];
 
@@ -19,7 +19,7 @@ export default function ExamView() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/exams", {
+      const response = await fetch("http://localhost:1337/api/exams/without-tutor", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -76,12 +76,7 @@ export default function ExamView() {
   }, []);
 
   const handleExamClick = (examId: number) => {
-    if (user.role === "Tutor") {
-      navigate(`/tutor/exams/${examId}`); // Navigate to ExamEditor with the exam ID
-    } else if (user.role === "Admin") {
-      navigate(`/admin/exams/${examId}`); // Navigate to ExamEditor with the exam ID
-    } 
-    
+    navigate(`/tutor/exams/monitor-request/${examId}`); // Navigate to ExamEditor with the exam ID
   };
 
   if (loading) {
@@ -90,11 +85,11 @@ export default function ExamView() {
 
   return (
     <ContentView
-      title={"Upcoming Exams"}
+      title={"Request Exam Monitoring"}
       onRowClick={handleExamClick} 
       fields={fields}
       keys={keys}
-      buttonName={user.role === "Tutor" ? "View" : "Edit"}
+      buttonName={user.role === "Tutor" ? "Request" : "Edit"}
       data={exams} // Pass the fetched and updated exam data here
     />
   );
