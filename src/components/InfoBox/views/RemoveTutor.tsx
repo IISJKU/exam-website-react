@@ -6,11 +6,13 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
 import Exam from "../../classes/Exam";
+import { useNavigate } from "react-router-dom";
 
 export default function RemoveTutor() {
   const { id } = useParams();
   const { t } = useTranslation();
   const user = useAuth();
+  const navigate = useNavigate();
   const userId = user.userId;
   const [loading, setLoading] = useState<boolean>(true);
   const [exam, setExam] = useState<any | null>(null); // Use any type for flexibility
@@ -121,6 +123,7 @@ export default function RemoveTutor() {
       showToast({ message: "Error submitting request to remove monitoring exam", type: "error" });
     } finally {
       setShowConfirmDialog(false); // Close dialog after action
+      navigate("/tutor/upcoming-exams");
     }
   };
 

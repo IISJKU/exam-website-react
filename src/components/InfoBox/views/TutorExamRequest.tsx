@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import { showToast } from "../components/ToastMessage";
 import { useAuth } from "../../../hooks/AuthProvider";
@@ -12,6 +12,7 @@ export default function TutorExamRequest() {
   const { t } = useTranslation();
   const user = useAuth();
   const userId = user.userId;
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(true);
   const [exam, setExam] = useState<any | null>(null); // Use any type for flexibility
   const [originalExam, setOriginalExam] = useState<Exam>(new Exam());
@@ -89,6 +90,8 @@ export default function TutorExamRequest() {
       }
     } catch (error) {
       showToast({ message: "Error submitting request to monitor exam", type: "error" });
+    } finally {
+      navigate("/tutor/exams/without-tutor");
     }
   };
 
