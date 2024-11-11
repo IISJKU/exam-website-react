@@ -3,7 +3,6 @@ import { useState } from "react";
 import SortableHeaders from "../components/SortableHeaders";
 import { useTranslation } from "react-i18next";
 import Pagination from "../components/Pagination";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { useAuth } from "../../../hooks/AuthProvider";
 
 interface ContentViewInterface<T> {
@@ -11,7 +10,7 @@ interface ContentViewInterface<T> {
   fields: string[];
   keys: (keyof T)[];
   data: T[];
-  buttonName?: string; // New prop for the button text
+  buttonName?: string; 
   onRowClick?: (id: number) => void;
 }
 
@@ -50,42 +49,33 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
         <tbody key={"tableBody"}>
           <SortableHeaders fields={props.fields} keys={props.keys} elements={filtered} setElements={setFilteredData} />
           {entries.map((element: T, index) => (
-            <tr
-              key={element.id + "" + index} // Add key for each row
-              className={element["confirmed"] != undefined ? (element["confirmed"] === false ? dashedBorder : className) : className}
-              onClick={() => {
-                if (element.id && props.onRowClick && user.role == "Admin") {
-                  props.onRowClick(element.id); // Use the onRowClick prop if available
-                }
-              }}
-            >
-              {props.keys.map((key, index) => (
-                <td key={(key as string) + index} className="pl-2">
-                  {typeof element[key] === "string"
-                    ? !isDate(element[key] as string)
-                      ? (element[key] as string)
-                      : formatDate(element[key] as string)
-                    : Array.isArray(element[key])
-                    ? (element[key] as string[]).join(", ")
-                    : typeof element[key] === "number"
-                    ? (element[key] as number)
-                    : " "}
-                </td>
-              ))}
+           <tr
+           key={`${element.id}-${index}`} // Add key for each row
+           className={element["confirmed"] != undefined ? (element["confirmed"] === false ? dashedBorder : className) : className}
+           onClick={() => {
+             if (element.id && props.onRowClick) {
+               props.onRowClick(element.id); // Use the onRowClick prop if available
+             }
+           }}
+         >
+           {props.keys.map((key, idx) => (
+             <td key={`${String(key)}-${idx}`} className="pl-2">
+               {typeof element[key] === "string"
+                 ? !isDate(element[key] as string)
+                   ? (element[key] as string)
+                   : formatDate(element[key] as string)
+                 : Array.isArray(element[key])
+                 ? (element[key] as string[]).join(", ")
+                 : typeof element[key] === "number"
+                 ? (element[key] as number)
+                 : " "}
+             </td>
+            ))}
 
-              <td key="editButton">
-                <button
-                  className="hover:underline"
-                  onClick={() => {
-                    if (element.id && props.onRowClick) {
-                      props.onRowClick(element.id); // Use the onRowClick prop if available
-                    }
-                  }}
-                >
-                  Edit
-                </button>
-              </td>
-            </tr>
+             <td className="pr-3" key="editButton">
+               <button>{props.buttonName || "Edit"}</button> {/* Use buttonName or default to "Edit" */}
+             </td>
+           </tr>
           ))}
         </tbody>
       </table>
