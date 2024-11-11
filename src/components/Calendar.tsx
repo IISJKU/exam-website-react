@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { showToast } from "./InfoBox/components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import Exam from "./classes/Exam";
 
+import fetchAll from "./InfoBox/views/FetchAll";
 import { useAuth } from "../hooks/AuthProvider";
 
 export default function Calendar() {
@@ -13,19 +15,12 @@ export default function Calendar() {
   const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const [exams, setExams] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // State for loading
-
   const user = useAuth();
 
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/exams", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      const data = await response.json();
+      const data = (await fetchAll("http://localhost:1337/api/exams", user.token)) as Exam[];
 
       setExams(data);
     } catch (error) {

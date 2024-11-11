@@ -15,6 +15,7 @@ interface NotificationComponentProps {
   options: Object;
   id: number;
   exam_id: number;
+  openId: number | undefined;
 }
 
 export default function NotificationComponent(props: NotificationComponentProps) {
@@ -35,6 +36,19 @@ export default function NotificationComponent(props: NotificationComponentProps)
     return t;
   };
 
+  const checkIfOpen = (): boolean => {
+    let t = false;
+
+    props.notification.forEach((notification) => {
+      if (Number(notification.id) == Number(props.openId)) {
+        t = true;
+      }
+    });
+
+    return t;
+  };
+  const [clickedOn, setClickedOn] = useState<boolean>(checkIfOpen());
+
   const [seen, setSeen] = useState<boolean>(hasSeen());
 
   let tabs: number[] = [];
@@ -42,7 +56,8 @@ export default function NotificationComponent(props: NotificationComponentProps)
   const [infoOpen, setInfoOpen] = useState<boolean>(false);
 
   const handleClick = (notifId: number) => {
-    navigate(`/admin/notifications/${notifId}`); // Navigate to ExamEditor with the exam ID
+    if (auth.role == "Admin") navigate(`/admin/notification/${notifId}`); // Navigate to ExamEditor with the exam ID
+    else navigate(`/student/notification/${notifId}`);
   };
 
   const staticTitles = ["title", "date", "lva_num", "duration", "status"];
@@ -58,7 +73,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
   };
 
   const getElem = (index: any, type: string): string => {
-    if (index.id != undefined) {
+    if (index != undefined && index.id != undefined) {
       index = index.id;
     }
 
@@ -136,20 +151,29 @@ export default function NotificationComponent(props: NotificationComponentProps)
 
   let color = "";
   if (notifications[0].type == NotificationType.createExam || notifications[0].type == NotificationType.proposeChange)
-    color = " even:bg-red-400 odd:bg-red-400 border border-striped";
+    color = " even:bg-red-100 odd:bg-red-200 border border-striped cursor-pointer ";
 
-  if (notifications[0].type == NotificationType.createExam) color = " even:bg-cyan-400 odd:bg-cyan-400";
+  if (notifications[0].type == NotificationType.createExam)
+    color = "bg-red-300 even:bg-red-200 <odd:bg-red-3></odd:bg-red-3>00 cursor-pointer border border-white hover:border-black";
 
   calcTabs();
 
+  useEffect(() => {
+    const div = document.getElementById("notification" + props.id.toString() + "_div");
+    div?.scrollIntoView({ behavior: "smooth" });
+    console.log("div");
+    console.log(div);
+  }, []);
+
   return (
     <li
+      id={"notification" + props.id.toString()}
       key={props.id}
-      className={"even:bg-slate-200 odd:bg-slate-100 cursor-pointer border border-white hover:border-black" + color.toString()}
+      className={color == "" ? "even:bg-slate-200 odd:bg-slate-100 cursor-pointer border border-white hover:border-black" : color.toString()}
       onClick={() => toggleInfoPannel()}
     >
       {props.notification[0].type == NotificationType.createExam ? (
-        <div className=" relative">
+        <div className=" relative" id={"notification" + props.id.toString() + "_div"}>
           {notifications[0].sentBy} proposed a new Exam
           {notifications[0].type == NotificationType.confirmChange || notifications[0].type == NotificationType.discardChange ? (
             <></>
@@ -161,7 +185,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
         </div>
       ) : (
         <div className=" relative">
-          {props.exam.title} was edited by {notifications[0].sentBy}
+          {props.exam.title != undefined ? props.exam.title + " was edited by " + notifications[0].sentBy : "Exam was declined by " + notifications[0].sentBy}
           {notifications[0].type == NotificationType.confirmChange || notifications[0].type == NotificationType.discardChange ? (
             <></>
           ) : (
@@ -172,20 +196,26 @@ export default function NotificationComponent(props: NotificationComponentProps)
         </div>
       )}
 
-      {infoOpen ? (
+      {infoOpen || clickedOn ? (
         <div className="">
           {notifications.map((notification: Notification, index) => (
             <div className="cursor-default">
               <ul className="p-4">
                 {notification.type == NotificationType.proposeChange ||
                 notification.type == NotificationType.adminChange ||
+                notification.type == NotificationType.createExamOld ||
                 notification.type == NotificationType.createExam ? (
                   <div className={("pl-" + tabs[index]).toString()}>
                     At {moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm") ?? ""} {notification.sentBy}{" "}
-                    {notification.type == NotificationType.adminChange ? "changed" : "proposed a change"}:
+                    {notification.type == NotificationType.adminChange
+                      ? "changed"
+                      : notification.type == NotificationType.createExamOld
+                      ? "proposed an Exam"
+                      : "proposed a change"}
+                    :
                     {Object.keys(JSON.parse(notification.information)).map((elem: string) => (
                       <li className="bg-white border border-black p-1">
-                        {notification.type == NotificationType.createExam
+                        {notification.type == NotificationType.createExam || notification.type == NotificationType.createExamOld
                           ? getTitle(JSON.parse(notification.information)[elem], elem) + ": " + getElem(JSON.parse(notification.information)[elem], elem)
                           : getElem(JSON.parse(notification.oldInformation)[elem], elem) + " -> " + getElem(JSON.parse(notification.information)[elem], elem)}
                       </li>
@@ -200,13 +230,16 @@ export default function NotificationComponent(props: NotificationComponentProps)
                     ).toString()}
                   >
                     {notification.sentBy} {notification.type == NotificationType.confirmChange ? "approved" : "declined"} the changes.
-                    {Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) => (
-                      <li
-                        className={(notification.type == NotificationType.discardChange ? "line-through " : "").toString() + "bg-white border border-black p-1"}
-                      >
-                        {getElem(JSON.parse(notification.oldInformation)[elem], elem)}
-                      </li>
-                    ))}{" "}
+                    {notification.oldInformation != "" &&
+                      Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) => (
+                        <li
+                          className={
+                            (notification.type == NotificationType.discardChange ? "line-through " : "").toString() + "bg-white border border-black p-1"
+                          }
+                        >
+                          {getElem(JSON.parse(notification.oldInformation)[elem], elem)}
+                        </li>
+                      ))}{" "}
                   </div>
                 )}
               </ul>

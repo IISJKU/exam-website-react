@@ -13,7 +13,6 @@ import Institute from "../../classes/Institute";
 import Room from "../../classes/Room";
 import Exam from "../../classes/Exam";
 
-
 export default function RequestExam() {
   const { id } = useParams(); // Get exam ID from URL params
 
@@ -23,7 +22,7 @@ export default function RequestExam() {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [editMode, setEditMode] = useState<boolean>(true);
-  const [exam, setExam] = useState<Exam | null>(null); 
+  const [exam, setExam] = useState<Exam | null>(null);
 
   const [title, setTitle] = useState<string>("");
   const [student, setStudent] = useState<number>(user.userId);
@@ -43,30 +42,39 @@ export default function RequestExam() {
     rooms: [] as Room[],
   });
 
+  const studentId = user.userId;
+
   useEffect(() => {
     const fetchStudentExam = async () => {
       try {
-        const examResponse = await fetch(`http://localhost:1337/api/exams/${id}`, {
+        const examResponse = await fetch(`http://localhost:1337/api/exams/me`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         });
-        const examData = await examResponse.json();
+
+        const allExams = await examResponse.json();
+        let examData: Exam | undefined;
+
+        allExams.forEach((exam: any) => {
+          if (exam.id == id) {
+            examData = exam as Exam;
+          }
+        });
 
         if (!examResponse.ok) {
-          showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error", });
-         }
+          showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${allExams.error.message || "Unknown error"}.`, type: "error" });
+        }
         if (examData) {
           setExam(examData);
           setTitle(examData.title);
           setLvaNum(examData.lva_num);
           setDate(examData.date);
           setDuration(examData.duration);
-          setStudent(examData.student_id);
-          setExaminer(examData.examiner_id);
-          setInstitute(examData.institute_id);
-          setMode(examData.mode_id);
+          typeof examData.examiner == "number" ? setExaminer(examData.examiner_id) : setExaminer(examData.examiner.id);
+          typeof examData.institute == "number" ? setInstitute(examData.institute) : setInstitute(examData.institute.id);
+          typeof examData.exam_mode == "number" ? setMode(examData.mode_id) : setMode(examData.exam_mode.id);
           setRoom(examData.room_id);
           setStatus(examData.status);
         } else {
@@ -101,7 +109,7 @@ export default function RequestExam() {
       }
     };
 
-    fetchStudentExam()
+    fetchStudentExam();
     fetchDropdownOptions();
   }, [user.token, id]);
 
@@ -173,15 +181,44 @@ export default function RequestExam() {
       <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} onChange={(e) => setLvaNum(Number(e.target.value))} />
       <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
       <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} onChange={(e) => setDuration(Number(e.target.value))} />
-    
-      <DropdownWithSearch tableName = "examiners"  label={t("Examiner")} options={dropdownOptions(options.examiners, "first_name", "last_name")} value={examiner ?? ""} onChange={(val) => setExaminer(Number(val))} placeholder={t("Search examiner...")} disabled={!editMode} />
-      <DropdownWithSearch tableName = "institutes" label={t("Institute")} options={dropdownOptions(options.institutes, "name")} value={institute ?? ""} onChange={(val) => setInstitute(Number(val))} placeholder={t("Search institutes...")} disabled={!editMode} />
-      <DropdownWithSearch tableName = "exam-modes" label={t("Mode")} options={dropdownOptions(options.modes, "name")} value={mode ?? ""} onChange={(val) => setMode(Number(val))} placeholder={t("Search modes...")} disabled={!editMode} />
+
+      <DropdownWithSearch
+        tableName="examiners"
+        label={t("Examiner")}
+        options={dropdownOptions(options.examiners, "first_name", "last_name")}
+        value={examiner ?? ""}
+        onChange={(val) => setExaminer(Number(val))}
+        placeholder={t("Search examiner...")}
+        disabled={!editMode}
+      />
+      <DropdownWithSearch
+        tableName="institutes"
+        label={t("Institute")}
+        options={dropdownOptions(options.institutes, "name")}
+        value={institute ?? ""}
+        onChange={(val) => setInstitute(Number(val))}
+        placeholder={t("Search institutes...")}
+        disabled={!editMode}
+      />
+      <DropdownWithSearch
+        tableName="exam-modes"
+        label={t("Mode")}
+        options={dropdownOptions(options.modes, "name")}
+        value={mode ?? ""}
+        onChange={(val) => setMode(Number(val))}
+        placeholder={t("Search modes...")}
+        disabled={!editMode}
+      />
 
       <EditField title={t("Status")} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus("Pending")} />
-      
-      <button onClick={handleSubmit} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline">{t("Save")}</button>
-      <button onClick={() => navigate(`/student/all-exams`)} className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline"> {t("Cancel")} </button>
+
+      <button onClick={handleSubmit} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline">
+        {t("Save")}
+      </button>
+      <button onClick={() => navigate(`/student/all-exams`)} className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline">
+        {" "}
+        {t("Cancel")}{" "}
+      </button>
     </div>
   );
 }

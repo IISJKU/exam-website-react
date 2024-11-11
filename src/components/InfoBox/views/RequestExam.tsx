@@ -13,6 +13,7 @@ import Institute from "../../classes/Institute";
 import Room from "../../classes/Room";
 import Exam from "../../classes/Exam";
 import Notification, { NotificationType } from "../../classes/Notification";
+import { stat } from "fs";
 
 // Define initial state type to include all properties
 interface InitialState {
@@ -74,12 +75,15 @@ export default function RequestExam() {
   useEffect(() => {
     const fetchDropdownOptions = async () => {
       try {
-        const [examinersRes, institutesRes, modesRes, roomsRes] = await Promise.all([
+        const [examinersRes, studentRes, institutesRes, modesRes, roomsRes] = await Promise.all([
           fetch("http://localhost:1337/api/examiners", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch("http://localhost:1337/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/institutes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
         ]);
+
+        console.log();
 
         setOptions({
           examiners: examinersRes ?? [],
@@ -88,11 +92,13 @@ export default function RequestExam() {
           rooms: roomsRes ?? [],
         });
 
+        setStudent(studentRes[0].id);
+
         setInitialState({
           exam,
           title,
           lva_num,
-          student,
+          student: student,
           date,
           duration,
           examiner,
@@ -128,19 +134,17 @@ export default function RequestExam() {
   function addedExam() {
     let t = "";
 
-    if (exam != null) {
-      t = t + ' "title" : "' + title + '",';
-      t = t + ' "lva_num" : "' + lva_num + '",';
-      t = t + ' "date" : "' + date + '",';
-      t = t + ' "duration" : "' + duration + '",';
-      t = t + ' "status" : "' + status + '",';
+    t = t + ' "title" : "' + title + '",';
+    t = t + ' "lva_num" : "' + lva_num + '",';
+    t = t + ' "date" : "' + date + '",';
+    t = t + ' "duration" : "' + duration + '",';
+    t = t + ' "status" : "' + status + '",';
 
-      t = t + ' "student_id" : "' + student + '",';
-      t = t + ' "room_id" : "' + room + '",';
-      t = t + ' "examiner_id" : "' + examiner + '",';
-      t = t + ' "institute_id" : "' + institute + '",';
-      t = t + ' "exam_mode" : "' + mode + '",';
-    }
+    t = t + ' "student_id" : "' + student + '",';
+    t = t + ' "room_id" : "' + room + '",';
+    t = t + ' "examiner_id" : "' + examiner + '",';
+    t = t + ' "institute_id" : "' + institute + '",';
+    t = t + ' "exam_mode" : "' + mode + '",';
 
     if (t != "") {
       t = t.substring(0, t.length - 1);
@@ -152,26 +156,25 @@ export default function RequestExam() {
 
   const handleSubmit = async () => {
     const data: Partial<Exam> = {
-      title,
-      date,
+      title: title,
+      date: date,
       student_id: student,
-      duration,
-      student,
-      examiner,
-      institute,
+      duration: duration,
+      examiner_id: examiner,
+      institute_id: institute,
       exam_mode: mode,
-      room,
+      room_id: room,
       lva_num,
       status,
     };
+
     setExam(data as Exam);
+
     try {
       let addedEx = addedExam();
-      let notif = new Notification(JSON.stringify(exam), "", user.user);
-      notif.type = NotificationType.createExam;
 
-      console.log(addedEx);
-      console.log(notif);
+      let notif = new Notification(JSON.stringify(data), "", user.user);
+      notif.type = NotificationType.createExam;
 
       if (addedEx != "") {
         const notify = await fetch(`http://localhost:1337/api/notifications`, {
@@ -190,8 +193,11 @@ export default function RequestExam() {
           });
           return;
         }
+
+        showToast({ message: "Exam notification created successfully", type: "success" });
       }
-      showToast({ message: "Exam notification created successfully", type: "success" });
+
+      navigate("/student/all-exams");
     } catch (error) {
       showToast({ message: "Error creating exam notification", type: "error" });
     }
@@ -209,6 +215,8 @@ export default function RequestExam() {
     setMode(initialState.mode);
     setRoom(initialState.room);
     setStatus(initialState.status);
+
+    navigate("/student/all-exams");
   };
 
   const dropdownOptions = (list: any[] = [], firstNameField: string, lastNameField?: string) =>
@@ -231,7 +239,9 @@ export default function RequestExam() {
         label={t("Examiner")}
         options={dropdownOptions(options.examiners, "first_name", "last_name")}
         value={examiner ?? ""}
-        onChange={(val) => setExaminer(Number(val))}
+        onChange={(val) => {
+          setExaminer(Number(val));
+        }}
         placeholder={t("Search examiner...")}
         disabled={!editMode}
       />

@@ -3,6 +3,8 @@ import { useState } from "react";
 import SortableHeaders from "../components/SortableHeaders";
 import { useTranslation } from "react-i18next";
 import Pagination from "../components/Pagination";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useAuth } from "../../../hooks/AuthProvider";
 
 interface ContentViewInterface<T> {
   title: string;
@@ -18,6 +20,7 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
   const [filtered, setFiltered] = useState<T[]>(props.data);
   const entriesPerPage = 20;
   const [page, setPage] = useState(1);
+  const user = useAuth();
 
   function setFilteredData(data: T[]) {
     setFiltered(data);
@@ -48,16 +51,16 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
           <SortableHeaders fields={props.fields} keys={props.keys} elements={filtered} setElements={setFilteredData} />
           {entries.map((element: T, index) => (
             <tr
-              key={`${element.id}-${index}`} // Add key for each row
+              key={element.id + "" + index} // Add key for each row
               className={element["confirmed"] != undefined ? (element["confirmed"] === false ? dashedBorder : className) : className}
               onClick={() => {
-                if (element.id && props.onRowClick) {
+                if (element.id && props.onRowClick && user.role == "Admin") {
                   props.onRowClick(element.id); // Use the onRowClick prop if available
                 }
               }}
             >
-              {props.keys.map((key, idx) => (
-                <td key={`${String(key)}-${idx}`} className="pl-2">
+              {props.keys.map((key, index) => (
+                <td key={(key as string) + index} className="pl-2">
                   {typeof element[key] === "string"
                     ? !isDate(element[key] as string)
                       ? (element[key] as string)
@@ -70,8 +73,17 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
                 </td>
               ))}
 
-              <td className="pr-3" key="editButton">
-                <button>{props.buttonName || "Edit"}</button> {/* Use buttonName or default to "Edit" */}
+              <td key="editButton">
+                <button
+                  className="hover:underline"
+                  onClick={() => {
+                    if (element.id && props.onRowClick) {
+                      props.onRowClick(element.id); // Use the onRowClick prop if available
+                    }
+                  }}
+                >
+                  Edit
+                </button>
               </td>
             </tr>
           ))}

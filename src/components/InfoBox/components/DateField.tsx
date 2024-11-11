@@ -11,9 +11,10 @@ interface DateFieldProps {
 
 export default function DateField(props: DateFieldProps) {
   // Format the date and time as per "en-GB" (DD/MM/YYYY HH:mm)
-  const formattedDate = props.dateValue ? moment(props.dateValue).format("DD/MM/YYYY") : "";
+  const formattedDate = props.dateValue ? moment(props.dateValue).format("YYYY-MM-DD") : "";
   const formattedTime = props.dateValue ? moment(props.dateValue).format("HH:mm") : "";
 
+  console.log(props.dateValue);
   return (
     <div>
       {props.title !== undefined ? <div className="font-bold">{props.title + " "}</div> : null}

@@ -22,6 +22,8 @@ export default function IndividualNotification() {
 
   const { t } = useTranslation();
 
+  const [notification, setNotification] = useState<Notification>();
+
   const [proposedExam, setProposedExam] = useState<Exam>(new Exam());
   const navigate = useNavigate(); // Initialize useNavigate for navigation
   const [loading, setLoading] = useState<boolean>(true);
@@ -82,7 +84,7 @@ export default function IndividualNotification() {
             Authorization: `Bearer ${user.token}`,
           },
         });
-        const data = (await response.json()).data;
+        const data = await response.json();
 
         let proposedExams: Notification[] = [];
 
@@ -91,38 +93,29 @@ export default function IndividualNotification() {
         //Check type of notif first... if its a new exam proposal, you should not collect all others
         data.forEach((element: any) => {
           if (element.id == Number(id)) {
-            exam_id = Number(element.attributes.exam_id);
+            exam_id = Number(element.exam_id);
           }
         });
 
         if (exam_id != 0) {
           data.forEach((element: any) => {
-            if (element.attributes.exam_id == Number(exam_id)) {
-              let t = new Notification(
-                element.attributes.information,
-                element.attributes.oldInformation,
-                element.attributes.seenBy,
-                element.attributes.exam_id
-              );
-              t.sentBy = element.attributes.sentBy;
+            if (element.exam_id == Number(exam_id)) {
+              let t = new Notification(element.information, element.oldInformation, element.seenBy, element.exam_id);
+              t.sentBy = element.sentBy;
 
-              if (element.attributes.type == NotificationType.confirmChange || element.attributes.type == NotificationType.confirmChange) proposedExams = [];
+              if (element.type == NotificationType.confirmChange || element.type == NotificationType.confirmChange) proposedExams = [];
               else proposedExams.push(t);
             }
           });
         } else {
           data.forEach((element: any) => {
             if (element.id == Number(id)) {
-              let t = new Notification(
-                element.attributes.information,
-                element.attributes.oldInformation,
-                element.attributes.seenBy,
-                element.attributes.exam_id
-              );
-              t.sentBy = element.attributes.sentBy;
+              let t = new Notification(element.information, element.oldInformation, element.seenBy, element.exam_id);
+              t.sentBy = element.sentBy;
 
-              t.type = element.attributes.type;
+              t.type = element.type;
               proposedExams.push(t);
+              setNotification(element as Notification);
             }
           });
         }
@@ -266,6 +259,43 @@ export default function IndividualNotification() {
     fetchDropdownOptions();
   }, [id]);
 
+  const fixProposedExam = () => {
+    proposedExam.student = proposedExam.student_id;
+    proposedExam.tutor = proposedExam.tutor_id;
+    proposedExam.examiner = proposedExam.examiner_id;
+    proposedExam.institute = proposedExam.institute_id;
+
+    //clean up fields
+    delete (proposedExam as { student_id?: number }).student_id;
+    delete (proposedExam as { tutor_id?: number }).tutor_id;
+    delete (proposedExam as { examiner_id?: number }).examiner_id;
+    delete (proposedExam as { institute_id?: number }).institute_id;
+  };
+
+  const sendNotification = async (accept: boolean) => {
+    let notif = new Notification("", JSON.stringify(proposedExam), user.user, exam?.id ? exam.id : proposedExam.id);
+
+    notif.type = NotificationType.confirmChange;
+    if (!accept) notif.type = NotificationType.discardChange;
+
+    const notify = await fetch(`http://localhost:1337/api/notifications`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data: notif }),
+    });
+
+    if (!notify.ok) {
+      const errorData = await notify.json();
+      showToast({
+        message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+        type: "error",
+      });
+      return;
+    }
+  };
+
   const handleUpdate = async (accept: boolean) => {
     if (accept) {
       //reset notif, set to passive & apply changes
@@ -292,28 +322,10 @@ export default function IndividualNotification() {
 
           showToast({ message: "Exam updated successfully", type: "success" });
 
-          let notif = new Notification("", JSON.stringify(proposedExam), user.user, exam?.id);
-
-          notif.type = NotificationType.confirmChange;
-          if (!accept) notif.type = NotificationType.discardChange;
-
-          const notify = await fetch(`http://localhost:1337/api/notifications`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ data: notif }),
-          });
-
-          if (!notify.ok) {
-            const errorData = await notify.json();
-            showToast({
-              message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
-              type: "error",
-            });
-            return;
-          }
+          sendNotification(accept);
         } else {
+          fixProposedExam();
+
           const response = await fetch(`http://localhost:1337/api/exams/`, {
             method: "POST",
             headers: {
@@ -323,33 +335,69 @@ export default function IndividualNotification() {
             body: JSON.stringify({ data: proposedExam }),
           });
 
-          const examRes = await fetch(`http://localhost:1337/api/exams/`, {
+          const examResponse = await fetch(`http://localhost:1337/api/exams/?sort[0]=id:desc&pagination[start]=0&pagination[limit]=25`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
-              "Content-Type": "application/json",
             },
           });
 
-          let ex = await examRes.json;
-          console.log(examRes);
+          const examData = await examResponse.json();
 
-          if (!response.ok) {
-            const errorData = await response.json();
-            showToast({
-              message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
-              type: "error",
-            });
-            return;
-          } else {
-            showToast({ message: "Successfully posted Exam", type: "success" });
+          let newExam: Exam | undefined;
+
+          if (examData.length != 0) {
+            for (let i = 0; i < examData.length; i++) {
+              if (
+                examData[i].title == proposedExam.title &&
+                examData[i].student_id == proposedExam.student &&
+                examData[i].duration == proposedExam.duration &&
+                examData[i].lva_num == proposedExam.lva_num
+              ) {
+                newExam = examData[i];
+              }
+            }
           }
+
+          if (newExam) {
+            proposedExam.id = newExam.id;
+            let newNotif = notification;
+
+            if (newNotif != undefined) {
+              newNotif.exam_id = newExam.id;
+
+              newNotif.type = NotificationType.createExamOld;
+              const notif = await fetch(`http://localhost:1337/api/notification/${newNotif.id}`, {
+                method: "PUT",
+                headers: {
+                  Authorization: `Bearer ${user.token}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ data: newNotif }),
+              });
+            }
+          } else {
+            showToast({ message: "New Exam Not Found", type: "error" });
+          }
+
+          sendNotification(accept);
         }
       } catch (error) {
         showToast({ message: "Error updating exam", type: "error" });
       }
     } else {
       //set notif to passive, discard changes
+      if (notification && (exam == null || exam.id == undefined || exam.id == 0)) {
+        const notif = await fetch(`http://localhost:1337/api/notifications/${notification.id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        sendNotification(false);
+      }
     }
 
     navigate("/admin/notifications");
@@ -404,7 +452,7 @@ export default function IndividualNotification() {
       <ComparisonField
         label={"Date"}
         options={[]}
-        value={moment(date).format("DD.MM.YYYY HH:mm")}
+        value={date != undefined ? moment(date).format("DD.MM.YYYY HH:mm") : ""}
         proposedVal={proposedExam.date ? moment(proposedExam.date).format("DD.MM.YYYY HH:mm") : ""}
       />
 

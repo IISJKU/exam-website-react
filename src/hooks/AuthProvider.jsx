@@ -37,14 +37,15 @@ const AuthProvider = ({ children }) => {
         //localStorage.setItem("site", res.jwt);
 
         const userRes = await userData();
-        if (userRes) {
+
+        if (userRes.role.name) {
           setUser(userRes.username);
           setRole(userRes.role.name);
           if (userRes.role.name == "Admin") {
             setUserId(userRes.id);
             navigate("/admin/exams");
           } else if (userRes.role.name == "Student") {
-            setUserId(userRes.student.id);
+            console.log("userRes.role.name");
             navigate("/student/all-exams");
           }else if (userRes.role.name == "Tutor") {
             setUserId(userRes.tutor.id);

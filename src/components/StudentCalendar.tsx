@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { showToast } from "./InfoBox/components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-
+import Exam from "./classes/Exam";
 import { useAuth } from "../hooks/AuthProvider";
+
+import fetchAll from "./InfoBox/views/FetchAll";
 
 export default function StudentCalender() {
   const { t } = useTranslation();
@@ -19,8 +21,7 @@ export default function StudentCalender() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch(`http://localhost:1337/api/exams/student/${user.userId}`, {
-        method: "GET",
+      const response = await fetch("http://localhost:1337/api/exams/me", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },

@@ -2,6 +2,7 @@ export enum NotificationType {
   confirmChange = "confirmChange",
   discardChange = "discardChange",
   createExam = "createExam",
+  createExamOld = "createExamOld",
   proposeChange = "proposeChange",
   adminChange = "adminChange",
   tutorConfirm = "tutorConfirm",

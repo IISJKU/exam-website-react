@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { showToast } from "../components/ToastMessage";
 import Exam from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
+import fetchAll from "./FetchAll";
 
 const localizer = momentLocalizer(moment);
 
@@ -39,16 +40,7 @@ export default function BigCalendar() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/exams", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
-       }
+      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, "Http error!")) as Exam[];
       setExams(data);
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });

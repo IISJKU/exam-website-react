@@ -49,11 +49,12 @@ export default function App() {
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/exams" element={<ExamView />} />
               <Route path="/admin/notifications" element={<NotificationView />} />
+              <Route path="/admin/notifications/:id" element={<NotificationView />} /> {/* open a specific notification */}
               <Route path="/admin/students" element={<StudentView />} />
               <Route path="/admin/tutors" element={<TutorView />} />
               <Route path="/admin/tutors/:id" element={<IndividualTutor />} />
               <Route path="/admin/students/:id" element={<IndividualStudent />} />
-              <Route path="/admin/notifications/:id" element={<IndividualNotification />} />
+              <Route path="/admin/notification/:id" element={<IndividualNotification />} />
               <Route path="/admin/exams/:id" element={<ExamEditor />} />
               <Route path="/admin/data-administration" element={<TableLinks />} />
               <Route path="/admin/data-administration/:tableName" element={<DataAdministrationPage />} />
@@ -63,8 +64,9 @@ export default function App() {
             <Route element={<StudentLayout />}>
               <Route path="/student/request-exam" element={<RequestExam />} />
               <Route path="/student/all-exams" element={<StudentExamView />} />
-              <Route path="/student/exams/:id" element={<StudentExamEditor />} />
+              <Route path="/student/exams/:id" element={<ExamEditor />} />
               <Route path="/student/calendar/:year/:month/:day" element={<StudentBigCalender />} />
+              <Route path="/student/notifications" element={<NotificationView />} />
             </Route>
 
             <Route element={<TutorLayout />}>

@@ -44,9 +44,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
 
   useEffect(() => {
     // Filter options based on the search term
-    const filtered = props.options.filter((option) =>
-      option.label.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filtered = props.options.filter((option) => option.label.toLowerCase().includes(searchTerm.toLowerCase()));
     setFilteredOptions(filtered);
   }, [searchTerm, props.options]);
 
@@ -58,7 +56,6 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
 
   function newRecord() {
     let t = "";
-    console.log(filteredOptions.length)
     if (filteredOptions.length == 0) {
       if (props.tableName != "") t = t + ' "table" : "' + props.tableName + '",';
       if (props.label != "") t = t + ' "label" : "' + props.label + '",';
@@ -69,7 +66,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
       t = t.substring(0, t.length - 1);
       t = "{" + t + "}";
     }
-    console.log(t);
+
     return t;
   }
 
@@ -92,7 +89,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
         }
 
         const newRecord = await response.json();
-        showToast({ message:`New record added: ` + {newRecord} , type: "info"});
+        showToast({ message: `New record added: ` + { newRecord }, type: "info" });
 
         // Add the new option to the dropdown list
         props.onChange(searchTerm); // Set the new record as the selected value
@@ -105,8 +102,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
   };
 
   // Get the label of the currently selected value (if any)
-  const selectedOptionLabel =
-    props.options.find((option) => option.value === props.value)?.label || "";
+  const selectedOptionLabel = props.options.find((option) => option.value === props.value)?.label || "";
 
   return (
     <div className="relative w-96" ref={dropdownRef}>
@@ -133,19 +129,14 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
                     key={option.value}
                     onClick={() => handleSelectOption(option.value)}
                     className={`cursor-pointer select-none relative py-2 pl-3 pr-9 ${
-                      option.value === props.value
-                        ? "bg-gray-100 text-black font-bold"
-                        : "text-gray-900"
+                      option.value === props.value ? "bg-gray-100 text-black font-bold" : "text-gray-900"
                     } hover:bg-indigo-500 hover:text-white`}
                   >
                     {option.label}
                   </li>
                 ))
               ) : (
-                <li
-                  className="text-gray-500 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:text-indigo-500"
-                  onClick={handleAddNewRecord}
-                >
+                <li className="text-gray-500 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:text-indigo-500" onClick={handleAddNewRecord}>
                   No options found. Click to add "{searchTerm}"
                 </li>
               )}

@@ -5,6 +5,7 @@ import Exam from "./classes/Exam";
 import { showToast } from "./InfoBox/components/ToastMessage";
 import Notification, { NotificationType } from "./classes/Notification";
 import useInterval from "../hooks/UseInterval";
+import { useNavigate } from "react-router-dom";
 
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[] | null>(null);
@@ -12,6 +13,9 @@ export default function NotificationBell() {
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
   const user = useAuth();
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
+
+  const navigate = useNavigate(); // React Router hook for navigation
+
   const fetchNotifications = async () => {
     try {
       const response = await fetch("http://localhost:1337/api/notifications", {
@@ -19,7 +23,7 @@ export default function NotificationBell() {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      const data = (await response.json()).data;
+      const data = await response.json();
 
       let t: Notification[] = [];
 
@@ -31,10 +35,12 @@ export default function NotificationBell() {
       const exData = await exResponse.json();
 
       data.forEach((element: any) => {
-        let e = new Notification(element.attributes.information, element.attributes.oldInformation, element.attributes.sentBy, element.attributes.exam_id);
+        let e = new Notification(element.information, element.oldInformation, element.sentBy, element.exam_id);
 
-        e.seenBy = element.attributes.seenBy;
-        e.type = element.attributes.type;
+        e.id = element.id;
+
+        e.seenBy = element.seenBy;
+        e.type = element.type;
 
         if (e.seenBy == undefined || !e.seenBy.includes(user.user) || !e.sentBy == user.user) {
           t.push(e);
@@ -90,6 +96,12 @@ export default function NotificationBell() {
     return str;
   };
 
+  const handleClick = (c: number) => {
+    console.log("notification" + c.toString());
+    if (user.role == "Admin") navigate(`admin/notifications/${c}`);
+    else navigate(`students/notifications/${c}`);
+  };
+
   return (
     <div
       className="relative focus:border-double h-10 ml-5 hover:border hover:border-black transition"
@@ -105,7 +117,11 @@ export default function NotificationBell() {
         notifications.length != 0 ? (
           <ul className="absolute -translate-x-32 mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black z-50 w-80">
             {notifications?.map((notification, index) => (
-              <li key={index} className={`cursor-pointer select-none relative py-2 hover:bg-indigo-500 hover:text-white`}>
+              <li
+                key={index}
+                className={`cursor-pointer select-none relative py-2 hover:bg-indigo-500 hover:text-white`}
+                onMouseDown={() => handleClick(notification.id)}
+              >
                 {notification.type == NotificationType.adminChange || notification.type == NotificationType.proposeChange
                   ? notification.sentBy + " changed " + getName(notification.exam_id)
                   : ""}

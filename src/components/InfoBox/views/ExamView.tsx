@@ -3,6 +3,9 @@ import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
+
+import fetchAll from "./FetchAll";
+import { ToastOptions } from "react-toastify";
 import { useAuth } from "../../../hooks/AuthProvider";
 
 export default function ExamView() {
@@ -11,7 +14,7 @@ export default function ExamView() {
 
   const keys: (keyof Exam)[] = ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute", "status", "student_misc"];
 
-  const [exams, setExams] = useState([]); // Store exams
+  const [exams, setExams] = useState<Exam[]>([]); // Store exams
   const [loading, setLoading] = useState<boolean>(true); // State for loading
 
   const user = useAuth();
@@ -19,17 +22,9 @@ export default function ExamView() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/exams", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      const data = await response.json();
-      
-      if (!response.ok) {
-       showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
-      }
+      //let data = [];
+
+      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, "Http error!")) as Exam[];
 
       // Modify the data array before setting it to exams
       const updatedData = data.map((exam: any) => {

@@ -11,16 +11,26 @@ export default function StudentMenu() {
       {/* Exams Overview Button */}
       <button
         onClick={() => {
-          //navigate("admin/notifications"); 
-        }} className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline">
+          navigate("student/notifications");
+        }}
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+      >
         {t("Notifications")}
       </button>
-      <button onClick={() => { navigate("student/all-exams");}}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline" >
+      <button
+        onClick={() => {
+          navigate("student/all-exams");
+        }}
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+      >
         {t("Exams Overview")}
       </button>
       <button
-        onClick={() => { navigate("student/request-exam"); }} className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline">
+        onClick={() => {
+          navigate("student/request-exam");
+        }}
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+      >
         {t("Request New Exam")}
       </button>
 

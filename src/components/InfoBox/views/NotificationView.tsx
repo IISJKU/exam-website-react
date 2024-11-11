@@ -14,10 +14,12 @@ import ExamMode from "../../classes/ExamMode";
 import Institute from "../../classes/Institute";
 import Room from "../../classes/Room";
 import { showToast } from "../components/ToastMessage";
+import { useParams } from "react-router-dom";
 
 export default function NotificationView() {
   const user = useAuth();
   const { t } = useTranslation();
+  const { id } = useParams(); // Get exam ID from URL params
 
   const [exams, setExams] = useState<Exam[]>();
 
@@ -27,6 +29,20 @@ export default function NotificationView() {
   const [seenNotifications, setSeenNotifications] = useState<Notification[]>([]);
   const [newNotifications, setNewNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // State for loading
+
+  const studentId = user.userId;
+
+  let notificationRoute = "http://localhost:1337/api/notifications";
+  let examRoute = "http://localhost:1337/api/exams";
+  let tutRoute = "http://localhost:1337/api/tutors";
+  let studentRoute = "http://localhost:1337/api/students";
+
+  if (user.role == "Student") {
+    notificationRoute = `http://localhost:1337/api/notifications/me`;
+    examRoute = `http://localhost:1337/api/exams/me`;
+    tutRoute = `http://localhost:1337/api/tutors/me`;
+    studentRoute = "http://localhost:1337/api/students/me";
+  }
 
   const [options, setOptions] = useState({
     students: [] as Student[],
@@ -49,7 +65,7 @@ export default function NotificationView() {
 
     arr.forEach((messages) => {
       messages.forEach((message) => {
-        if (message.exam_id == notif.exam_id && message.id != notif.exam_id) has = true;
+        if (message.exam_id == notif.exam_id && message.id != notif.exam_id && message.exam_id != 0) has = true;
       });
     });
 
@@ -59,20 +75,24 @@ export default function NotificationView() {
   // Fetch data from Strapi API
   const fetchNotifications = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/notifications", {
+      const response = await fetch(notificationRoute, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
 
-      const examRes = await fetch("http://localhost:1337/api/exams", {
+      const examRes = await fetch(examRoute, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      const data = (await response.json()).data;
+
+      //let c = await response.json();
+      //console.log(c);
+      let data = await response.json(); //should probably rewrite api response, instead of changing stuff here
+      //if (user.role == "Admin") data = data.data;
 
       if (!response.ok) {
         showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
@@ -91,11 +111,11 @@ export default function NotificationView() {
       let prop: Notification[] = [];
 
       data.forEach((element: any) => {
-        let el = new Notification(element.attributes.information, element.attributes.oldInformation, element.attributes.sentBy, element.attributes.exam_id);
+        let el = new Notification(element.information, element.oldInformation, element.sentBy, element.exam_id);
         el.id = element.id;
-        el.type = element.attributes.type;
-        el.createdAt = element.attributes.createdAt;
-        el.seenBy = element.attributes.seenBy || "";
+        el.type = element.type;
+        el.createdAt = element.createdAt;
+        el.seenBy = element.seenBy || "";
 
         if (el.type != NotificationType.createExam) all.push(el);
         else prop.push(el);
@@ -106,10 +126,9 @@ export default function NotificationView() {
       //Sort into read and unread msgs, depending on if there is one message in the stack that is unread.
       all.forEach((elem) => {
         let foundThread = false;
-
         for (let i = 0; i < threads.length; i++) {
           if (threads[i][0] != undefined && !foundThread) {
-            if (threads[i][0].exam_id == elem.exam_id) {
+            if (threads[i][0].exam_id == elem.exam_id && elem.exam_id != 0) {
               threads[i].push(elem);
               foundThread = true;
             }
@@ -138,6 +157,7 @@ export default function NotificationView() {
       if (tempNew.length != 0) setNewNotifications(tempNew.reverse());
       if (tempOld.length != 0) setSeenNotifications(tempOld.reverse());
       if (all.length != 0) setNotifications(all);
+
       if (prop.length != 0) setProposals(prop.reverse());
       if (examData != undefined) setExams(examData);
     } catch (error) {}
@@ -146,13 +166,13 @@ export default function NotificationView() {
   const fetchDropdownOptions = async () => {
     try {
       const [studentsRes, tutorsRes, examinersRes, majorsRes, institutesRes, modesRes, roomsRes] = await Promise.all([
-        fetch("http://localhost:1337/api/students", {
+        fetch(studentRoute, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch("http://localhost:1337/api/tutors", {
+        fetch(tutRoute, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -246,6 +266,8 @@ export default function NotificationView() {
     return notifs;
   };
 
+  const [openId, setOpenId] = useState<undefined | number>(Number(id));
+
   return (
     <div className="w-full h-full p-5 select-none">
       <div className="flex w-full content-center items-center ">
@@ -266,6 +288,7 @@ export default function NotificationView() {
                 id={elem.id}
                 exam_id={elem.exam_id}
                 sentBy={elem.sentBy}
+                openId={openId}
               />
             ))}
           </ul>
@@ -281,10 +304,11 @@ export default function NotificationView() {
               <NotificationComponent
                 exam={getExam(elem.exam_id)}
                 options={options}
-                notification={getNotifications(elem.id)}
+                notification={elem.exam_id == 0 ? [elem] : getNotifications(elem.id)}
                 id={elem.id}
                 exam_id={elem.exam_id}
                 sentBy={elem.sentBy}
+                openId={openId}
               />
             ))}
           </ul>
@@ -300,10 +324,11 @@ export default function NotificationView() {
               <NotificationComponent
                 exam={getExam(elem.exam_id)}
                 options={options}
-                notification={getNotifications(elem.id)}
+                notification={elem.exam_id == 0 ? [elem] : getNotifications(elem.id)}
                 id={elem.id}
                 exam_id={elem.exam_id}
                 sentBy={elem.sentBy}
+                openId={openId}
               />
             ))}
           </ul>
