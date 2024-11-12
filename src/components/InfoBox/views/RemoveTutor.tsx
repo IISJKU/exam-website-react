@@ -34,7 +34,7 @@ export default function RemoveTutor() {
           showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error" });
           return;
         }
-        
+
         setExam(examData);
         setOriginalExam(examData);
       } catch (error) {
@@ -85,7 +85,7 @@ export default function RemoveTutor() {
         body: JSON.stringify({ examId: id }),
       });
       const data = await response.json();
-      
+
       if (response.ok) {
         showToast({ message: "Remove exam from monitoring submitted successfully", type: "success" });
 
@@ -93,7 +93,7 @@ export default function RemoveTutor() {
 
         if (change != "" && exam) {
           let notif = new Notification(change, JSON.stringify(originalExam), user.user, exam.id);
-          notif.type = NotificationType.tutorConfirm;
+          notif.type = NotificationType.tutorDecline;
 
           const notify = await fetch(`http://localhost:1337/api/notifications`, {
             method: "POST",
@@ -103,16 +103,15 @@ export default function RemoveTutor() {
             body: JSON.stringify({ data: notif }),
           });
 
-        if (!notify.ok) {
-          const errorData = await response.json();
-          showToast({
-            message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
-            type: "error",
-          });
-          return;
+          if (!notify.ok) {
+            const errorData = await response.json();
+            showToast({
+              message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+              type: "error",
+            });
+            return;
+          }
         }
-      }
-
       } else {
         showToast({
           message: `HTTP error! Status: ${response.status}, Message: ${data.error?.message || "Unknown error"}.`,
@@ -136,25 +135,46 @@ export default function RemoveTutor() {
       <h2 className="text-2xl font-bold mb-4">{t("Exam Details")}</h2>
 
       {/* Display Exam Details in Read-Only Format */}
-      <p><strong>{t("Exam Title")}:</strong> {exam.title}</p>
-      <p><strong>{t("LVA Num")}:</strong> {exam.lva_num}</p>
-      <p><strong>{t("Date")}:</strong> {moment(exam.date).format("DD.MM.YYYY HH:mm")}</p>
-      <p><strong>{t("Duration")}:</strong> {exam.duration} {t("minutes")}</p>
-      
-      <p><strong>{t("Student")}:</strong> {exam.student && typeof exam.student === "object" ? `${exam.student.first_name} ${exam.student.last_name}` : t("Not Assigned")}</p>
-      <p><strong>{t("Examiner")}:</strong> {exam.examiner && typeof exam.examiner === "object" ? `${exam.examiner.first_name} ${exam.examiner.last_name}` : t("Not Assigned")}</p>
-      
-      <p><strong>{t("Major")}:</strong> {exam.major && typeof exam.major === "object" ? exam.major.name : t("Not Assigned")}</p>
-      <p><strong>{t("Institute")}:</strong> {exam.institute && typeof exam.institute === "object" ? exam.institute.name : t("Not Assigned")}</p>
-      <p><strong>{t("Room")}:</strong> {exam.room && typeof exam.room === "object" ? exam.room.name : t("Not Assigned")}</p>
-      <p><strong>{t("Mode")}:</strong> {exam.exam_mode && typeof exam.exam_mode === "object" ? exam.exam_mode.name : t("Not Assigned")}</p>
-      <p><strong>{t("Status")}:</strong> {exam.status}</p>
+      <p>
+        <strong>{t("Exam Title")}:</strong> {exam.title}
+      </p>
+      <p>
+        <strong>{t("LVA Num")}:</strong> {exam.lva_num}
+      </p>
+      <p>
+        <strong>{t("Date")}:</strong> {moment(exam.date).format("DD.MM.YYYY HH:mm")}
+      </p>
+      <p>
+        <strong>{t("Duration")}:</strong> {exam.duration} {t("minutes")}
+      </p>
+
+      <p>
+        <strong>{t("Student")}:</strong>{" "}
+        {exam.student && typeof exam.student === "object" ? `${exam.student.first_name} ${exam.student.last_name}` : t("Not Assigned")}
+      </p>
+      <p>
+        <strong>{t("Examiner")}:</strong>{" "}
+        {exam.examiner && typeof exam.examiner === "object" ? `${exam.examiner.first_name} ${exam.examiner.last_name}` : t("Not Assigned")}
+      </p>
+
+      <p>
+        <strong>{t("Major")}:</strong> {exam.major && typeof exam.major === "object" ? exam.major.name : t("Not Assigned")}
+      </p>
+      <p>
+        <strong>{t("Institute")}:</strong> {exam.institute && typeof exam.institute === "object" ? exam.institute.name : t("Not Assigned")}
+      </p>
+      <p>
+        <strong>{t("Room")}:</strong> {exam.room && typeof exam.room === "object" ? exam.room.name : t("Not Assigned")}
+      </p>
+      <p>
+        <strong>{t("Mode")}:</strong> {exam.exam_mode && typeof exam.exam_mode === "object" ? exam.exam_mode.name : t("Not Assigned")}
+      </p>
+      <p>
+        <strong>{t("Status")}:</strong> {exam.status}
+      </p>
 
       {/* Remove Tutor Button */}
-      <button
-        onClick={() => setShowConfirmDialog(true)}
-        className="mt-4 border-2 border-blue-500 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-      >
+      <button onClick={() => setShowConfirmDialog(true)} className="mt-4 border-2 border-blue-500 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
         {t("Remove")}
       </button>
 
@@ -170,10 +190,7 @@ export default function RemoveTutor() {
               >
                 {t("Cancel")}
               </button>
-              <button
-                onClick={handleRemove}
-                className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
-              >
+              <button onClick={handleRemove} className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">
                 {t("Confirm")}
               </button>
             </div>

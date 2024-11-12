@@ -221,6 +221,16 @@ export default function NotificationComponent(props: NotificationComponentProps)
                       </li>
                     ))}
                   </div>
+                ) : notification.type == NotificationType.tutorConfirm || notification.type == NotificationType.tutorDecline ? (
+                  <div
+                    className={(
+                      "border border-black p-2 " +
+                      (notification.type == NotificationType.tutorConfirm ? "bg-teal-300 " : "bg-red-400 border-dotted ") +
+                      "font-bold"
+                    ).toString()}
+                  >
+                    Tutor {notification.sentBy} {notification.type == NotificationType.tutorConfirm ? "registered to " : "canceled to "} monitor the exam.
+                  </div>
                 ) : (
                   <div
                     className={(

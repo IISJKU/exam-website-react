@@ -6,6 +6,7 @@ export enum NotificationType {
   proposeChange = "proposeChange",
   adminChange = "adminChange",
   tutorConfirm = "tutorConfirm",
+  tutorDecline = "tutorDecline",
 }
 
 export default class Notification {
