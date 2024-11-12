@@ -57,6 +57,14 @@ export default function SideMenu() {
       >
         {t("Data Administration")}
       </button>
+      <button
+        onClick={() => {
+          navigate("admin/room-management"); 
+        }}
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+      >
+        {t("Room Management")}
+      </button>
 
       {/* Calendar Component */}
       <Calendar />

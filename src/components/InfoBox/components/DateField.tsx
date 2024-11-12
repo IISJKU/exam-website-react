@@ -5,8 +5,8 @@ interface DateFieldProps {
   editMode: boolean;
   title?: string;
   dateValue: string; // The full ISO date-time string
-  onDateChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onTimeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onDateChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onTimeChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function DateField(props: DateFieldProps) {

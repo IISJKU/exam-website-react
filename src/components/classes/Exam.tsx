@@ -18,7 +18,7 @@ export default class Exam {
   major!: Major | number; // Major name or ID
   institute!: Institute | number; // Institute name or ID
   exam_mode!: ExamMode | number; // ExamMode object or ID (number)
-  room!: Room | number; // ExamMode object or ID (number)
+  room!: Room | number | null; // ExamMode object or ID (number)
   lva_num!: number;
   student_misc!: string;
   status!: string;
