@@ -73,7 +73,7 @@ export default function NotificationBell() {
 
   useInterval(() => {
     if (user.token != undefined && user.token.length > 1 && user.role == "Admin") fetchNotifications();
-  }, 100000); //check once every minute
+  }, 3000); //check once every minute
 
   function parseChangeMessage() {}
   //setInterval(fetchExams, 5000);

@@ -59,7 +59,7 @@ export default function RemoveTutor() {
 
       t = t + ' "student_id" : "' + exam.student.id + '",';
       t = t + ' "tutor_id" : "' + exam.tutor.id + '",';
-      t = t + ' "room_id" : "' + exam.room.id + '",';
+      exam.room ? (t = t + ' "room_id" : "' + exam.room.id + '",') : (t = t);
       t = t + ' "examiner_id" : "' + exam.examiner.id + '",';
       t = t + ' "major_id" : "' + exam.major.id + '",';
       t = t + ' "institute_id" : "' + exam.institute.id + '",';
@@ -99,6 +99,7 @@ export default function RemoveTutor() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
             },
             body: JSON.stringify({ data: notif }),
           });

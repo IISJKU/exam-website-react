@@ -19,7 +19,7 @@ export default function TutorCalendar() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch(`http://localhost:1337/api/exams/tutor/${user.userId}`, {
+      const response = await fetch(`http://localhost:1337/api/exams/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -27,6 +27,7 @@ export default function TutorCalendar() {
       });
       const data = await response.json();
 
+      console.log(data);
       setExams(data);
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });

@@ -10,12 +10,16 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
   let allEntries: any[] = [];
   let data = [];
 
-  while (data.length !== 0 || start) {
+  while (start) {
     data = [];
     start = false;
 
     // Determine if the link already contains "?" for query parameters
-    const paginatedLink = link.includes("?") ? `${link}&pagination[start]=${t}&pagination[limit]=${numEntries}` : `${link}?pagination[start]=${t}&pagination[limit]=${numEntries}`;
+    const paginatedLink = link.includes("?")
+      ? `${link}&pagination[start]=${t}&pagination[limit]=${numEntries}`
+      : `${link}?pagination[start]=${t}&pagination[limit]=${numEntries}`;
+
+    console.log(paginatedLink);
 
     const response = await fetch(paginatedLink, {
       method: "GET",
@@ -31,9 +35,11 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
         type: "error",
       });
     }
+    console.log("here");
+    console.log(data);
 
     t = t + numEntries;
-    if (data.length !== 0) allEntries = allEntries.concat(data);
+    if (data.length !== 0 && data != null) allEntries = allEntries.concat(data);
   }
 
   return allEntries;

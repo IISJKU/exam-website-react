@@ -15,6 +15,7 @@ import Institute from "../../classes/Institute";
 import Room from "../../classes/Room";
 import { showToast } from "../components/ToastMessage";
 import { useParams } from "react-router-dom";
+import fetchAll from "./FetchAll";
 
 export default function NotificationView() {
   const user = useAuth();
@@ -41,6 +42,9 @@ export default function NotificationView() {
     notificationRoute = `http://localhost:1337/api/notifications/me`;
     examRoute = `http://localhost:1337/api/exams/me`;
     tutRoute = `http://localhost:1337/api/tutors/me`;
+    studentRoute = "http://localhost:1337/api/students/me";
+  } else if (user.role == "Tutor") {
+    notificationRoute = `http://localhost:1337/api/notifications/me`;
     studentRoute = "http://localhost:1337/api/students/me";
   }
 
@@ -82,13 +86,6 @@ export default function NotificationView() {
         },
       });
 
-      const examRes = await fetch(examRoute, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-
       //let c = await response.json();
       //console.log(c);
       let data = await response.json(); //should probably rewrite api response, instead of changing stuff here
@@ -98,11 +95,7 @@ export default function NotificationView() {
         showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
       }
 
-      const examData = await examRes.json();
-
-      if (!examRes.ok) {
-        showToast({ message: `HTTP error! Status: ${examRes.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error" });
-      }
+      const examData = (await fetchAll("http://localhost:1337/api/exams", user.token)) as Exam[];
 
       let tempNew: Notification[] = [];
       let tempOld: Notification[] = [];
@@ -122,6 +115,8 @@ export default function NotificationView() {
       });
 
       let threads: Notification[][] = [];
+
+      console.log(all);
 
       //Sort into read and unread msgs, depending on if there is one message in the stack that is unread.
       all.forEach((elem) => {

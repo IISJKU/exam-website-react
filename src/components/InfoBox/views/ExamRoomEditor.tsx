@@ -34,7 +34,7 @@ export default function ExamRoomEditor() {
   useEffect(() => {
     const fetchExam = async () => {
       try {
-        let  path = `http://localhost:1337/api/exams/${id}`;
+        let path = `http://localhost:1337/api/exams/${id}`;
         const examResponse = await fetch(path, {
           method: "GET",
           headers: {
@@ -51,7 +51,6 @@ export default function ExamRoomEditor() {
         examData = rawData;
 
         if (examData) {
-          console.log(examData)
           setExam(examData);
           setTitle(examData.title);
           setLvaNum(examData.lva_num);
@@ -59,11 +58,13 @@ export default function ExamRoomEditor() {
           setDuration(examData.duration);
           setRoom(examData.room_id);
           // Combine first name and last name for tutor and student
-          const tutorFullName = typeof examData.tutor === 'object' && examData.tutor !== null ? `${examData.tutor.first_name} ${examData.tutor.last_name}` : "N/A";
-          const studentFullName = typeof examData.student === 'object' && examData.student !== null ? `${examData.student.first_name} ${examData.student.last_name}` : "N/A";
+          const tutorFullName =
+            typeof examData.tutor === "object" && examData.tutor !== null ? `${examData.tutor.first_name} ${examData.tutor.last_name}` : "N/A";
+          const studentFullName =
+            typeof examData.student === "object" && examData.student !== null ? `${examData.student.first_name} ${examData.student.last_name}` : "N/A";
           setTutorName(tutorFullName);
           setStudentName(studentFullName);
-          const examModeName = typeof examData.exam_mode === 'object' && examData.exam_mode !== null ? examData.exam_mode.name : "Unknown";
+          const examModeName = typeof examData.exam_mode === "object" && examData.exam_mode !== null ? examData.exam_mode.name : "Unknown";
           setMode(examModeName);
         } else {
           showToast({ message: "No exam data found", type: "error" });
@@ -97,22 +98,22 @@ export default function ExamRoomEditor() {
     };
 
     try {
-        const response = await fetch(`http://localhost:1337/api/exams/${id}`, {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ data }),
+      const response = await fetch(`http://localhost:1337/api/exams/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ data }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        showToast({
+          message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+          type: "error",
         });
-        if (!response.ok) {
-          const errorData = await response.json();
-          showToast({
-            message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
-            type: "error",
-          });
-          return;
-        }
+        return;
+      }
 
       if (exam) {
         let notif = new Notification("", JSON.stringify(exam), user.user, exam.id);
@@ -177,15 +178,16 @@ export default function ExamRoomEditor() {
     showToast({ message: "Room selection canceled", type: "info" });
   };
 
-  const dropdownOptions = (list: Room[]) => list.map((item) => ({
-    value: item.id,
-    label: item.name,
-  }));
-  
+  const dropdownOptions = (list: Room[]) =>
+    list.map((item) => ({
+      value: item.id,
+      label: item.name,
+    }));
+
   if (loading || !exam) {
     return <p>Loading exam data...</p>;
   }
-  
+
   return (
     <div className="m-5">
       <EditField title={t("Exam Title")} editMode={false} text={title} hideTitle={false} />
@@ -196,7 +198,7 @@ export default function ExamRoomEditor() {
       <EditField title={"Tutor"} text={tutorName ?? ""} editMode={false} hideTitle={false} />
       <EditField title={t("Mode")} text={mode ?? ""} editMode={false} hideTitle={false} />
 
-  	  <DropdownWithSearch
+      <DropdownWithSearch
         tableName="rooms"
         label={t("Room")}
         options={dropdownOptions(options.rooms)}
@@ -207,37 +209,45 @@ export default function ExamRoomEditor() {
       />
 
       <button
-        onClick={() => { setEditMode(!editMode); if (editMode) handleUpdate(); }}
-        className="border-2 border-black p-1 hover:bg-slate-400 hover:underline" >
+        onClick={() => {
+          setEditMode(!editMode);
+          if (editMode) handleUpdate();
+        }}
+        className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
+      >
         {editMode ? t("Save") : t("Edit")}
       </button>
-      {editMode ? ( <button className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline"
-          onClick={() => {setEditMode(!editMode); }} >
+      {editMode ? (
+        <button
+          className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline"
+          onClick={() => {
+            setEditMode(!editMode);
+          }}
+        >
           Cancel
         </button>
       ) : (
         <></>
       )}
-    {/* Confirmation Dialog */}
-    {showConfirmDialog && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-white p-4 rounded shadow-lg max-w-sm">
-          <p className="mb-4">{t("The selected room has a capacity of 0. Do you want to continue?")}</p>
-          <div className="flex justify-end">
-            <button
-              onClick={handleCancelRoomSelection}
-              className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded mr-2 hover:bg-gray-300" >
-              {t("Cancel")}
-            </button>
-            <button
-              onClick={handleConfirmRoomSelection}
-              className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600" >
-              {t("Confirm")}
-            </button>
+      {/* Confirmation Dialog */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded shadow-lg max-w-sm">
+            <p className="mb-4">{t("The selected room has a capacity of 0. Do you want to continue?")}</p>
+            <div className="flex justify-end">
+              <button
+                onClick={handleCancelRoomSelection}
+                className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded mr-2 hover:bg-gray-300"
+              >
+                {t("Cancel")}
+              </button>
+              <button onClick={handleConfirmRoomSelection} className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">
+                {t("Confirm")}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
-  </div>
+      )}
+    </div>
   );
 }

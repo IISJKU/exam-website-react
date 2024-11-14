@@ -161,8 +161,6 @@ export default function NotificationComponent(props: NotificationComponentProps)
   useEffect(() => {
     const div = document.getElementById("notification" + props.id.toString() + "_div");
     div?.scrollIntoView({ behavior: "smooth" });
-    console.log("div");
-    console.log(div);
   }, []);
 
   return (
@@ -173,9 +171,9 @@ export default function NotificationComponent(props: NotificationComponentProps)
       onClick={() => toggleInfoPannel()}
     >
       {props.notification[0].type == NotificationType.createExam ? (
-        <div className=" relative" id={"notification" + props.id.toString() + "_div"}>
+        <div className="relative" id={"notification" + props.id.toString() + "_div"}>
           {notifications[0].sentBy} proposed a new Exam
-          {notifications[0].type == NotificationType.confirmChange || notifications[0].type == NotificationType.discardChange ? (
+          {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) || auth.role == "Tutor" ? (
             <></>
           ) : (
             <a className="inline-block absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>
@@ -184,9 +182,13 @@ export default function NotificationComponent(props: NotificationComponentProps)
           )}
         </div>
       ) : (
-        <div className=" relative">
-          {props.exam.title != undefined ? props.exam.title + " was edited by " + notifications[0].sentBy : "Exam was declined by " + notifications[0].sentBy}
-          {notifications[0].type == NotificationType.confirmChange || notifications[0].type == NotificationType.discardChange ? (
+        <div className="relative">
+          {props.exam.title != undefined
+            ? notifications[0].type == NotificationType.tutorConfirm
+              ? notifications[0].sentBy + " will monitor " + props.exam.title
+              : props.exam.title + " was edited by " + notifications[0].sentBy
+            : "Exam was declined by " + notifications[0].sentBy}
+          {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) || auth.role == "Tutor" ? (
             <></>
           ) : (
             <a className="inline-block absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>

@@ -18,9 +18,8 @@ export default function TutorExamView() {
 
   // Fetch data from Strapi API
   const fetchTutorExams = async (tutorId: number) => {
-
     try {
-      const response = await fetch(`http://localhost:1337/api/exams/tutor/${tutorId}`, {
+      const response = await fetch(`http://localhost:1337/api/exams/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -28,8 +27,8 @@ export default function TutorExamView() {
       });
       const data = await response.json();
       if (!response.ok) {
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
-       }
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
+      }
 
       // Modify the data array before setting it to exams
       const updatedData = data.map((exam: any) => {

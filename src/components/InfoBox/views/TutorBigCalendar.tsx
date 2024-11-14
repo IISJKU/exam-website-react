@@ -39,7 +39,7 @@ export default function TutorBigCalender() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch(`http://localhost:1337/api/exams/tutor/${user.userId}`, {
+      const response = await fetch(`http://localhost:1337/api/exams/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -47,7 +47,7 @@ export default function TutorBigCalender() {
       });
       const data = await response.json();
       if (!response.ok) {
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
       }
       setExams(data);
     } catch (error) {

@@ -81,6 +81,8 @@ export default function App() {
               <Route path="/tutor/exams/without-tutor" element={<ExamWithoutTutor />} />
               <Route path="/tutor/exams/monitor-request/:id" element={<TutorExamRequest />} />
               <Route path="/tutor/calendar/:year/:month/:day" element={<TutorBigCalender />} />
+              <Route path="/tutor/notifications" element={<NotificationView />} />
+              <Route path="/tutor/notification/:id" element={<IndividualNotification />} />
             </Route>
           </Routes>
 

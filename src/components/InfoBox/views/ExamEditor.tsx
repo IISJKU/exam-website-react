@@ -305,6 +305,7 @@ export default function ExamEditor() {
         const notify = await fetch(`http://localhost:1337/api/notifications`, {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${user.token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ data: notif }),
