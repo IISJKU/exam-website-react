@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import 'react-calendar/dist/Calendar.css';
+
 import { showToast } from "../components/ToastMessage";
 import DropdownWithSearch from "../components/DropdownWithSearch";
 import { useAuth } from "../../../hooks/AuthProvider";
@@ -20,7 +20,7 @@ export default function RoomManagement() {
   const [pendingRoomId, setPendingRoomId] = useState<number | null>(null); // New state to track pending room
 
   useEffect(() => {
-    fetchAllExams()
+    fetchAllExams();
     fetchData("exams", setExams);
     fetchData("rooms", setRooms);
   }, []);
@@ -31,7 +31,7 @@ export default function RoomManagement() {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       if (!response.ok) throw new Error(`Failed to fetch ${type}`);
-      
+
       const data = await response.json();
       if (type === "exams") {
         const examsWithNullRoom = data.filter((exam: Exam) => !exam.room);
@@ -45,8 +45,8 @@ export default function RoomManagement() {
     }
   };
 
-   // Fetch exams
-   const fetchAllExams = async () => {
+  // Fetch exams
+  const fetchAllExams = async () => {
     const response = await fetch("http://localhost:1337/api/exams", {
       headers: { Authorization: `Bearer ${user.token}` },
     });
@@ -60,19 +60,19 @@ export default function RoomManagement() {
       showToast({ message: "Please select a room to save.", type: "warning" });
       return;
     }
-  
+
     try {
       const room = rooms.find((r) => r.id === roomId);
       if (!room) {
         return showToast({ message: "Room not found", type: "error" });
       }
-  
+
       // Ensure room capacity is greater than zero or show confirmation dialog if it is zero
       if (room.capacity <= 0 && !showConfirmDialog) {
         setShowConfirmDialog(true);
         return;
       }
-  
+
       // Update the exam with the selected room ID
       const examUpdateResponse = await fetch(`http://localhost:1337/api/exams/${examId}`, {
         method: "PUT",
@@ -82,7 +82,7 @@ export default function RoomManagement() {
         },
         body: JSON.stringify({ data: { room: roomId } }),
       });
-  
+
       if (!examUpdateResponse.ok) throw new Error("Failed to update exam room");
 
       fetchData("exams", setExams); // Refresh exams to reflect changes
@@ -90,32 +90,31 @@ export default function RoomManagement() {
       showToast({ message: `Error updating exam room: ${error}.`, type: "error" });
     }
   };
-  
 
   const handleRoomChange = (examId: number, newRoomId: number) => {
     setSelectedExam(examId);
     const room = rooms.find((r) => r.id === newRoomId);
     const selectedExam = exams.find((exam) => exam.id === examId);
-  
+
     if (!selectedExam || !room) return;
-  
+
     // Convert selected exam start time and end time to Date objects
     const selectedExamStart = new Date(selectedExam.date);
     const selectedExamEnd = new Date(selectedExamStart.getTime() + selectedExam.duration * 60000);
-  
+
     // Check for overlapping exams in the same room
     const overlappingExams = allExams.filter((exam) => {
       if (exam.id === examId || exam.room_id !== newRoomId || exam.room_id === null) return false;
-  
+
       const examStart = new Date(exam.date);
       const examEnd = new Date(examStart.getTime() + exam.duration * 60000);
-  
+
       // Check if there is a time overlap
       return (
-        (examStart < selectedExamEnd && examEnd > selectedExamStart) // Overlapping condition
+        examStart < selectedExamEnd && examEnd > selectedExamStart // Overlapping condition
       );
     });
-  
+
     // Check if the overlapping exams exceed room capacity
     if (overlappingExams.length + 1 > room.capacity) {
       showToast({
@@ -124,23 +123,20 @@ export default function RoomManagement() {
       });
       return;
     }
-  
+
     // If capacity allows, assign the room
     if (room.capacity === 0) {
       setPendingRoomId(newRoomId); // Temporarily store the room ID
       setShowConfirmDialog(true);
     } else {
-      setExams((prevExams) =>
-        prevExams.map((exam) => (exam.id === examId ? { ...exam, room_id: newRoomId } : exam))
-      );
+      setExams((prevExams) => prevExams.map((exam) => (exam.id === examId ? { ...exam, room_id: newRoomId } : exam)));
       showToast({ message: `Room capacity: ${room.capacity}`, type: "info" });
     }
   };
-  
 
   const handleConfirmRoomSelection = () => {
     setSelectedRoom(pendingRoomId); // Set the room from the pending state
-    setExams((prevExams) => prevExams.map((exam) => exam.id === selectedExam ? { ...exam, room_id: pendingRoomId ?? exam.room_id } : exam ));    
+    setExams((prevExams) => prevExams.map((exam) => (exam.id === selectedExam ? { ...exam, room_id: pendingRoomId ?? exam.room_id } : exam)));
     setShowConfirmDialog(false);
     showToast({ message: "Room with 0 capacity selected", type: "warning" });
   };
@@ -148,7 +144,7 @@ export default function RoomManagement() {
   const handleCancelRoomSelection = () => {
     setShowConfirmDialog(false);
     setPendingRoomId(null);
-    setSelectedRoom(null); 
+    setSelectedRoom(null);
     showToast({ message: "Room selection canceled", type: "info" });
   };
 
@@ -185,9 +181,7 @@ export default function RoomManagement() {
                 })}
               </td>
               <td className="p-3 border border-gray-300">{exam.duration} mins</td>
-              <td className="p-3 border border-gray-300">
-                {typeof exam.exam_mode === "object" && exam.exam_mode !== null ? exam.exam_mode.name : "Unknown"}
-              </td>
+              <td className="p-3 border border-gray-300">{typeof exam.exam_mode === "object" && exam.exam_mode !== null ? exam.exam_mode.name : "Unknown"}</td>
               <td className="p-3 border border-gray-300">
                 {typeof exam.student === "object" && exam.student !== null ? `${exam.student.first_name} ${exam.student.last_name}` : "N/A"}
               </td>
@@ -201,10 +195,7 @@ export default function RoomManagement() {
                 />
               </td>
               <td className="p-3 border border-gray-300">
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-                  onClick={() => updateExamRoom(exam.id, exam.room_id)}
-                >
+                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => updateExamRoom(exam.id, exam.room_id)}>
                   Save
                 </button>
               </td>
@@ -230,7 +221,7 @@ export default function RoomManagement() {
       ))}
     </div>
   );
-  
+
   return (
     <div className="p-8 bg-gray-50 rounded-lg">
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Room Management</h1>
@@ -242,12 +233,11 @@ export default function RoomManagement() {
             <div className="flex justify-end">
               <button
                 onClick={handleCancelRoomSelection}
-                className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded mr-2 hover:bg-gray-300" >
+                className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded mr-2 hover:bg-gray-300"
+              >
                 {t("Cancel")}
               </button>
-              <button
-                onClick={handleConfirmRoomSelection}
-                className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600" >
+              <button onClick={handleConfirmRoomSelection} className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">
                 {t("Confirm")}
               </button>
             </div>
@@ -259,4 +249,4 @@ export default function RoomManagement() {
       <RoomsCalender selectedRoomId={selectedRoom} />
     </div>
   );
-};
+}

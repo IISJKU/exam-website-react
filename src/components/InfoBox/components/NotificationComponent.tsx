@@ -165,7 +165,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
 
   const getName = (): string => {
     console.log(auth.user);
-    if (notifications[0].sentBy == notifications[0].sentBy) return "You";
+    if (notifications[0].sentBy == auth.user) return "You";
     return notifications[0].sentBy;
   };
 
