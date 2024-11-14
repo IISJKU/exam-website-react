@@ -80,7 +80,7 @@ export default function RequestExam() {
           fetch("http://localhost:1337/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/institutes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()).then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)), 
         ]);
 
         console.log();
@@ -181,6 +181,7 @@ export default function RequestExam() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
           },
           body: JSON.stringify({ data: notif }),
         });

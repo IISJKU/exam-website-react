@@ -16,6 +16,7 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
 import ComparisonField from "../components/ComparisonField";
+import fetchAll from "./FetchAll";
 
 export default function IndividualNotification() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -79,7 +80,7 @@ export default function IndividualNotification() {
   useEffect(() => {
     const fetchNotification = async () => {
       try {
-        const response = await fetch("http://localhost:1337/api/notifications", {
+        const response = await fetch(`http://localhost:1337/api/notifications`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -102,9 +103,10 @@ export default function IndividualNotification() {
             if (element.exam_id == Number(exam_id)) {
               let t = new Notification(element.information, element.oldInformation, element.seenBy, element.exam_id);
               t.sentBy = element.sentBy;
+              t.type = element.type;
 
-              if (element.type == NotificationType.confirmChange || element.type == NotificationType.confirmChange) proposedExams = [];
-              else proposedExams.push(t);
+              if (element.type == NotificationType.confirmChange) proposedExams = [];
+              else if (element.type != NotificationType.tutorConfirm && element.type != NotificationType.tutorDecline) proposedExams.push(t);
             }
           });
         } else {
@@ -147,16 +149,10 @@ export default function IndividualNotification() {
           setProposedExam(JSON.parse(proposedExams[0].information) as Exam);
         }
 
-        const examResponse = await fetch(`http://localhost:1337/api/exams/`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+        const examData = (await fetchAll("http://localhost:1337/api/exams", user.token)) as Exam[];
 
-        const examData = await examResponse.json();
         if (!response.ok) {
-          showToast({ message: `HTTP error! Status: ${response.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error" });
+          showToast({ message: `HTTP error! Status: ${response.status}, Message: ${"Unknown error"}.`, type: "error" });
         }
 
         if (examData) {
@@ -237,7 +233,8 @@ export default function IndividualNotification() {
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
-          }).then((res) => res.json()),
+          }).then((res) => res.json())
+          .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)), 
         ]);
 
         setOptions({
@@ -282,6 +279,7 @@ export default function IndividualNotification() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
       },
       body: JSON.stringify({ data: notif }),
     });
@@ -305,8 +303,8 @@ export default function IndividualNotification() {
           const response = await fetch(`http://localhost:1337/api/exams/${exam.id}`, {
             method: "PUT",
             headers: {
-              Authorization: `Bearer ${user.token}`,
               "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
             },
             body: JSON.stringify({ data: proposedExam }),
           });
@@ -367,7 +365,7 @@ export default function IndividualNotification() {
               newNotif.exam_id = newExam.id;
 
               newNotif.type = NotificationType.createExamOld;
-              const notif = await fetch(`http://localhost:1337/api/notification/${newNotif.id}`, {
+              const notif = await fetch(`http://localhost:1337/api/notifications/${newNotif.id}`, {
                 method: "PUT",
                 headers: {
                   Authorization: `Bearer ${user.token}`,

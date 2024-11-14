@@ -93,7 +93,7 @@ export default function RequestExam() {
           fetch("http://localhost:1337/api/examiners", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/institutes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()).then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)), 
         ]);
 
         setOptions({

@@ -69,12 +69,13 @@ export default function TutorExamRequest() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
             },
             body: JSON.stringify({ data: notif }),
           });
 
           if (!notify.ok) {
-            const errorData = await response.json();
+            const errorData = await notify.json();
             showToast({
               message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
               type: "error",

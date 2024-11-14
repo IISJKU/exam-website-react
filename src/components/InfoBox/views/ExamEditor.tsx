@@ -27,7 +27,7 @@ export default function ExamEditor() {
   const [loading, setLoading] = useState<boolean>(true);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [exam, setExam] = useState<Exam | null>(null); // Store exam data
-
+  const [allExams, setAllExams] = useState<Exam[]>([]);
   const [title, setTitle] = useState<string>("");
   const [lva_num, setLvaNum] = useState<number | undefined>();
   const [date, setDate] = useState<string>("");
@@ -38,10 +38,12 @@ export default function ExamEditor() {
   const [major, setMajor] = useState<number | undefined>();
   const [institute, setInstitute] = useState<number | undefined>();
   const [mode, setMode] = useState<number | undefined>();
-  const [room, setRoom] = useState<number | undefined>();
+  const [room, setRoom] = useState<number | null>();
   const [status, setStatus] = useState<string>("");
 
   const [originalExam, setOriginalExam] = useState<Exam>(new Exam());
+  const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null); // Track selected room ID for confirmation
 
   const [options, setOptions] = useState({
     students: [] as Student[],
@@ -109,7 +111,6 @@ export default function ExamEditor() {
           setDuration(examData.duration);
           setRoom(examData.room_id);
           setStatus(examData.status);
-
           setTutor(examData.tutor_id);
           setStudent(examData.student_id);
           setExaminer(examData.examiner_id);
@@ -171,7 +172,8 @@ export default function ExamEditor() {
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
-          }).then((res) => res.json()),
+          }).then((res) => res.json())
+          .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)), // Filter for available rooms
         ]);
 
         setOptions({
@@ -188,8 +190,18 @@ export default function ExamEditor() {
       }
     };
 
+    // Fetch exams
+   const fetchAllExams = async () => {
+    const response = await fetch("http://localhost:1337/api/exams", {
+      headers: { Authorization: `Bearer ${user.token}` },
+    });
+    const data = await response.json();
+    setAllExams(data);
+    };
+    
     fetchExam();
     fetchDropdownOptions();
+    if (user.role == "Admin") fetchAllExams();
   }, [id]);
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -236,7 +248,7 @@ export default function ExamEditor() {
       if (user.role == "Admin") {
         if (!compareField("student", student)) t = t + ' "student_id" : "' + student + '",';
         if (!compareField("tutor", tutor)) t = t + ' "tutor_id" : "' + tutor + '",';
-        if (!compareField("room", room)) t = t + ' "room_id" : "' + room + '",';
+        if (room && !compareField("room", room)) t = t + ' "room_id" : "' + room + '",';
         if (!compareField("examiner", examiner)) t = t + ' "examiner_id" : "' + examiner + '",';
         if (!compareField("major", major)) t = t + ' "major_id" : "' + major + '",';
         if (!compareField("institute", institute)) t = t + ' "institute_id" : "' + institute + '",';
@@ -274,6 +286,8 @@ export default function ExamEditor() {
       lva_num,
       status,
     };
+    // Track the original room ID
+    const originalRoomId = exam?.room_id; // The room before any change
 
     try {
       if (user.role == "Admin") {
@@ -305,6 +319,7 @@ export default function ExamEditor() {
         const notify = await fetch(`http://localhost:1337/api/notifications`, {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${user.token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ data: notif }),
@@ -320,11 +335,62 @@ export default function ExamEditor() {
         }
       }
 
-      showToast({ message: "Exam updated successfully", type: "success" });
-      //navigate("/admin/exams");
     } catch (error) {
       showToast({ message: "Error updating exam", type: "error" });
     }
+  };
+
+  const handleRoomChange = (newRoomId: number) => {
+    const room = options.rooms.find((r) => r.id === newRoomId);  
+    if (!exam || !room) return;
+  
+    // Convert selected exam start time and end time to Date objects
+    const selectedExamStart = new Date(exam.date);
+    const selectedExamEnd = new Date(selectedExamStart.getTime() + exam.duration * 60000);
+  
+    // Check for overlapping exams in the same room
+    const overlappingExams = allExams.filter((examData) => {
+      if (examData.id === exam.id || examData.room_id !== newRoomId || examData.room_id === null) return false;
+  
+      const examStart = new Date(exam.date);
+      const examEnd = new Date(examStart.getTime() + exam.duration * 60000);
+  
+      // Check if there is a time overlap
+      return (
+        (examStart < selectedExamEnd && examEnd > selectedExamStart) // Overlapping condition
+      );
+    });
+  
+    // Check if the overlapping exams exceed room capacity
+    if (overlappingExams.length + 1 > room.capacity) {
+      showToast({
+        message: "Room capacity exceeded with overlapping exams.",
+        type: "error",
+      });
+      return;
+    }
+  
+    // If capacity allows, assign the room
+    if (room.capacity === 0) {
+      setSelectedRoomId(newRoomId); // Track room to be set if confirmed
+      setShowConfirmDialog(true);
+    } else {
+      setRoom(newRoomId);
+      showToast({ message: `Room capacity: ${room.capacity}`, type: "info" });
+    }
+  };
+
+  const handleConfirmRoomSelection = () => {
+    setRoom(selectedRoomId);
+    setShowConfirmDialog(false);
+    showToast({ message: "Room with 0 capacity selected", type: "warning" });
+  };
+
+  const handleCancelRoomSelection = () => {
+    setSelectedRoomId(null);      
+    setShowConfirmDialog(false);
+    setRoom(null);
+    showToast({ message: "Room selection canceled", type: "info" });
   };
 
   if (loading || !exam) {
@@ -428,7 +494,7 @@ export default function ExamEditor() {
           label={t("Room")}
           options={dropdownOptions(options.rooms, "name")}
           value={room ?? ""}
-          onChange={(newVal) => setRoom(Number(newVal))}
+          onChange={(newVal) => handleRoomChange(Number(newVal))}
           placeholder={t("Search rooms...")}
           disabled={!editMode}
         />
@@ -456,6 +522,25 @@ export default function ExamEditor() {
         ) : (
           <></>
         )}
+         {showConfirmDialog && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded shadow-lg max-w-sm">
+            <p className="mb-4">{t("The selected room has a capacity of 0. Do you want to continue?")}</p>
+            <div className="flex justify-end">
+              <button
+                onClick={handleCancelRoomSelection}
+                className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded mr-2 hover:bg-gray-300" >
+                {t("Cancel")}
+              </button>
+              <button
+                onClick={handleConfirmRoomSelection}
+                className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600" >
+                {t("Confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     );
   else

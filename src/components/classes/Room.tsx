@@ -6,7 +6,7 @@ export default class Room extends EntryBase {
   building!: string;
   capacity!: number;
   location!: string;
-  is_available!: boolean;
+  isAvailable!: boolean;
   getName(): string {
     return this.name;
   }

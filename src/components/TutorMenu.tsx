@@ -11,20 +11,34 @@ export default function TutorMenu() {
       {/* Exams Overview Button */}
       <button
         onClick={() => {
-          //navigate("admin/notifications"); 
-        }} className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline">
+          navigate("tutor/notifications");
+        }}
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+      >
         {t("Notifications")}
       </button>
-      <button onClick={() => { navigate("tutor/exams");}}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline" >
+      <button
+        onClick={() => {
+          navigate("tutor/exams");
+        }}
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+      >
         {t("Exams Overview")}
       </button>
-      <button onClick={() => { navigate("tutor/upcoming-exams");}}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline" >
+      <button
+        onClick={() => {
+          navigate("tutor/upcoming-exams");
+        }}
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+      >
         {t("Upcoming Monitored Exams")}
       </button>
       <button
-        onClick={() => { navigate("tutor/exams/without-tutor"); }} className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline">
+        onClick={() => {
+          navigate("tutor/exams/without-tutor");
+        }}
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+      >
         {t("Request Exam Monitoring")}
       </button>
 

@@ -30,7 +30,6 @@ import TutorBigCalender from "./components/InfoBox/views/TutorBigCalendar";
 import ExamWithoutTutor from "./components/InfoBox/views/ExamWithoutTutor";
 import TutorExamRequest from "./components/InfoBox/views/TutorExamRequest";
 import RemoveTutor from "./components/InfoBox/views/RemoveTutor";
-import ExamRoomEditor from "./components/InfoBox/views/ExamRoomEditor";
 import ExamRoomView from "./components/InfoBox/views/ExamRoomView";
 
 export default function App() {
@@ -61,7 +60,6 @@ export default function App() {
               <Route path="/admin/data-administration" element={<TableLinks />} />
               <Route path="/admin/data-administration/:tableName" element={<DataAdministrationPage />} />
               <Route path="/admin/room-management" element={<ExamRoomView />} />
-              <Route path="/admin/room-editor/:id" element={<ExamRoomEditor />} />
               <Route path="/admin/calendar/:year/:month/:day" element={<BigCalendar />} /> {/* BigCalendar Route */}
             </Route>
 
@@ -81,6 +79,8 @@ export default function App() {
               <Route path="/tutor/exams/without-tutor" element={<ExamWithoutTutor />} />
               <Route path="/tutor/exams/monitor-request/:id" element={<TutorExamRequest />} />
               <Route path="/tutor/calendar/:year/:month/:day" element={<TutorBigCalender />} />
+              <Route path="/tutor/notifications" element={<NotificationView />} />
+              <Route path="/tutor/notification/:id" element={<IndividualNotification />} />
             </Route>
           </Routes>
 
