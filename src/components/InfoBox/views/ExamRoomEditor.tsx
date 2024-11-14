@@ -188,6 +188,7 @@ export default function ExamRoomEditor() {
     return <p>Loading exam data...</p>;
   }
 
+
   return (
     <div className="m-5">
       <EditField title={t("Exam Title")} editMode={false} text={title} hideTitle={false} />
@@ -251,4 +252,3 @@ export default function ExamRoomEditor() {
     </div>
   );
 }
-
