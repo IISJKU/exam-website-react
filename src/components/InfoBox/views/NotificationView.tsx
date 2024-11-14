@@ -95,7 +95,11 @@ export default function NotificationView() {
         showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
       }
 
-      const examData = (await fetchAll("http://localhost:1337/api/exams", user.token)) as Exam[];
+      let examsLink = "http://localhost:1337/api/exams";
+      if (user.role == "Student") examsLink = "http://localhost:1337/api/exams/me";
+
+      const examData = (await fetchAll(examsLink, user.token)) as Exam[];
+      console.log(examData);
 
       let tempNew: Notification[] = [];
       let tempOld: Notification[] = [];
@@ -115,8 +119,6 @@ export default function NotificationView() {
       });
 
       let threads: Notification[][] = [];
-
-      console.log(all);
 
       //Sort into read and unread msgs, depending on if there is one message in the stack that is unread.
       all.forEach((elem) => {

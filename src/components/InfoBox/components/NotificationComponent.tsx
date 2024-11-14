@@ -1,4 +1,4 @@
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, ReactElement, ReactHTMLElement } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // Import useParams and useNavigate
 import Exam from "../../classes/Exam";
 import { useTranslation } from "react-i18next";
@@ -163,6 +163,12 @@ export default function NotificationComponent(props: NotificationComponentProps)
     div?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  const getName = (): string => {
+    console.log(auth.user);
+    if (notifications[0].sentBy == notifications[0].sentBy) return "You";
+    return notifications[0].sentBy;
+  };
+
   return (
     <li
       id={"notification" + props.id.toString()}
@@ -172,7 +178,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
     >
       {props.notification[0].type == NotificationType.createExam ? (
         <div className="relative" id={"notification" + props.id.toString() + "_div"}>
-          {notifications[0].sentBy} proposed a new Exam
+          {getName()} proposed a new Exam
           {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) || auth.role == "Tutor" ? (
             <></>
           ) : (
@@ -185,9 +191,11 @@ export default function NotificationComponent(props: NotificationComponentProps)
         <div className="relative">
           {props.exam.title != undefined
             ? notifications[0].type == NotificationType.tutorConfirm
-              ? notifications[0].sentBy + " will monitor " + props.exam.title
-              : props.exam.title + " was edited by " + notifications[0].sentBy
-            : "Exam was declined by " + notifications[0].sentBy}
+              ? getName() + " will monitor " + props.exam.title
+              : notifications[0].type == NotificationType.tutorDecline
+              ? getName() + " will no longer monitor " + props.exam.title
+              : props.exam.title + " was edited by " + getName()
+            : "Exam was declined by " + getName()}
           {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) || auth.role == "Tutor" ? (
             <></>
           ) : (
@@ -201,7 +209,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
       {infoOpen || clickedOn ? (
         <div className="">
           {notifications.map((notification: Notification, index) => (
-            <div className="cursor-default">
+            <div className="cursor-default" key={"divcontainer_" + notification.id}>
               <ul className="p-4">
                 {notification.type == NotificationType.proposeChange ||
                 notification.type == NotificationType.adminChange ||
@@ -216,7 +224,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                       : "proposed a change"}
                     :
                     {Object.keys(JSON.parse(notification.information)).map((elem: string) => (
-                      <li className="bg-white border border-black p-1">
+                      <li className="bg-white border border-black p-1" key={"entry_" + notification.id}>
                         {notification.type == NotificationType.createExam || notification.type == NotificationType.createExamOld
                           ? getTitle(JSON.parse(notification.information)[elem], elem) + ": " + getElem(JSON.parse(notification.information)[elem], elem)
                           : getElem(JSON.parse(notification.oldInformation)[elem], elem) + " -> " + getElem(JSON.parse(notification.information)[elem], elem)}
@@ -248,6 +256,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                           className={
                             (notification.type == NotificationType.discardChange ? "line-through " : "").toString() + "bg-white border border-black p-1"
                           }
+                          key={"entry_" + notification.id}
                         >
                           {getElem(JSON.parse(notification.oldInformation)[elem], elem)}
                         </li>
