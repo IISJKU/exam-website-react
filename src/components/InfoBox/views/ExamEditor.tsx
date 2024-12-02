@@ -351,8 +351,8 @@ export default function ExamEditor() {
     const overlappingExams = allExams.filter((examData) => {
       if (examData.id === exam.id || examData.room_id !== newRoomId || examData.room_id === null) return false;
 
-      const examStart = new Date(exam.date);
-      const examEnd = new Date(examStart.getTime() + exam.duration * 60000);
+      const examStart = new Date(examData.date);
+      const examEnd = new Date(examStart.getTime() + examData.duration * 60000);
 
       // Check if there is a time overlap
       return (
