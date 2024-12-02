@@ -126,7 +126,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
     <div className="relative w-96" ref={dropdownRef} onKeyDown={handleKeyPress}>
       {props.label && <div className="font-bold">{props.label}</div>}
       {props.disabled ? (
-        <div className="mb-2 inline-block ">{selectedOptionLabel}</div>
+        <div className="mb-2 inline-block">{selectedOptionLabel}</div>
       ) : (
         <div className="relative mt-1">
           <input
@@ -134,19 +134,19 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
             placeholder={selectedOptionLabel || props.placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className={`block mb-2 bg-slate-100 focus:ring-2 border-2 border-black px-1 placeholder-black ${
-              searchTerm === "" && props.value ? "text-black" : "text-black"
-            }`}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
+              className={`mb-2 border border-gray-300 p-2 w-80 rounded-md px-1 placeholder-black ${
+                searchTerm === "" && props.value ? "text-black" : "text-black"
+              }`}
           />
           {isDropdownOpen && (
-            <ul className="absolute mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black px-1 z-50">
+            <ul className="absolute bg-white shadow-lg z-50 w-80">
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => (
                   <li
                     key={option.value}
                     onClick={() => handleSelectOption(option.value)}
-                    className={`cursor-pointer select-none relative py-2 pl-3 pr-9 ${
+                    className={`cursor-pointer select-none py-2 pl-3 pr-9 ${
                       option.value === props.value ? "bg-gray-100 text-black font-bold" : "text-gray-900"
                     } hover:bg-indigo-500 hover:text-white`}
                   >
@@ -154,7 +154,10 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
                   </li>
                 ))
               ) : (
-                <li className="text-gray-500 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:text-indigo-500" onClick={handleAddNewRecord}>
+                <li
+                  className="text-black-500 cursor-pointer select-none py-2 pl-3 pr-9 hover:text-indigo-500"
+                  onClick={handleAddNewRecord}
+                >
                   "{searchTerm}"
                 </li>
               )}
@@ -163,5 +166,5 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
         </div>
       )}
     </div>
-  );
+  );  
 }

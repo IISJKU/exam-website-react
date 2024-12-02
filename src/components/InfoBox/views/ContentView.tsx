@@ -63,7 +63,7 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
                {typeof element[key] === "string"
                  ? !isDate(element[key] as string)
                    ? (element[key] as string)
-                   : formatDate(element[key] as string)
+                   : formatDateTime(element[key] as string)
                  : Array.isArray(element[key])
                  ? (element[key] as string[]).join(", ")
                  : typeof element[key] === "number"
@@ -86,7 +86,7 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
 }
 
 // Helper function to format the date
-const formatDate = (dateString: string): string => {
+export const formatDateTime = (dateString: string): string => {
   const date = new Date(dateString);
 
   const dateOptions: Intl.DateTimeFormatOptions = {

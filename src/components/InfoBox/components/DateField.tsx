@@ -24,10 +24,10 @@ export default function DateField(props: DateFieldProps) {
             type="date"
             value={moment(props.dateValue).format("YYYY-MM-DD")} // Input expects YYYY-MM-DD format
             onChange={props.onDateChange}
-            className="mb-2 border-2 border-black p-1"
+            className="border border-gray-300 p-2 w-48 rounded-md"
           />
           {/* Time Input */}
-          <input type="time" value={formattedTime} onChange={props.onTimeChange} className="mb-2 border-2 border-black p-1 ml-2" />
+          <input type="time" value={formattedTime} onChange={props.onTimeChange} className="border border-gray-300 p-2 w-32 rounded-md ml-1"/>
         </div>
       ) : (
         <div>

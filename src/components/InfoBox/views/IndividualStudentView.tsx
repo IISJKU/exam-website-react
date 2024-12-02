@@ -129,8 +129,8 @@ export default function IndividualStudent() {
     <div className="m-10">
       <EditField title="First Name" editMode={editMode} text={first_name} onChange={(e) => setFirstName(e.target.value)} />
       <EditField title="Last Name" editMode={editMode} text={last_name} onChange={(e) => setLastName(e.target.value)} />
-      <EditField title="Phone" editMode={editMode} text={phone} onChange={(e) => setPhone(e.target.value)} />
-      <EditField title="Matrikel Number" editMode={editMode} text={matrikel_number} onChange={(e) => setMatrikelNum(e.target.value)} />
+      <EditField title="Phone" editMode={editMode} text={phone} hideTitle={false} onChange={(e) => setPhone(e.target.value)} />
+      <EditField title="Matrikel Number" editMode={editMode} hideTitle={false} text={matrikel_number} onChange={(e) => setMatrikelNum(e.target.value)} />
       <DropdownWithSearch
         tableName = "majors"
         label="Major"
@@ -140,9 +140,9 @@ export default function IndividualStudent() {
         placeholder="Search major..."
         disabled={!editMode}
       />
-      <EditField title="Emergency Contact" editMode={editMode} text={emergency_contact} onChange={(e) => setEmergencyContact(e.target.value)} />
-      <EditField title="Overtime" editMode={editMode} text={bonus_time ? bonus_time.toString() : ""} onChange={(e) => setOvertime(Number(e.target.value))} />
-      <EditField title="Misc" editMode={editMode} text={misc} onChange={(e) => setMisc(e.target.value)} />
+      <EditField title="Emergency Contact" editMode={editMode} text={emergency_contact} hideTitle={false} onChange={(e) => setEmergencyContact(e.target.value)} />
+      <EditField title="Overtime" editMode={editMode} text={bonus_time ? bonus_time.toString() : ""} hideTitle={false} onChange={(e) => setOvertime(Number(e.target.value))} />
+      <EditField title="Misc" editMode={editMode} text={misc} hideTitle={false} onChange={(e) => setMisc(e.target.value)} />
       <br />
       <button
         onClick={() => {

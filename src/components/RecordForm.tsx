@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import DateField from "./InfoBox/components/DateField";
 
 interface RecordFormProps {
   record: DataRecord | null;
@@ -124,14 +125,17 @@ export default function RecordForm(props: RecordFormProps) {
             <label className="block text-gray-700 capitalize">
               {field.replace("_", " ")}:
             </label>
-            <input
-              type="text"
+            {field === "date" ? 
+            <DateField editMode={true} dateValue={formData[field]} />
+            : <input
+              type={"text"}
               name={field}
               value={formData[field] || ""}
               onChange={handleChange}
               className="border border-gray-300 p-2 w-full rounded-md"
               required={isRequired}
-            />
+              min="3"
+            /> }
           </div>
         );
       })}
@@ -142,10 +146,14 @@ export default function RecordForm(props: RecordFormProps) {
         .map((field) => {
           const isRequired = !(props.optionalFields ?? []).includes(field.name);
 
+          const containsRoleField = props.relationalFields?.some(
+            (field) => field.name === "role"
+          );
           // Enable only 'student' field if role is 'student' and only 'tutor' field if role is 'tutor'
           const isDisabled =
-            (field.name === "student" && role !== "student") ||
-            (field.name === "tutor" && role !== "tutor");
+          (containsRoleField) &&
+          ((field.name === "student" && role !== "student") ||
+           (field.name === "tutor" && role !== "tutor"));
 
           return (
             <div className="mb-4" key={field.name}>

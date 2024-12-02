@@ -6,7 +6,7 @@ interface EditFieldProps {
   text: string | number;
   title?: string;
   hideTitle?: boolean;
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 export default function EditField(props: EditFieldProps) {
@@ -21,7 +21,7 @@ export default function EditField(props: EditFieldProps) {
     setValue(props.text);
   }, [props.text]);
 
-  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setValue(e.target.value);
     if (props.onChange) {
       props.onChange(e); // Call the onChange prop if provided
@@ -45,9 +45,17 @@ export default function EditField(props: EditFieldProps) {
         <div className="font-bold">{t(props.title) + " "}</div>
       )}
       {props.editMode ? (
+        props.title === "Status" ?
+          <textarea 
+            onChange={handleChange}
+            className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
+            rows={4}
+            cols={40} 
+            value={value}
+          /> :
         <input
           onChange={handleChange}
-          className="mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black px-1"
+          className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
           type="text"
           value={value}
         />

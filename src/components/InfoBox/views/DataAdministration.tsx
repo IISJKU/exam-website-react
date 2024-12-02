@@ -4,6 +4,7 @@ import { showToast } from "../components/ToastMessage";
 import { useAuth } from "../../../hooks/AuthProvider";
 
 import fetchAll from "./FetchAll";
+import {formatDateTime } from "./ContentView";
 
 interface DataAdministrationProps {
   tableName: string;
@@ -88,10 +89,15 @@ export default function DataAdministration(props: DataAdministrationProps) {
   // Fetch relational data for dropdowns
   const fetchRelationalData = async () => {
     const relationalPromises = props.populateFields?.map(async (field) => {
-      const result = fetchAll(`http://localhost:1337/api/${field.populateTable}`, user.token, `HTTP error!`) as any["roles"];
+      const result = await fetchAll(`http://localhost:1337/api/${field.populateTable}`, user.token, `HTTP error!`);
 
-      // fix user roles update issue
-      const records = result.roles || result; // If roles array exists, use it; otherwise use result
+      type ResultType = { roles?: any[] } | any[];
+
+      const records =
+        Array.isArray(result) && result.length > 0 && Array.isArray(result[result.length - 1]?.roles)
+          ? result[result.length - 1].roles
+          : result; // Use roles if it exists and is an array, otherwise use result
+
 
       if (Array.isArray(records)) {
         return {
@@ -241,8 +247,11 @@ export default function DataAdministration(props: DataAdministrationProps) {
                           ? "True"
                           : "False"
                         : typeof record[field] === "object" && record[field]
-                        ? record[field].name
-                        : record[field] || "N/A"}
+                          ? record[field].name
+                        : field == "date" && record[field]
+                          ? formatDateTime(record[field])
+                      : record[field] || "N/A"
+                          }
                     </td>
                   ))}
                   {props.populateFields?.map((field) => (
