@@ -23,8 +23,8 @@ interface InitialState {
   student: number;
   date: string;
   duration?: number;
-  examiner?: number;
-  institute?: number;
+  examiner?: number | string;
+  institute?: number | string;
   mode?: number;
   room?: number;
   status: string;
@@ -44,11 +44,13 @@ export default function RequestExam() {
   const [lva_num, setLvaNum] = useState<number | undefined>();
   const [date, setDate] = useState<string>("");
   const [duration, setDuration] = useState<number | undefined>();
-  const [examiner, setExaminer] = useState<number | undefined>();
-  const [institute, setInstitute] = useState<number | undefined>();
+  const [examiner, setExaminer] = useState<number | string | undefined>();
+  const [institute, setInstitute] = useState<number | string | undefined>();
   const [mode, setMode] = useState<number | undefined>();
   const [room, setRoom] = useState<number | undefined>();
   const [status, setStatus] = useState<string>("Pending");
+
+  const [error, setErrorText] = useState<string>();
 
   // Define initial state with the correct type
   const [initialState, setInitialState] = useState<InitialState>({
@@ -80,7 +82,9 @@ export default function RequestExam() {
           fetch("http://localhost:1337/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/institutes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()).then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)), 
+          fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } })
+            .then((res) => res.json())
+            .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)),
         ]);
 
         setOptions({
@@ -158,13 +162,32 @@ export default function RequestExam() {
       date: date,
       student_id: student,
       duration: duration,
-      examiner_id: examiner,
-      institute_id: institute,
+      examiner_id: 0,
+      examiner: undefined,
+      institute_id: 0,
       exam_mode: mode,
       room_id: room,
       lva_num,
       status,
     };
+
+    if (typeof examiner == "number") {
+      data.examiner_id = examiner;
+    } else {
+      if (examiner) {
+        let nuExaminer = new Examiner();
+        let firstName = examiner?.substring(0, examiner.indexOf(" ")).trim();
+        let lastName = examiner?.substring(examiner.indexOf(" "), examiner.length).trim();
+
+        nuExaminer.first_name = firstName;
+        nuExaminer.last_name = lastName;
+        data.examiner = nuExaminer;
+      }
+    }
+
+    if (typeof institute == "number") {
+      data.institute_id = institute;
+    }
 
     setExam(data as Exam);
 
@@ -174,6 +197,7 @@ export default function RequestExam() {
       let notif = new Notification(JSON.stringify(data), "", user.user);
       notif.type = NotificationType.createExam;
 
+      console.log(data);
       if (addedEx != "") {
         const notify = await fetch(`http://localhost:1337/api/notifications`, {
           method: "POST",
@@ -201,6 +225,8 @@ export default function RequestExam() {
       showToast({ message: "Error creating exam notification", type: "error" });
     }
   };
+
+  const [submit, setSubmit] = useState<boolean>(false);
 
   const handleCancel = () => {
     setExam(initialState.exam);
@@ -243,6 +269,7 @@ export default function RequestExam() {
         }}
         placeholder={t("Search examiner...")}
         disabled={!editMode}
+        submit={submit}
       />
       <DropdownWithSearch
         tableName="institutes"
@@ -252,6 +279,7 @@ export default function RequestExam() {
         onChange={(val) => setInstitute(Number(val))}
         placeholder={t("Search institutes...")}
         disabled={!editMode}
+        submit={submit}
       />
       <DropdownWithSearch
         tableName="exam-modes"
@@ -261,6 +289,7 @@ export default function RequestExam() {
         onChange={(val) => setMode(Number(val))}
         placeholder={t("Search modes...")}
         disabled={!editMode}
+        submit={submit}
       />
 
       <EditField title={t("Status")} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus("Pending")} />
@@ -271,6 +300,7 @@ export default function RequestExam() {
       <button onClick={handleCancel} className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline">
         {t("Cancel")}
       </button>
+      {error ? <div className="text-red-800 text-xl">Please fill in all of the fields!</div> : <></>}
     </div>
   );
 }

@@ -97,7 +97,6 @@ export default function NotificationBell() {
   };
 
   const handleClick = (c: number) => {
-    console.log("notification" + c.toString());
     if (user.role == "Admin") navigate(`admin/notifications/${c}`);
     else navigate(`students/notifications/${c}`);
   };

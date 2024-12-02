@@ -1,6 +1,7 @@
 import Calendar from "./Calendar";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom"; // For navigation
+import NotificationButton from "./NotificationButton";
 
 export default function SideMenu() {
   const { t } = useTranslation();
@@ -8,16 +9,7 @@ export default function SideMenu() {
 
   return (
     <div className="p-5 text-xl h-full w-full bg-slate-200">
-      {/* Exams Overview Button */}
-      <button
-        onClick={() => {
-          navigate("admin/notifications"); // Navigate to the exams route
-        }}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
-      >
-        {t("Notifications")}
-      </button>
-
+      <NotificationButton path="admin/notifications" />
       {/* Exams Overview Button */}
       <button
         onClick={() => {
@@ -59,7 +51,7 @@ export default function SideMenu() {
       </button>
       <button
         onClick={() => {
-          navigate("admin/room-management"); 
+          navigate("admin/room-management");
         }}
         className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
       >

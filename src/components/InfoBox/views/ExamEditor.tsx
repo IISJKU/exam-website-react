@@ -70,11 +70,10 @@ export default function ExamEditor() {
     const fetchExam = async () => {
       try {
         let path = ``;
-        if (user.role == "Admin") {
+        if (user.role == "Admin" || user.role == "Tutor") {
           path = `http://localhost:1337/api/exams/${id}`;
         } else if (user.role == "Student") {
           path = `http://localhost:1337/api/exams/me`;
-        } else {
         }
         const examResponse = await fetch(path, {
           method: "GET",
@@ -172,8 +171,9 @@ export default function ExamEditor() {
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
-          }).then((res) => res.json())
-          .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)), // Filter for available rooms
+          })
+            .then((res) => res.json())
+            .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)), // Filter for available rooms
         ]);
 
         setOptions({
@@ -191,14 +191,14 @@ export default function ExamEditor() {
     };
 
     // Fetch exams
-   const fetchAllExams = async () => {
-    const response = await fetch("http://localhost:1337/api/exams", {
-      headers: { Authorization: `Bearer ${user.token}` },
-    });
-    const data = await response.json();
-    setAllExams(data);
+    const fetchAllExams = async () => {
+      const response = await fetch("http://localhost:1337/api/exams", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await response.json();
+      setAllExams(data);
     };
-    
+
     fetchExam();
     fetchDropdownOptions();
     if (user.role == "Admin") fetchAllExams();
@@ -334,33 +334,32 @@ export default function ExamEditor() {
           return;
         }
       }
-
     } catch (error) {
       showToast({ message: "Error updating exam", type: "error" });
     }
   };
 
   const handleRoomChange = (newRoomId: number) => {
-    const room = options.rooms.find((r) => r.id === newRoomId);  
+    const room = options.rooms.find((r) => r.id === newRoomId);
     if (!exam || !room) return;
-  
+
     // Convert selected exam start time and end time to Date objects
     const selectedExamStart = new Date(exam.date);
     const selectedExamEnd = new Date(selectedExamStart.getTime() + exam.duration * 60000);
-  
+
     // Check for overlapping exams in the same room
     const overlappingExams = allExams.filter((examData) => {
       if (examData.id === exam.id || examData.room_id !== newRoomId || examData.room_id === null) return false;
-  
+
       const examStart = new Date(exam.date);
       const examEnd = new Date(examStart.getTime() + exam.duration * 60000);
-  
+
       // Check if there is a time overlap
       return (
-        (examStart < selectedExamEnd && examEnd > selectedExamStart) // Overlapping condition
+        examStart < selectedExamEnd && examEnd > selectedExamStart // Overlapping condition
       );
     });
-  
+
     // Check if the overlapping exams exceed room capacity
     if (overlappingExams.length + 1 > room.capacity) {
       showToast({
@@ -369,7 +368,7 @@ export default function ExamEditor() {
       });
       return;
     }
-  
+
     // If capacity allows, assign the room
     if (room.capacity === 0) {
       setSelectedRoomId(newRoomId); // Track room to be set if confirmed
@@ -387,7 +386,7 @@ export default function ExamEditor() {
   };
 
   const handleCancelRoomSelection = () => {
-    setSelectedRoomId(null);      
+    setSelectedRoomId(null);
     setShowConfirmDialog(false);
     setRoom(null);
     showToast({ message: "Room selection canceled", type: "info" });
@@ -522,25 +521,24 @@ export default function ExamEditor() {
         ) : (
           <></>
         )}
-         {showConfirmDialog && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded shadow-lg max-w-sm">
-            <p className="mb-4">{t("The selected room has a capacity of 0. Do you want to continue?")}</p>
-            <div className="flex justify-end">
-              <button
-                onClick={handleCancelRoomSelection}
-                className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded mr-2 hover:bg-gray-300" >
-                {t("Cancel")}
-              </button>
-              <button
-                onClick={handleConfirmRoomSelection}
-                className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600" >
-                {t("Confirm")}
-              </button>
+        {showConfirmDialog && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-4 rounded shadow-lg max-w-sm">
+              <p className="mb-4">{t("The selected room has a capacity of 0. Do you want to continue?")}</p>
+              <div className="flex justify-end">
+                <button
+                  onClick={handleCancelRoomSelection}
+                  className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded mr-2 hover:bg-gray-300"
+                >
+                  {t("Cancel")}
+                </button>
+                <button onClick={handleConfirmRoomSelection} className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">
+                  {t("Confirm")}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     );
   else

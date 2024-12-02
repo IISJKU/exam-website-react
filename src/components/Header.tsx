@@ -1,4 +1,3 @@
-import NotificationBell from "./NotificationBell";
 import LanguageSwitch from "./LanguageSwitch";
 
 export default function Header() {
@@ -6,7 +5,6 @@ export default function Header() {
     <>
       <div className="flex relative items-center select-none max-w-full w-full">
         <h1 className="md:text-5xl text-3xl font-bold font-lexend underline p-5  xl:basis-10/12 basis-3/5">IIS Exam Page</h1>
-        <NotificationBell />
         <div className="absolute right-5">
           <LanguageSwitch />
         </div>

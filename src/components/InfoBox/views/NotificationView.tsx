@@ -16,6 +16,7 @@ import Room from "../../classes/Room";
 import { showToast } from "../components/ToastMessage";
 import { useParams } from "react-router-dom";
 import fetchAll from "./FetchAll";
+import NotificationCategory from "../components/NotificationCategory";
 
 export default function NotificationView() {
   const user = useAuth();
@@ -25,6 +26,7 @@ export default function NotificationView() {
   const [exams, setExams] = useState<Exam[]>();
 
   const [proposals, setProposals] = useState<Notification[]>([]);
+  const [actionsRequired, setActionsRequired] = useState<Notification[]>([]);
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [seenNotifications, setSeenNotifications] = useState<Notification[]>([]);
@@ -45,7 +47,6 @@ export default function NotificationView() {
     studentRoute = "http://localhost:1337/api/students/me";
   } else if (user.role == "Tutor") {
     notificationRoute = `http://localhost:1337/api/notifications/me`;
-    studentRoute = "http://localhost:1337/api/students/me";
   }
 
   const [options, setOptions] = useState({
@@ -64,6 +65,29 @@ export default function NotificationView() {
     return false;
   };
 
+  const getNotifications = (id: number): Notification[] => {
+    let notifs: Notification[] = [];
+    let n = new Notification();
+
+    notifications.forEach((element) => {
+      if (Number(element.id) == Number(id)) {
+        n = element;
+      }
+    });
+
+    for (let i = 0; i < notifications.length; i++)
+      if (Number(notifications[notifications.length - 1 - i].exam_id) == Number(n.exam_id)) notifs.push(notifications[notifications.length - 1 - i]);
+
+    /*
+    seenNotifications.forEach((element) => {
+      if (Number(element.id) == Number(id)) {
+        notifs.push(element);
+      }
+    }); */
+
+    return notifs;
+  };
+
   const hasThread = (arr: Notification[][], notif: Notification): boolean => {
     let has = false;
 
@@ -74,6 +98,25 @@ export default function NotificationView() {
     });
 
     return has;
+  };
+
+  const sortNotifs = (arr: Notification[]): Notification[] => {
+    let tempArr: Notification[] = [];
+
+    arr.forEach((elem) => {
+      let t = getNotifications(elem.id);
+
+      tempArr.push(t[0]);
+    });
+
+    tempArr.sort((a: Notification, b: Notification) => {
+      const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0); // Default to epoch (earliest date) if undefined
+      const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0); // Default to epoch (earliest date) if undefined
+
+      return dateB.getTime() - dateA.getTime(); // Sorting in descending order (latest date first)
+    });
+
+    return tempArr;
   };
 
   // Fetch data from Strapi API
@@ -87,7 +130,6 @@ export default function NotificationView() {
       });
 
       //let c = await response.json();
-      //console.log(c);
       let data = await response.json(); //should probably rewrite api response, instead of changing stuff here
       //if (user.role == "Admin") data = data.data;
 
@@ -99,10 +141,10 @@ export default function NotificationView() {
       if (user.role == "Student") examsLink = "http://localhost:1337/api/exams/me";
 
       const examData = (await fetchAll(examsLink, user.token)) as Exam[];
-      console.log(examData);
 
       let tempNew: Notification[] = [];
       let tempOld: Notification[] = [];
+      let accReq: Notification[] = [];
       let all: Notification[] = [];
 
       let prop: Notification[] = [];
@@ -139,21 +181,29 @@ export default function NotificationView() {
 
       threads.forEach((thread) => {
         let hasUnread = false;
+        let hasChange = false;
+
         thread.forEach((notif) => {
           if ((notif.seenBy.length == 0 || !notif.seenBy.includes(user.user)) && notif.sentBy != user.user) {
             hasUnread = true;
           }
         });
 
+        if (thread[thread.length - 1].type == "proposeChange") {
+          hasChange = true;
+        }
+
         thread.forEach((notif) => {
-          if (hasUnread && !hasThread([tempNew, tempOld], notif)) tempNew.push(notif);
-          else if (!hasThread([tempNew, tempOld], notif)) tempOld.push(notif);
+          if (hasUnread && !hasThread([tempNew, tempOld, accReq], notif)) tempNew.push(notif);
+          else if (!hasThread([tempNew, tempOld, accReq], notif) && !hasChange) tempOld.push(notif);
+          else if (!hasThread([tempNew, tempOld, accReq], notif)) accReq.push(notif);
         });
       });
 
-      if (tempNew.length != 0) setNewNotifications(tempNew.reverse());
-      if (tempOld.length != 0) setSeenNotifications(tempOld.reverse());
       if (all.length != 0) setNotifications(all);
+      if (tempNew.length != 0) setNewNotifications(tempNew);
+      if (tempOld.length != 0) setSeenNotifications(tempOld);
+      if (accReq.length != 0) setActionsRequired(accReq);
 
       if (prop.length != 0) setProposals(prop.reverse());
       if (examData != undefined) setExams(examData);
@@ -204,8 +254,9 @@ export default function NotificationView() {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
-        }).then((res) => res.json())
-        .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)), 
+        })
+          .then((res) => res.json())
+          .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)),
       ]);
 
       setOptions({
@@ -241,29 +292,6 @@ export default function NotificationView() {
     return x;
   };
 
-  const getNotifications = (id: number): Notification[] => {
-    let notifs: Notification[] = [];
-    let n = new Notification();
-
-    notifications.forEach((element) => {
-      if (Number(element.id) == Number(id)) {
-        n = element;
-      }
-    });
-
-    for (let i = 0; i < notifications.length; i++)
-      if (Number(notifications[notifications.length - 1 - i].exam_id) == Number(n.exam_id)) notifs.push(notifications[notifications.length - 1 - i]);
-
-    /*
-    seenNotifications.forEach((element) => {
-      if (Number(element.id) == Number(id)) {
-        notifs.push(element);
-      }
-    }); */
-
-    return notifs;
-  };
-
   const [openId, setOpenId] = useState<undefined | number>(Number(id));
 
   return (
@@ -273,67 +301,10 @@ export default function NotificationView() {
         {/*<SearchBar items={props.data} filter={setFilteredData} /> */}
       </div>
       <div className="h-5"></div>
-
-      {proposals.length != 0 ? (
-        <div>
-          <div className="text-2xl font-bold">Proposed Exams</div>
-          <ul className="w-full text-left border-2">
-            {proposals.map((elem) => (
-              <NotificationComponent
-                exam={getExam(elem.exam_id)}
-                options={options}
-                notification={[elem]}
-                id={elem.id}
-                exam_id={elem.exam_id}
-                sentBy={elem.sentBy}
-                openId={openId}
-              />
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <></>
-      )}
-      {newNotifications.length != 0 ? (
-        <div>
-          <div className="text-2xl font-bold">New Notifications</div>
-          <ul className="w-full text-left border-2">
-            {newNotifications.map((elem) => (
-              <NotificationComponent
-                exam={getExam(elem.exam_id)}
-                options={options}
-                notification={elem.exam_id == 0 ? [elem] : getNotifications(elem.id)}
-                id={elem.id}
-                exam_id={elem.exam_id}
-                sentBy={elem.sentBy}
-                openId={openId}
-              />
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <></>
-      )}
-      {seenNotifications.length != 0 ? (
-        <div>
-          <div className="text-2xl font-bold">Old Notifications</div>
-          <ul className="w-full text-left border-2">
-            {seenNotifications.map((elem) => (
-              <NotificationComponent
-                exam={getExam(elem.exam_id)}
-                options={options}
-                notification={elem.exam_id == 0 ? [elem] : getNotifications(elem.id)}
-                id={elem.id}
-                exam_id={elem.exam_id}
-                sentBy={elem.sentBy}
-                openId={openId}
-              />
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <></>
-      )}
+      <NotificationCategory notifications={proposals} text={"Proposed Exams"} exams={exams} options={options} />
+      <NotificationCategory notifications={sortNotifs(actionsRequired)} text={"Required Actions"} exams={exams} options={options} />
+      <NotificationCategory notifications={sortNotifs(newNotifications)} text={"New Notifications"} exams={exams} options={options} />
+      <NotificationCategory notifications={sortNotifs(seenNotifications)} text={"Old Notifications"} exams={exams} options={options} />
     </div>
   );
 }

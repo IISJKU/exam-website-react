@@ -10,6 +10,7 @@ export default function Login() {
   const { t } = useTranslation();
   const [formValues, setFormValues] = useState({ identifier: "", password: "" });
   const navigate = useNavigate(); // Hook to programmatically navigate
+  const [errorText, setErrorText] = useState<string>();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormValues({ ...formValues, [e.target.id]: e.target.value });
@@ -22,12 +23,13 @@ export default function Login() {
     e.preventDefault(); // Prevent the form from refreshing the page
 
     try {
-      if (formValues.identifier !== "" && formValues.password !== "") {
-        auth.loginAction(formValues);
+      if (formValues.identifier && formValues.password && formValues.identifier !== "" && formValues.password !== "") {
+        await auth.loginAction(formValues);
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      alert("Login failed. Please try again.");
+      if (error instanceof TypeError) setErrorText("Server can't be reached");
+      else setErrorText("Username or Password don't match.");
+      console.log(error);
     }
   };
 
@@ -36,7 +38,7 @@ export default function Login() {
       <Header />
       <form onSubmit={handleSubmit}>
         <FormField label={t("Email")} id={"identifier"} type={"text"} value={formValues.identifier} onChange={handleChange} />
-        <FormField label={t("Password")} id={"password"} type={"password"} value={formValues.password} onChange={handleChange} />
+        <FormField label={t("Password")} id={"password"} type={"password"} value={formValues.password} onChange={handleChange} errorText={errorText} />
         <button type="submit" className="mx-6 my-4 px-2 text-2xl border border-slate-900 hover:underline">
           {t("Login")}
         </button>

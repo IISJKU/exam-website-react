@@ -15,7 +15,6 @@ interface NotificationComponentProps {
   options: Object;
   id: number;
   exam_id: number;
-  openId: number | undefined;
 }
 
 export default function NotificationComponent(props: NotificationComponentProps) {
@@ -35,19 +34,6 @@ export default function NotificationComponent(props: NotificationComponentProps)
 
     return t;
   };
-
-  const checkIfOpen = (): boolean => {
-    let t = false;
-
-    props.notification.forEach((notification) => {
-      if (Number(notification.id) == Number(props.openId)) {
-        t = true;
-      }
-    });
-
-    return t;
-  };
-  const [clickedOn, setClickedOn] = useState<boolean>(checkIfOpen());
 
   const [seen, setSeen] = useState<boolean>(hasSeen());
 
@@ -73,6 +59,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
   };
 
   const getElem = (index: any, type: string): string => {
+    console.log(index);
     if (index != undefined && index.id != undefined) {
       index = index.id;
     }
@@ -164,7 +151,6 @@ export default function NotificationComponent(props: NotificationComponentProps)
   }, []);
 
   const getName = (): string => {
-    console.log(auth.user);
     if (notifications[0].sentBy == auth.user) return "You";
     return notifications[0].sentBy;
   };
@@ -173,103 +159,109 @@ export default function NotificationComponent(props: NotificationComponentProps)
     <li
       id={"notification" + props.id.toString()}
       key={props.id}
-      className={color == "" ? "even:bg-slate-200 odd:bg-slate-100 cursor-pointer border border-white hover:border-black" : color.toString()}
+      className={color == "" ? "even:bg-slate-200 odd:bg-slate-100 cursor-pointer border border-white hover:border-black " : color.toString()}
       onClick={() => toggleInfoPannel()}
     >
-      {props.notification[0].type == NotificationType.createExam ? (
-        <div className="relative" id={"notification" + props.id.toString() + "_div"}>
-          {getName()} proposed a new Exam
-          {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) || auth.role == "Tutor" ? (
-            <></>
-          ) : (
-            <a className="inline-block absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>
-              Edit
-            </a>
-          )}
-        </div>
-      ) : (
-        <div className="relative">
-          {props.exam.title != undefined
-            ? notifications[0].type == NotificationType.tutorConfirm
-              ? getName() + " will monitor " + props.exam.title
-              : notifications[0].type == NotificationType.tutorDecline
-              ? getName() + " will no longer monitor " + props.exam.title
-              : props.exam.title + " was edited by " + getName()
-            : "Exam was declined by " + getName()}
-          {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) || auth.role == "Tutor" ? (
-            <></>
-          ) : (
-            <a className="inline-block absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>
-              Edit
-            </a>
-          )}
-        </div>
-      )}
-
-      {infoOpen || clickedOn ? (
-        <div className="">
-          {notifications.map((notification: Notification, index) => (
-            <div className="cursor-default" key={"divcontainer_" + notification.id}>
-              <ul className="p-4">
-                {notification.type == NotificationType.proposeChange ||
-                notification.type == NotificationType.adminChange ||
-                notification.type == NotificationType.createExamOld ||
-                notification.type == NotificationType.createExam ? (
-                  <div className={("pl-" + tabs[index]).toString()}>
-                    At {moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm") ?? ""} {notification.sentBy}{" "}
-                    {notification.type == NotificationType.adminChange
-                      ? "changed"
-                      : notification.type == NotificationType.createExamOld
-                      ? "proposed an Exam"
-                      : "proposed a change"}
-                    :
-                    {Object.keys(JSON.parse(notification.information)).map((elem: string) => (
-                      <li className="bg-white border border-black p-1" key={"entry_" + notification.id}>
-                        {notification.type == NotificationType.createExam || notification.type == NotificationType.createExamOld
-                          ? getTitle(JSON.parse(notification.information)[elem], elem) + ": " + getElem(JSON.parse(notification.information)[elem], elem)
-                          : getElem(JSON.parse(notification.oldInformation)[elem], elem) + " -> " + getElem(JSON.parse(notification.information)[elem], elem)}
-                      </li>
-                    ))}
-                  </div>
-                ) : notification.type == NotificationType.tutorConfirm || notification.type == NotificationType.tutorDecline ? (
-                  <div
-                    className={(
-                      "border border-black p-2 " +
-                      (notification.type == NotificationType.tutorConfirm ? "bg-teal-300 " : "bg-red-400 border-dotted ") +
-                      "font-bold"
-                    ).toString()}
-                  >
-                    Tutor {notification.sentBy} {notification.type == NotificationType.tutorConfirm ? "registered to " : "canceled to "} monitor the exam.
-                  </div>
-                ) : (
-                  <div
-                    className={(
-                      "border border-black p-2 " +
-                      (notification.type == NotificationType.confirmChange ? "bg-lime-200 " : "bg-red-400 border-dotted ") +
-                      "font-bold"
-                    ).toString()}
-                  >
-                    {notification.sentBy} {notification.type == NotificationType.confirmChange ? "approved" : "declined"} the changes.
-                    {notification.oldInformation != "" &&
-                      Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) => (
-                        <li
-                          className={
-                            (notification.type == NotificationType.discardChange ? "line-through " : "").toString() + "bg-white border border-black p-1"
-                          }
-                          key={"entry_" + notification.id}
-                        >
-                          {getElem(JSON.parse(notification.oldInformation)[elem], elem)}
+      <div className="relative">
+        <p className="inline-block w-60 font-bold">{moment(notifications[0].createdAt).format("DD.MM.YYYY HH:mm") + ""}</p>
+        {props.notification[0].type == NotificationType.createExam ? (
+          <div className="inline-block " id={"notification" + props.id.toString() + "_div"}>
+            {getName()} proposed a new Exam
+            {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) ||
+            auth.role == "Tutor" ||
+            auth.role == "Student" ? (
+              <></>
+            ) : (
+              <a className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>
+                Edit
+              </a>
+            )}
+          </div>
+        ) : (
+          <div className="inline-block w-max">
+            {props.exam.title != undefined
+              ? notifications[0].type == NotificationType.tutorConfirm
+                ? getName() + " will monitor " + props.exam.title
+                : notifications[0].type == NotificationType.tutorDecline
+                ? getName() + " will no longer monitor " + props.exam.title
+                : props.exam.title + " was edited by " + getName()
+              : "Exam was declined by " + getName()}
+            {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) ||
+            auth.role == "Tutor" ||
+            auth.role == "Student" ? (
+              <></>
+            ) : (
+              <a className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>
+                Edit
+              </a>
+            )}
+          </div>
+        )}
+        {infoOpen ? (
+          <div className="">
+            {notifications.map((notification: Notification, index) => (
+              <div className="cursor-default" key={"divcontainer_" + notification.id}>
+                <ul className="p-4">
+                  {notification.type == NotificationType.proposeChange ||
+                  notification.type == NotificationType.adminChange ||
+                  notification.type == NotificationType.createExamOld ||
+                  notification.type == NotificationType.createExam ? (
+                    <div className={("pl-" + tabs[index]).toString()}>
+                      At {moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm") ?? ""} {notification.sentBy}{" "}
+                      {notification.type == NotificationType.adminChange
+                        ? "changed"
+                        : notification.type == NotificationType.createExamOld
+                        ? "proposed an Exam"
+                        : "proposed a change"}
+                      :
+                      {Object.keys(JSON.parse(notification.information)).map((elem: string) => (
+                        <li className="bg-white border border-black p-1" key={"entry2_" + notification.id}>
+                          {notification.type == NotificationType.createExam || notification.type == NotificationType.createExamOld
+                            ? getTitle(JSON.parse(notification.information)[elem], elem) + ": " + getElem(JSON.parse(notification.information)[elem], elem)
+                            : getElem(JSON.parse(notification.oldInformation)[elem], elem) + " -> " + getElem(JSON.parse(notification.information)[elem], elem)}
                         </li>
-                      ))}{" "}
-                  </div>
-                )}
-              </ul>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <></>
-      )}
+                      ))}
+                    </div>
+                  ) : notification.type == NotificationType.tutorConfirm || notification.type == NotificationType.tutorDecline ? (
+                    <div
+                      className={(
+                        "border border-black p-2 " +
+                        (notification.type == NotificationType.tutorConfirm ? "bg-teal-300 " : "bg-red-400 border-dotted ") +
+                        "font-bold"
+                      ).toString()}
+                    >
+                      Tutor {notification.sentBy} {notification.type == NotificationType.tutorConfirm ? "registered to " : "canceled to "} monitor the exam.
+                    </div>
+                  ) : (
+                    <div
+                      className={(
+                        "border border-black p-2 " +
+                        (notification.type == NotificationType.confirmChange ? "bg-lime-200 " : "bg-red-400 border-dotted ") +
+                        "font-bold"
+                      ).toString()}
+                    >
+                      {notification.sentBy} {notification.type == NotificationType.confirmChange ? "approved" : "declined"} the changes.
+                      {notification.oldInformation != "" &&
+                        Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) => (
+                          <li
+                            className={
+                              (notification.type == NotificationType.discardChange ? "line-through " : "").toString() + "bg-white border border-black p-1"
+                            }
+                            key={"entry_" + notification.id}
+                          >
+                            {getElem(JSON.parse(notification.oldInformation)[elem], elem)}
+                          </li>
+                        ))}{" "}
+                    </div>
+                  )}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <></>
+        )}
+      </div>
     </li>
   );
 }

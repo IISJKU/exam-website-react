@@ -16,6 +16,7 @@ interface DropdownWithSearchProps {
   onChange: (value: string | number) => void;
   disabled?: boolean;
   placeholder?: string;
+  submit?: boolean;
 }
 
 export default function DropdownWithSearch(props: DropdownWithSearchProps) {
@@ -50,8 +51,14 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
 
   const handleSelectOption = (optionValue: string | number) => {
     props.onChange(optionValue); // Call onChange function passed from the parent component
+    if (typeof optionValue == "string") optionValue = JSON.parse(optionValue).searchTerm;
+
+    console.log("optionValue");
+    console.log(optionValue);
+    console.log("end");
+
     setIsDropdownOpen(false); // Close dropdown after selection
-    setSearchTerm(""); // Clear search term after selection
+    if (typeof optionValue == "number") setSearchTerm(""); // Clear search term after selection
   };
 
   function newRecord() {
@@ -72,6 +79,9 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
 
   const handleAddNewRecord = async () => {
     let newRec = newRecord();
+    setIsDropdownOpen(false);
+    handleSelectOption(newRec);
+    /*
     if (newRec != "") {
       // Function to handle adding a new record to the database
       try {
@@ -79,9 +89,10 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
           },
           //body: JSON.stringify({ label: searchTerm, value: searchTerm }), // Adjust payload as necessary
-          body: JSON.stringify({ data: new Notification(newRec, user.user, props.label) }),
+          body: JSON.stringify({ data: new Notification("{}", "{" + props.label + ":" + newRec + "}", user.user) }),
         });
 
         if (!response.ok) {
@@ -89,7 +100,8 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
         }
 
         const newRecord = await response.json();
-        showToast({ message: `New record added: ` + { newRecord }, type: "info" });
+
+        showToast({ message: `New record added: ` + newRec, type: "info" });
 
         // Add the new option to the dropdown list
         props.onChange(searchTerm); // Set the new record as the selected value
@@ -98,14 +110,20 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
       } catch (error) {
         showToast({ message: `Error while adding new notification`, type: "error" });
       }
-    }
+    } */
   };
 
   // Get the label of the currently selected value (if any)
   const selectedOptionLabel = props.options.find((option) => option.value === props.value)?.label || "";
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter") {
+      handleAddNewRecord();
+    }
+  };
+
   return (
-    <div className="relative w-96" ref={dropdownRef}>
+    <div className="relative w-96" ref={dropdownRef} onKeyDown={handleKeyPress}>
       {props.label && <div className="font-bold">{props.label}</div>}
       {props.disabled ? (
         <div className="mb-2 inline-block ">{selectedOptionLabel}</div>
@@ -118,7 +136,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
             onChange={(e) => setSearchTerm(e.target.value)}
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className={`block mb-2 bg-slate-100 focus:ring-2 border-2 border-black px-1 placeholder-black ${
-              searchTerm === "" && props.value ? "text-black" : "text-gray-500"
+              searchTerm === "" && props.value ? "text-black" : "text-black"
             }`}
           />
           {isDropdownOpen && (
@@ -137,7 +155,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
                 ))
               ) : (
                 <li className="text-gray-500 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:text-indigo-500" onClick={handleAddNewRecord}>
-                  No options found. Click to add "{searchTerm}"
+                  "{searchTerm}"
                 </li>
               )}
             </ul>

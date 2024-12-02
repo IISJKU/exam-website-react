@@ -6,16 +6,14 @@ interface FormFieldProps {
   type: HTMLInputTypeAttribute;
   value: HTMLInputTypeAttribute;
   onChange: ChangeEventHandler;
+  errorText?: string;
 }
 
 export default function FormField(props: FormFieldProps) {
   return (
     <div className="p-5 w-full">
       <div>
-        <label
-          htmlFor={props.id}
-          className="block mb-2 text-xl font-medium text-gray-900"
-        >
+        <label htmlFor={props.id} className="block mb-2 text-xl font-medium text-gray-900">
           {props.label}*
         </label>
         <input
@@ -34,6 +32,7 @@ export default function FormField(props: FormFieldProps) {
           required
         />
       </div>
+      {props.errorText ? <div className="text-red-800 text-xl">{props.errorText}</div> : <></>}
     </div>
   );
 }

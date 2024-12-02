@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom"; // For navigation
 import StudentCalender from "./StudentCalendar";
+import NotificationButton from "./NotificationButton";
 
 export default function StudentMenu() {
   const { t } = useTranslation();
@@ -8,15 +9,8 @@ export default function StudentMenu() {
 
   return (
     <div className="p-5 text-xl h-full w-full bg-slate-200">
+      <NotificationButton path="student/notifications" />
       {/* Exams Overview Button */}
-      <button
-        onClick={() => {
-          navigate("student/notifications");
-        }}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
-      >
-        {t("Notifications")}
-      </button>
       <button
         onClick={() => {
           navigate("student/all-exams");

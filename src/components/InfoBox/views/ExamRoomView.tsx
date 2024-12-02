@@ -7,6 +7,9 @@ import Exam from "../../classes/Exam";
 import Room from "../../classes/Room";
 import { useTranslation } from "react-i18next";
 import RoomsCalender from "./RoomsCalender";
+import fetchAll from "./FetchAll";
+import Notification from "../../classes/Notification";
+import { NotificationType } from "../../classes/Notification";
 
 export default function RoomManagement() {
   const user = useAuth();
@@ -27,16 +30,14 @@ export default function RoomManagement() {
 
   const fetchData = async (type: "exams" | "rooms", setData: Function) => {
     try {
-      const response = await fetch(`http://localhost:1337/api/${type}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      if (!response.ok) throw new Error(`Failed to fetch ${type}`);
-
-      const data = await response.json();
       if (type === "exams") {
+        const data = (await fetchAll(`http://localhost:1337/api/${type}`, user.token, `Failed to fetch ${type}`)) as Exam[];
+        data.forEach((exam: Exam) => {});
+
         const examsWithNullRoom = data.filter((exam: Exam) => !exam.room);
         setData(examsWithNullRoom);
       } else {
+        const data = (await fetchAll(`http://localhost:1337/api/${type}`, user.token, `Failed to fetch ${type}`)) as Room[];
         const availableRooms = data.filter((room: Room) => room.isAvailable === true);
         setData(availableRooms);
       }
@@ -54,8 +55,11 @@ export default function RoomManagement() {
     setAllExams(data);
   };
 
-  const updateExamRoom = async (examId: number, roomId: number | null) => {
+  const updateExamRoom = async (exam: Exam) => {
+    let examId = exam.id;
+    let roomId = exam.room_id;
     setSelectedExam(examId);
+
     if (!roomId) {
       showToast({ message: "Please select a room to save.", type: "warning" });
       return;
@@ -72,6 +76,21 @@ export default function RoomManagement() {
         setShowConfirmDialog(true);
         return;
       }
+
+      console.log(exam.room_id);
+
+      let notif = new Notification('{"room_id":' + exam.room_id + "}", "{}", user.user, examId);
+
+      notif.type = NotificationType.adminChange;
+
+      const notify = await fetch(`http://localhost:1337/api/notifications`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ data: notif }),
+      });
 
       // Update the exam with the selected room ID
       const examUpdateResponse = await fetch(`http://localhost:1337/api/exams/${examId}`, {
@@ -195,7 +214,7 @@ export default function RoomManagement() {
                 />
               </td>
               <td className="p-3 border border-gray-300">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => updateExamRoom(exam.id, exam.room_id)}>
+                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => updateExamRoom(exam)}>
                   Save
                 </button>
               </td>

@@ -11,34 +11,47 @@ const AuthProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
-  const userData = async () => {
-    const response = await fetch(url + "/api/users/me?populate=*", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const res = await response.json();
+  let tempToken;
 
-    return res;
+  const userData = async (token2) => {
+    if (token2) {
+      const response = await fetch(url + "/api/users/me?populate=*", {
+        headers: {
+          Authorization: `Bearer ${token2}`,
+        },
+      });
+
+      if (!response.ok) throw new Error(response.message);
+
+      const res = await response.json();
+
+      //if (!res.ok) throw new Error(res.message);
+      console.log("res");
+      console.log(res);
+
+      return res;
+    }
   };
 
   const loginAction = async (data) => {
-    try {
-      const response = await fetch(url + "/api/auth/local?populate=*", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      const res = await response.json();
-      if (res) {
-        setToken(res.jwt);
-        //localStorage.setItem("site", res.jwt);
+    const response = await fetch(url + "/api/auth/local?populate=*", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    console.log(response);
 
-        const userRes = await userData();
+    if (!response.ok) throw Error(response.message);
 
-        if (userRes.role.name) {
+    const res = await response.json();
+    if (res) {
+      try {
+        console.log(res);
+        const userRes = await userData(res.jwt);
+
+        if (userRes.role && userRes.role.name) {
           setUser(userRes.username);
           setRole(userRes.role.name);
           if (userRes.role.name == "Admin") {
@@ -47,17 +60,18 @@ const AuthProvider = ({ children }) => {
           } else if (userRes.role.name == "Student") {
             console.log("userRes.role.name");
             navigate("/student/all-exams");
-          }else if (userRes.role.name == "Tutor") {
+          } else if (userRes.role.name == "Tutor") {
             setUserId(userRes.tutor.id);
             navigate("/tutor/exams");
           }
         }
-
-        return;
+        setToken(res.jwt);
+      } catch (error) {
+        throw new Error(res.message);
       }
-      throw new Error(res.message);
-    } catch (err) {
-      console.error(err);
+
+      console.log("----------------------------");
+      return;
     }
   };
 

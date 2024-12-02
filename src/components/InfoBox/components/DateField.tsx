@@ -14,7 +14,6 @@ export default function DateField(props: DateFieldProps) {
   const formattedDate = props.dateValue ? moment(props.dateValue).format("YYYY-MM-DD") : "";
   const formattedTime = props.dateValue ? moment(props.dateValue).format("HH:mm") : "";
 
-  console.log(props.dateValue);
   return (
     <div>
       {props.title !== undefined ? <div className="font-bold">{props.title + " "}</div> : null}

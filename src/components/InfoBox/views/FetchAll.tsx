@@ -35,7 +35,7 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
     }
 
     t = t + numEntries;
-    console.log(data);
+
     if (data.length !== 0 && data != null) allEntries = allEntries.concat(data);
   }
 

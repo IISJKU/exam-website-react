@@ -27,7 +27,6 @@ export default function TutorCalendar() {
       });
       const data = await response.json();
 
-      console.log(data);
       setExams(data);
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
