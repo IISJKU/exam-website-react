@@ -7,14 +7,33 @@ import { useAuth } from "../../../hooks/AuthProvider";
 
 export default function TutorExamView() {
   const navigate = useNavigate(); // Initialize navigate
-  const fields = ["Exam Title", "LVA Nr.", "Date/Time", "Duration", "Mode", "Student", "Examiner", "Institute", "Status", "Student Misc"];
-  const keys: (keyof Exam)[] = ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute", "status", "student_misc"];
+  const user = useAuth();
+  const tutorId = user.userId;
 
   const [exams, setExams] = useState([]); // Store exams
   const [loading, setLoading] = useState<boolean>(true); // State for loading
+  const [isMobileView, setIsMobileView] = useState<boolean>(false); // Track mobile view
 
-  const user = useAuth();
-  const tutorId = user.userId;
+  // Determine fields and keys dynamically based on screen size
+  const fields = isMobileView
+    ? ["Exam Title", "Date/Time"] // Shortened fields for mobile
+    : ["Exam Title", "LVA Nr.", "Date/Time", "Duration", "Mode", "Student", "Examiner", "Institute", "Status", "Student Misc"];
+
+  const keys: (keyof Exam)[] = isMobileView
+    ? ["title", "date"] // Shortened keys for mobile
+    : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute", "status", "student_misc"];
+  
+  // Update `isMobileView` based on window width
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth < 768); // Use a breakpoint (e.g., 768px for small screens)
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener("resize", handleResize); // Add listener on resize
+
+    return () => window.removeEventListener("resize", handleResize); // Cleanup listener
+  }, []);
 
   // Fetch data from Strapi API
   const fetchTutorExams = async (tutorId: number) => {
@@ -74,7 +93,7 @@ export default function TutorExamView() {
   };
 
   if (loading) {
-    return <p>Loading exams...</p>; // Display loading indicator while fetching
+    return <p>Loading exams...</p>; 
   }
 
   return (
@@ -84,7 +103,7 @@ export default function TutorExamView() {
       fields={fields}
       keys={keys}
       buttonName="Remove"
-      data={exams} // Pass the fetched and updated exam data here
+      data={exams} 
     />
   );
 }

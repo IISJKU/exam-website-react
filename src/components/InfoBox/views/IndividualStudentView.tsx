@@ -10,6 +10,7 @@ import { useAuth } from "../../../hooks/AuthProvider";
 
 export default function IndividualStudent() {
   const { id } = useParams(); // Get the student ID from the URL params
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [editMode, setEditMode] = useState<boolean>(false);
@@ -144,6 +145,7 @@ export default function IndividualStudent() {
       <EditField title="Overtime" editMode={editMode} text={bonus_time ? bonus_time.toString() : ""} hideTitle={false} onChange={(e) => setOvertime(Number(e.target.value))} />
       <EditField title="Misc" editMode={editMode} text={misc} hideTitle={false} onChange={(e) => setMisc(e.target.value)} />
       <br />
+      <button onClick={() => navigate(-1)} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline me-2">{("Back")}</button>
       <button
         onClick={() => {
           setEditMode(!editMode);

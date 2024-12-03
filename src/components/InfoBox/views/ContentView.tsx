@@ -40,49 +40,59 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
 
   return (
     <div className="w-full h-full p-5 select-none">
-      <div className="flex w-full content-center items-center ">
-        <h2 className="text-4xl w-1/3 my-2 ">{t(props.title)}</h2>
+      <div className="flex flex-wrap justify-between items-center mb-4">
+        <h2 className="text-4xl w-full md:w-1/3 my-2">{t(props.title)}</h2>
         <SearchBar items={props.data} filter={setFilteredData} />
       </div>
-      <div className="h-5"></div>
-      <table className="w-full table-auto text-left border-2">
-        <tbody key={"tableBody"}>
+       {/* Table Wrapper with Horizontal Scrolling */}
+    <div className="overflow-x-auto">
+      <table className="min-w-full table-auto text-left border-2">
+        <thead>
           <SortableHeaders fields={props.fields} keys={props.keys} elements={filtered} setElements={setFilteredData} />
+        </thead>
+        <tbody>
           {entries.map((element: T, index) => (
-           <tr
-           key={`${element.id}-${index}`} // Add key for each row
-           className={element["confirmed"] != undefined ? (element["confirmed"] === false ? dashedBorder : className) : className}
-           onClick={() => {
-             if (element.id && props.onRowClick) {
-               props.onRowClick(element.id); // Use the onRowClick prop if available
-             }
-           }}
-         >
-           {props.keys.map((key, idx) => (
-             <td key={`${String(key)}-${idx}`} className="pl-2">
-               {typeof element[key] === "string"
-                 ? !isDate(element[key] as string)
-                   ? (element[key] as string)
-                   : formatDateTime(element[key] as string)
-                 : Array.isArray(element[key])
-                 ? (element[key] as string[]).join(", ")
-                 : typeof element[key] === "number"
-                 ? (element[key] as number)
-                 : " "}
-             </td>
-            ))}
-
-             <td className="pr-3" key="editButton">
-               <button>{props.buttonName || "Edit"}</button> {/* Use buttonName or default to "Edit" */}
-             </td>
-           </tr>
+            <tr
+              key={`${element.id}-${index}`}
+              className={
+                element["confirmed"] != undefined
+                  ? element["confirmed"] === false
+                    ? dashedBorder
+                    : className
+                  : className
+              }
+              onClick={() => {
+                if (element.id && props.onRowClick) {
+                  props.onRowClick(element.id);
+                }
+              }}
+            >
+              {props.keys.map((key, idx) => (
+                <td key={`${String(key)}-${idx}`} className="pl-2">
+                  {typeof element[key] === "string"
+                    ? !isDate(element[key] as string)
+                      ? (element[key] as string)
+                      : formatDateTime(element[key] as string)
+                    : Array.isArray(element[key])
+                    ? (element[key] as string[]).join(", ")
+                    : typeof element[key] === "number"
+                    ? (element[key] as number)
+                    : " "}
+                </td>
+              ))}
+              <td className="pr-3" key="editButton">
+                <button>{props.buttonName || "Edit"}</button>
+              </td>
+            </tr>
           ))}
         </tbody>
       </table>
-
-      <Pagination callback={setPage} pageNames={pages} activePage={page} />
     </div>
-  );
+
+    {/* Pagination */}
+    <Pagination callback={setPage} pageNames={pages} activePage={page} />
+  </div>
+);
 }
 
 // Helper function to format the date

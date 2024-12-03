@@ -500,6 +500,7 @@ export default function ExamEditor() {
 
         <EditField title={"Status"} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus(e.target.value)} />
 
+        <button onClick={() => navigate(-1)} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline me-2">{("Back")}</button>
         <button
           onClick={() => {
             setEditMode(!editMode);
@@ -545,9 +546,9 @@ export default function ExamEditor() {
     return (
       <div className="m-5">
         <EditField title={t("Exam Title")} editMode={editMode} text={title} onChange={(e) => setTitle(e.target.value)} />
-        <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} onChange={(e) => setLvaNum(Number(e.target.value))} />
+        <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} hideTitle={false} onChange={(e) => setLvaNum(Number(e.target.value))} />
         <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
-        <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} onChange={(e) => setDuration(Number(e.target.value))} />
+        <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} hideTitle={false} onChange={(e) => setDuration(Number(e.target.value))} />
 
         <DropdownWithSearch
           tableName="examiners"
@@ -579,6 +580,7 @@ export default function ExamEditor() {
 
         <EditField title={t("Status")} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus("Pending")} />
 
+        <button onClick={() => navigate(-1)} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline me-2">{("Back")}</button>
         <button
           onClick={() => {
             setEditMode(!editMode);

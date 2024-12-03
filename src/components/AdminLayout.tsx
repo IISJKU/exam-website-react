@@ -6,9 +6,9 @@ import LogoutButton from "./InfoBox/components/LogoutButton";
 
 export default function AdminLayout() {
   return (
-    <div className="h-full w-full overflow-y-auto">
+    <div className="h-full w-full">
       <Header />
-      <div className="flex flex-column h-full w-full">
+      <div className="md:flex flex-column h-full w-full">
         {/* Side Menu */}
         <div className="basis-1/6 h-max ">
           <SideMenu /> {/* Persistent Side Menu */}

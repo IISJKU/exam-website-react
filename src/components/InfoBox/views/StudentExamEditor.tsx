@@ -180,7 +180,7 @@ export default function RequestExam() {
       <EditField title={t("Exam Title")} editMode={editMode} text={title} onChange={(e) => setTitle(e.target.value)} />
       <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} onChange={(e) => setLvaNum(Number(e.target.value))} />
       <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
-      <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} onChange={(e) => setDuration(Number(e.target.value))} />
+      <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} hideTitle={false} onChange={(e) => setDuration(Number(e.target.value))} />
 
       <DropdownWithSearch
         tableName="examiners"

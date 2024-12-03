@@ -8,7 +8,7 @@ interface SearchProps {
 export default function SearchBar(props: SearchProps) {
   const [input, changeInput] = useState<string>("");
 
-  const month = ["January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "Oktober", "November", "December"];
+  const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   let matches: any[] = [];
 
   function check(key: string, item: object, searchString: string): boolean {
@@ -44,9 +44,9 @@ export default function SearchBar(props: SearchProps) {
   //props.filter(matches);
 
   return (
-    <div className="flex focus:ring-2 border-2 border-black ">
-      <div className="mr-1">🔎</div>
-      <input className="center" placeholder="Search" onChange={(e) => filter(e.target.value)}></input>
+    <div className="relative w-full md:w-2/3 lg:max-w-md">
+      <input className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Search..." onChange={(e) => filter(e.target.value)}></input>
+      <div aria-hidden="true" className="absolute inset-y-0 right-3 flex items-center text-xl font-bold text-gray-500">🔎</div>
     </div>
   );
 }

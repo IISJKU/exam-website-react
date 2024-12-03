@@ -100,6 +100,7 @@ export default function IndividualTutor() {
       <EditField title="Matrikel Nr" editMode={editMode} text={matrikel_number} hideTitle={false} onChange={(e) => setMatrikelNum(e.target.value)} />
       <EditField title="Course" editMode={editMode} text={course} hideTitle={false} onChange={(e) => setCourse(e.target.value)} />
       <br />
+      <button onClick={() => navigate(-1)} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline me-2">{("Back")}</button>
       <button
         onClick={() => {
           setEditMode(!editMode);
