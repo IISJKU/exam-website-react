@@ -10,109 +10,83 @@ interface SHProps<T> {
 }
 
 export default function SortableHeaders<T extends { id?: number }>(props: SHProps<T>) {
-  //<div>▲▼</div>
+  const [states, setStates] = useState<SorterState[]>(Array(props.fields.length).fill(SorterState.off));
 
-  const [activeKey, setKey] = useState<string>("");
+  function sortByKey(array: T[], key: keyof T, direction: SorterState): T[] {
+    return [...array].sort((a, b) => {
+      const valueA = a[key];
+      const valueB = b[key];
 
-  let keyStates: SorterState[] = [];
+      if (direction === SorterState.off) return 0; 
 
-  if (keyStates.length == 0) {
-    props.fields.forEach((element) => {
-      keyStates.push(SorterState.off);
-    });
-  }
+      // Check if values are numbers for numeric sorting
+      const isNumericA = typeof valueA === "number";
+      const isNumericB = typeof valueB === "number";
 
-  const [states, setStates] = useState<SorterState[]>(keyStates);
+      if (isNumericA && isNumericB) {
+        return direction === SorterState.up ? valueA - valueB : valueB - valueA;
+      }
 
-  function sortByKey(array: T[], key: keyof T, direction: SorterState): any[] {
-    let arr = array.sort((a, b) => {
-      let tKey = key;
+      // Fall back to string sorting for non-numeric values
+      const keyA = String(valueA).toLowerCase();
+      const keyB = String(valueB).toLowerCase();
 
-      if (direction == SorterState.off) tKey = "id";
-
-      const keyA = String(a[tKey]).toLowerCase(); // Convert to lowercase to ensure case-insensitive sorting
-      const keyB = String(b[tKey]).toLowerCase();
-
-      if (direction == SorterState.up || direction == SorterState.off) {
-        if (keyA < keyB) {
-          return -1; // a comes before b
-        }
-        if (keyA > keyB) {
-          return 1; // a comes after b
-        }
-        return 0; // a and b are equal
+      if (direction === SorterState.up) {
+        return keyA.localeCompare(keyB);
       } else {
-        if (keyA < keyB) {
-          return 1; // a comes before b
-        }
-        if (keyA > keyB) {
-          return -1; // a comes after b
-        }
-        return 0; // a and b are equal
+        return keyB.localeCompare(keyA);
       }
     });
-
-    return arr;
   }
 
   function sortElements(tStates: SorterState[]) {
-    let key: keyof T = props.keys[0]; // should be initialized as something different
-    let tState: SorterState = SorterState.off;
+    let activeSortKey: keyof T = "id" as keyof T;
+    let activeSortState: SorterState = SorterState.off;
 
     tStates.forEach((state, index) => {
-      if (state != SorterState.off) {
-        key = props.keys[index];
-        tState = state;
+      if (state !== SorterState.off) {
+        activeSortKey = props.keys[index];
+        activeSortState = state;
       }
     });
 
-    let tElem = [...props.elements];
-    let t = sortByKey(tElem, key, tState);
-
-    props.setElements(t);
+    const sortedElements = sortByKey(props.elements, activeSortKey, activeSortState);
+    props.setElements(sortedElements);
   }
 
   function setActiveKey(key: keyof T) {
-    let tKey = "";
+    const updatedStates = [...states];
+    const keyIndex = props.keys.indexOf(key);
 
-    keyStates = [...states];
+    if (keyIndex !== -1) {
+      updatedStates[keyIndex] =
+        updatedStates[keyIndex] === SorterState.off
+          ? SorterState.up
+          : updatedStates[keyIndex] === SorterState.up
+          ? SorterState.down
+          : SorterState.off;
 
-    let skip: number | undefined = undefined;
-    props.keys.forEach((element, index) => {
-      if (element === key) {
-        if (keyStates[index] == SorterState.off) {
-          keyStates[index] = SorterState.up;
-        } else if (keyStates[index] == SorterState.up) {
-          keyStates[index] = SorterState.down;
-        } else {
-          keyStates[index] = SorterState.off;
-        }
+      updatedStates.forEach((_, index) => {
+        if (index !== keyIndex) updatedStates[index] = SorterState.off;
+      });
 
-        skip = index;
-      }
-    });
-
-    keyStates.forEach((keyState, index) => {
-      if (skip === undefined || skip !== index) keyStates[index] = SorterState.off;
-    });
-
-    setStates(keyStates);
-    sortElements(keyStates);
+      setStates(updatedStates);
+      sortElements(updatedStates);
+    }
   }
 
   return (
-    <>
-      <tr className="select-none border-2 border-black">
-        {props.fields.map((field, index) => (
-          <Sorter
-            key={index}
-            onClick={() => setActiveKey(props.keys[index])}
-            id={props.keys[index]}
-            name={props.fields[index].toString()}
-            state={states[index]}
-          />
-        ))}
-      </tr>
-    </>
+    <tr className="select-none border-2 border-black">
+      {props.fields.map((field, index) => (
+        <Sorter
+          key={index}
+          onClick={() => setActiveKey(props.keys[index])}
+          id={props.keys[index]}
+          name={props.fields[index].toString()}
+          state={states[index]}
+        />
+      ))}
+    </tr>
   );
 }
+
