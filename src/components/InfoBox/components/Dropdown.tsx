@@ -26,26 +26,29 @@ export default function Dropdown(props: DropdownProps) {
   }
 
   return (
-    <div className="">
-      {props.label !== undefined ? (
-        <div className="font-bold">{t(props.label) + " "}</div>
+    <div role="group" aria-labelledby={`dropdown-label-${props.label.toLowerCase()}`}>
+      {props.label ? (
+        <label id={`dropdown-label-${props.label.toLowerCase()}`} className="font-bold">{t(props.label) + " "}</label>
       ) : (
         <></>
           )}
         <div className="mb-2 inline-block ">
             <select
-                value={props.value}
+                value={value}
                 onChange={handleChange}
                 disabled={props.disabled}
-                className="form-control"
+                className="form-control border border-gray-300 p-2 rounded-md"
+                aria-labelledby={`dropdown-label-${props.label.toLowerCase()}`} 
+                aria-required="false"
+                aria-disabled={props.disabled ? "true" : undefined} 
             >
                 <option value="" disabled>
-                Select a {props.label.toLowerCase()}
+                {t(`Select a ${props.label.toLowerCase()}`)}
                 </option>
                 {props.options.map((option) => (
-                <option key={option.value} value={option.value}>
-                    {option.label}
-                </option>
+                  <option key={option.value} value={option.value}>
+                      {option.label}
+                  </option>
                 ))}
             </select>
         </div>

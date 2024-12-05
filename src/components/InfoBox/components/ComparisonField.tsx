@@ -31,24 +31,44 @@ export default function ComparisonField(props: ComparisonField) {
     return t.getName();
   };
 
-  if (props.proposedVal != undefined && props.proposedVal != "")
-    return (
-      <div className="relative w-96">
-        {/* Add ref to the dropdown container */}
-        {props.label !== undefined ? <div className="font-bold">{props.label + " "}</div> : null}
-        <div className="mb-2 inline-block ">
-          <div className="line-through">{selectedOptionLabel}</div>
-          <div className="text-red-400">{props.proposedVal}</div>
-        </div>
+  return (
+    <div
+      className="relative w-96"
+      role="region" // Defines this as a distinct region for screen readers
+      aria-labelledby={`comparison-field-${props.label?.toLowerCase()}`}
+    >
+      {/* Label for the dropdown */}
+      {props.label && (
+        <label
+          id={`comparison-field-${props.label?.toLowerCase()}`}
+          className="font-bold"
+        >
+          {props.label}
+        </label>
+      )}
+      
+      {/* Current and Proposed Values */}
+      <div className="mb-2 inline-block">
+        {props.proposedVal ? (
+          <>
+            <div className="line-through" aria-label={`Current value: ${selectedOptionLabel}`}>
+              {selectedOptionLabel}
+            </div>
+            <div
+              className="text-red-400"
+              aria-label={`Proposed value: ${props.proposedVal}`}
+            >
+              {props.proposedVal}
+            </div>
+          </>
+        ) : (
+          <div
+            aria-label={`Current value: ${selectedOptionLabel}`}
+          >
+            {selectedOptionLabel}
+          </div>
+        )}
       </div>
-    );
-  else {
-    return (
-      <div className="relative w-96">
-        {/* Add ref to the dropdown container */}
-        {props.label !== undefined ? <div className="font-bold">{props.label + " "}</div> : null}
-        <div className="mb-2 inline-block ">{selectedOptionLabel}</div>
-      </div>
-    );
-  }
+    </div>
+  );
 }

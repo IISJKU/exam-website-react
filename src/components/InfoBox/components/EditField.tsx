@@ -42,25 +42,31 @@ export default function EditField(props: EditFieldProps) {
   return (
     <div className={classList}>
       {props.title && (props.editMode || !hide) && (
-        <div className="font-bold">{t(props.title) + " "}</div>
+        <label htmlFor={`edit-field-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{t(props.title) + " "}</label>
       )}
       {props.editMode ? (
-        props.title === "Status" ?
+        props.title === "Status" ? (
           <textarea 
+            id={`edit-field-${props.title?.replace(/\s+/g, "-").toLowerCase()}`}
             onChange={handleChange}
             className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
             rows={4}
             cols={40} 
             value={value}
-          /> :
-        <input
-          onChange={handleChange}
-          className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
-          type="text"
-          value={value}
-        />
+            aria-label={props.title}
+          />
+        ) : (
+          <input
+            id={`edit-field-${props.title?.replace(/\s+/g, "-").toLowerCase()}`}
+            onChange={handleChange}
+            className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
+            type="text"
+              value={value}
+              aria-label={props.title}
+            />
+        )
       ) : (
-        <div className="mb-2 inline-block ">
+        <div className="mb-2 inline-block" role="textbox" aria-readonly="true">
           {value}
           {additionalText}
         </div>

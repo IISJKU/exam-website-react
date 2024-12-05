@@ -52,11 +52,6 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
   const handleSelectOption = (optionValue: string | number) => {
     props.onChange(optionValue); // Call onChange function passed from the parent component
     if (typeof optionValue == "string") optionValue = JSON.parse(optionValue).searchTerm;
-
-    console.log("optionValue");
-    console.log(optionValue);
-    console.log("end");
-
     setIsDropdownOpen(false); // Close dropdown after selection
     if (typeof optionValue == "number") setSearchTerm(""); // Clear search term after selection
   };
@@ -123,28 +118,39 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
   };
 
   return (
-    <div className="relative w-96" ref={dropdownRef} onKeyDown={handleKeyPress}>
-      {props.label && <div className="font-bold">{props.label}</div>}
+    <div className="relative w-96" ref={dropdownRef} onKeyDown={handleKeyPress} role="combobox"
+      aria-haspopup="listbox"
+      aria-expanded={isDropdownOpen}
+      aria-owns="dropdown-list"
+      aria-labelledby={`dropdown-label-${props.label}`}>
+      {props.label && <label id={`dropdown-label-${props.label}`} className="font-bold" htmlFor="dropdown-input">{props.label}</label>}
       {props.disabled ? (
-        <div className="mb-2 inline-block">{selectedOptionLabel}</div>
+        <div className="mb-2">{selectedOptionLabel}</div>
       ) : (
         <div className="relative mt-1">
           <input
+            id="dropdown-input"
             type="text"
             placeholder={selectedOptionLabel || props.placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
-              className={`mb-2 border border-gray-300 p-2 w-80 rounded-md px-1 placeholder-black ${
+            className={`mb-2 border border-gray-300 p-2 w-80 rounded-md px-1 placeholder-black ${
                 searchTerm === "" && props.value ? "text-black" : "text-black"
-              }`}
+                }`}
+            aria-autocomplete="list"
+            aria-controls="dropdown-list" 
+            aria-activedescendant={isDropdownOpen && filteredOptions.length > 0 ? `option-${filteredOptions[0].value}` : undefined}
+            aria-disabled={props.disabled || false}
           />
           {isDropdownOpen && (
-            <ul className="absolute bg-white shadow-lg z-50 w-80">
+            <ul id="dropdown-list" role="listbox" className="absolute bg-white shadow-lg z-50 w-80 max-h-40 overflow-auto">
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => (
                   <li
                     key={option.value}
+                    id={`option-${option.value}`}
+                    role="option"
                     onClick={() => handleSelectOption(option.value)}
                     className={`cursor-pointer select-none py-2 pl-3 pr-9 ${
                       option.value === props.value ? "bg-gray-100 text-black font-bold" : "text-gray-900"

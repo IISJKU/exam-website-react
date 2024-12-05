@@ -418,7 +418,7 @@ export default function ExamEditor() {
           onChange={(e) => setLvaNum(Number(e.target.value))}
         />
 
-        <DateField editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
+        <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
 
         <EditField
           title={t("Duration")}
