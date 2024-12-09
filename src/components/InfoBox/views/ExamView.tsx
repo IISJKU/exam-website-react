@@ -1,11 +1,9 @@
+import React, { useEffect, useState } from "react";
 import Exam from "../../classes/Exam";
 import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
-
 import fetchAll from "./FetchAll";
-import { ToastOptions } from "react-toastify";
 import { useAuth } from "../../../hooks/AuthProvider";
 
 export default function ExamView() {
@@ -13,7 +11,7 @@ export default function ExamView() {
   const user = useAuth();
 
   const [exams, setExams] = useState<Exam[]>([]); // Store exams
-  const [loading, setLoading] = useState<boolean>(true); // State for loading
+  const [loading, setLoading] = useState<boolean>(true); 
   const [isMobileView, setIsMobileView] = useState<boolean>(false); // Track mobile view
 
   // Determine fields and keys dynamically based on screen size
@@ -76,11 +74,11 @@ export default function ExamView() {
         return updatedExam;
       });
 
-      setExams(updatedData); // Set the updated data to exams
+      setExams(updatedData); 
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
     } finally {
-      setLoading(false); // Set loading to false when the fetch is complete
+      setLoading(false);
     }
   };
 
@@ -89,16 +87,12 @@ export default function ExamView() {
   }, []);
 
   const handleExamClick = (examId: number) => {
-    if (user.role === "Tutor") {
-      navigate(`/tutor/exams/${examId}`); // Navigate to ExamEditor with the exam ID
-    } else if (user.role === "Admin") {
-      navigate(`/admin/exams/${examId}`); // Navigate to ExamEditor with the exam ID
-    } 
-    
+    const routePrefix = user.role === "Tutor" ? "tutor" : "admin";
+    navigate(`/${routePrefix}/exams/${examId}`);
   };
 
   if (loading) {
-    return <p>Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite">Loading exams...</p>; 
   }
 
   return (

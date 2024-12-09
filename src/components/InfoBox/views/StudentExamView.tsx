@@ -91,7 +91,7 @@ export default function StudentExamView() {
   };
 
   if (loading) {
-    return <p>Loading exams...</p>;
+    return <p aria-live="polite">Loading exams...</p>;
   }
 
   return (

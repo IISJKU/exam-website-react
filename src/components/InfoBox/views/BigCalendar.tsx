@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Calendar, momentLocalizer, Views, Event } from "react-big-calendar";
 import moment from "moment";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { showToast } from "../components/ToastMessage";
 import Exam from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
@@ -62,6 +61,7 @@ export default function BigCalendar() {
         title: exam.title,
         start,
         end,
+        id: exam.id,
       };
     });
     setEvents(newEvents);
@@ -71,7 +71,6 @@ export default function BigCalendar() {
     (event: Event) => {
       const selectedExam = exams.find((exam) => event.title === exam.title);
       if (selectedExam) {
-        // Use navigate to go to the exam details route (you can adjust the route as needed)
         navigate(`/admin/exams/${selectedExam.id}`);
       }
     },
@@ -79,7 +78,7 @@ export default function BigCalendar() {
   );
 
   if (loading) {
-    return <p>Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite">Loading exams...</p>; // Display loading indicator while fetching
   }
 
   return (
@@ -97,6 +96,15 @@ export default function BigCalendar() {
         style={{ height: 700 }}
         onNavigate={(newDate) => setDate(newDate)}
         popup
+        aria-label="Exam Calendar view"
+        eventPropGetter={(event, start, end, isSelected) => {
+          return {
+            style: {
+              cursor: "pointer",
+            },
+            "aria-label": `${event.title} from ${moment(start).format("LLLL")} to ${moment(end).format("LLLL")}`,
+          };
+        }}
       />
     </div>
   );

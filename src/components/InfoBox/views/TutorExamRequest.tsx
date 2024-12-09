@@ -96,7 +96,7 @@ export default function TutorExamRequest() {
     }
   };
 
-  if (loading) return <p>Loading exam data...</p>;
+  if (loading) return <p aria-live="polite">Loading exam data...</p>;
 
   if (!exam) return <p>No exam details found.</p>;
 

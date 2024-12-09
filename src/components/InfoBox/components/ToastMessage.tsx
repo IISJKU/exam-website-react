@@ -18,6 +18,8 @@ export const showToast = ({
   const toastOptions = {
     position,
     autoClose,
+    role: "alert",
+    "aria-live": type === "error" || type === "warning" ? "assertive" : "polite", // Assertive for high-priority, polite for others
   };
 
   switch (type) {

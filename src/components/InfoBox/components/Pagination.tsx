@@ -35,16 +35,16 @@ export default function Pagination(props: PaginationInterface) {
   }
 
   return (
-    <div className="center my-10 text-l flex w-full center justify-center overflow-hidden select-none ">
+    <div className="center my-10 text-l flex w-full center justify-center overflow-hidden select-none" aria-label="Pagination Navigation">
       {pageNames.map((p, index) =>
         p === "..." ? (
-          <div className="w-7 aspect-square text-slate-700 text-center">{p}</div>
+          <div key={index} aria-hidden="true" className="w-7 aspect-square text-slate-700 text-center">{p}</div>
         ) : p === props.activePage ? (
-          <button key={index} className="w-7 aspect-square underline hover:opacity-60 border-2">
+          <button key={index} aria-current="page" aria-label={`Page ${p} (current page)`} className="w-7 aspect-square underline hover:opacity-60 border-2">
             {p}
           </button>
         ) : (
-          <button key={index} onClick={() => props.callback(p)} className="w-7 aspect-square hover:opacity-60 text-slate-700 border-2">
+          <button key={index} onClick={() => props.callback(p)} aria-label={`Go to page ${p}`} className="w-7 aspect-square hover:opacity-60 text-slate-700 border-2">
             {p}
           </button>
         )

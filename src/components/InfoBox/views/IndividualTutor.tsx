@@ -4,6 +4,7 @@ import EditField from "../components/EditField";
 import { showToast } from "../components/ToastMessage";
 import Tutor from "../../classes/Tutor";
 import { useAuth } from "../../../hooks/AuthProvider";
+import { t } from "i18next";
 
 export default function IndividualTutor() {
   const { id } = useParams(); // Extract the tutor ID from the route parameters
@@ -89,39 +90,43 @@ export default function IndividualTutor() {
   };
 
   if (loading || !tutor) {
-    return <p>Loading tutor data...</p>;
+    return <p aria-live="polite">Loading tutor data...</p>;
   }
 
   return (
-    <div className="m-10">
-      <EditField title="First Name" editMode={editMode} text={first_name} onChange={(e) => setFirstName(e.target.value)} />
-      <EditField title="Last Name" editMode={editMode} text={last_name} onChange={(e) => setLastName(e.target.value)} />
-      <EditField title="Phone" editMode={editMode} text={phone} hideTitle={false} onChange={(e) => setPhone(e.target.value)} />
-      <EditField title="Matrikel Nr" editMode={editMode} text={matrikel_number} hideTitle={false} onChange={(e) => setMatrikelNum(e.target.value)} />
-      <EditField title="Course" editMode={editMode} text={course} hideTitle={false} onChange={(e) => setCourse(e.target.value)} />
-      <br />
-      <button onClick={() => navigate(-1)} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline me-2">{("Back")}</button>
-      <button
-        onClick={() => {
-          setEditMode(!editMode);
-          if (editMode) handleUpdate();
-        }}
-        className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
-      >
-        {editMode ? "Save" : "Edit"}
-      </button>
-      {editMode ? (
+    <div className="m-10" role="main" aria-labelledby="tutor-details-heading">
+        <h1 id="tutor-details-heading" className="text-2xl font-bold mb-4 sr-only">
+        Tutor Details
+        </h1>
+      <EditField title="First Name" editMode={editMode} text={first_name} onChange={(e) => setFirstName(e.target.value)} aria-label={t("Edit tutor's first name")}/>
+      <EditField title="Last Name" editMode={editMode} text={last_name} onChange={(e) => setLastName(e.target.value)} aria-label={t("Edit tutor's last name")}/>
+      <EditField title="Phone" editMode={editMode} text={phone} hideTitle={false} onChange={(e) => setPhone(e.target.value)} aria-label={t("Edit tutor's phone")}/>
+      <EditField title="Matrikel Nr" editMode={editMode} text={matrikel_number} hideTitle={false} onChange={(e) => setMatrikelNum(e.target.value)} aria-label={t("Edit tutor's matrikel number")}/>
+      <EditField title="Course" editMode={editMode} text={course} hideTitle={false} onChange={(e) => setCourse(e.target.value)} aria-label={t("Edit tutor's course")}/>
+      <div className="mt-4 flex gap-4">
+        <button onClick={() => navigate(-1)}
+          className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
+          aria-label="Go back to the previous page">{t("Back")}</button>
         <button
-          className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline"
           onClick={() => {
             setEditMode(!editMode);
+            if (editMode) handleUpdate();
           }}
+          className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
+          aria-label={editMode ? "Save changes" : "Enable edit mode"}
         >
-          Cancel
+          {editMode ? "Save" : "Edit"}
         </button>
-      ) : (
-        <></>
-      )}
+        {editMode && (
+          <button
+            className="border-2 border-red-500 p-1 hover:bg-red-400 hover:underline"
+            onClick={() => setEditMode(false)}
+            aria-label="Cancel editing"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </div>
   );
 }

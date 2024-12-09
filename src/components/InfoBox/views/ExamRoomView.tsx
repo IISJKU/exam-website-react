@@ -32,14 +32,10 @@ export default function RoomManagement() {
     try {
       if (type === "exams") {
         const data = (await fetchAll(`http://localhost:1337/api/${type}`, user.token, `Failed to fetch ${type}`)) as Exam[];
-        data.forEach((exam: Exam) => {});
-
-        const examsWithNullRoom = data.filter((exam: Exam) => !exam.room);
-        setData(examsWithNullRoom);
+        setData(data.filter((exam: Exam) => !exam.room)); // Filter exams without rooms
       } else {
         const data = (await fetchAll(`http://localhost:1337/api/${type}`, user.token, `Failed to fetch ${type}`)) as Room[];
-        const availableRooms = data.filter((room: Room) => room.isAvailable === true);
-        setData(availableRooms);
+        setData(data.filter((room: Room) => room.isAvailable));
       }
     } catch (error) {
       showToast({ message: `Error fetching ${type}: ${error}`, type: "error" });
@@ -77,10 +73,7 @@ export default function RoomManagement() {
         return;
       }
 
-      console.log(exam.room_id);
-
       let notif = new Notification('{"room_id":' + exam.room_id + "}", "{}", user.user, examId);
-
       notif.type = NotificationType.adminChange;
 
       const notify = await fetch(`http://localhost:1337/api/notifications`, {
@@ -188,7 +181,7 @@ export default function RoomManagement() {
         </thead>
         <tbody>
           {exams.map((exam) => (
-            <tr key={exam.id} className="odd:bg-gray-100 even:bg-white hover:bg-gray-200 text-center">
+            <tr key={exam.id} className="odd:bg-gray-100 even:bg-white hover:bg-gray-200 text-center" aria-live="polite" role="row">
               <td className="p-3 border border-gray-300">{exam.title}</td>
               <td className="p-3 border border-gray-300">{exam.lva_num}</td>
               <td className="p-3 border border-gray-300">
@@ -211,11 +204,16 @@ export default function RoomManagement() {
                   options={rooms.map((r) => ({ value: r.id, label: r.name }))}
                   value={exam.room_id}
                   onChange={(newRoomId) => handleRoomChange(exam.id, Number(newRoomId))}
+                  aria-label={`${t("Select Room for Exam")} ${exam.title}`}
                 />
               </td>
               <td className="p-3 border border-gray-300">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => updateExamRoom(exam)}>
-                  Save
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label={t("Save Room Selection")}
+                  onClick={() => updateExamRoom(exam)}
+                >
+                  {t("Save")}
                 </button>
               </td>
             </tr>
@@ -243,20 +241,34 @@ export default function RoomManagement() {
 
   return (
     <div className="p-8 bg-gray-50 rounded-lg">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Room Management</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">{t("Room Management")}</h1>
       {renderExamsTable()}
       {showConfirmDialog && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-dialog-title"
+          aria-describedby="confirm-dialog-description"
+        >
           <div className="bg-white p-4 rounded shadow-lg max-w-sm">
-            <p className="mb-4">{t("The selected room has a capacity of 0. Do you want to continue?")}</p>
+            <h2 id="confirm-dialog-title" className="text-lg font-bold mb-4">
+              {t("Confirm Room Selection")}
+            </h2>
+            <p id="confirm-dialog-description" className="mb-4">{t("The selected room has a capacity of 0. Do you want to continue?")}</p>
             <div className="flex justify-end">
               <button
                 onClick={handleCancelRoomSelection}
-                className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded mr-2 hover:bg-gray-300"
+                className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded mr-2 hover:bg-gray-300 focus:ring-2 focus:ring-gray-400"
+                aria-label={t("Cancel Room Selection")}
               >
                 {t("Cancel")}
               </button>
-              <button onClick={handleConfirmRoomSelection} className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">
+              <button
+                onClick={handleConfirmRoomSelection}
+                className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 focus:ring-2 focus:ring-red-500"
+                aria-label={t("Confirm Room Selection")}
+              >
                 {t("Confirm")}
               </button>
             </div>

@@ -15,7 +15,7 @@ interface DataAdministrationProps {
 
 interface DataRecord {
   id?: number;
-  [key: string]: any; // Dynamically handle fields
+  [key: string]: any;
 }
 
 export default function DataAdministration(props: DataAdministrationProps) {
@@ -90,8 +90,6 @@ export default function DataAdministration(props: DataAdministrationProps) {
   const fetchRelationalData = async () => {
     const relationalPromises = props.populateFields?.map(async (field) => {
       const result = await fetchAll(`http://localhost:1337/api/${field.populateTable}`, user.token, `HTTP error!`);
-
-      type ResultType = { roles?: any[] } | any[];
 
       const records =
         Array.isArray(result) && result.length > 0 && Array.isArray(result[result.length - 1]?.roles)
@@ -212,36 +210,36 @@ export default function DataAdministration(props: DataAdministrationProps) {
   };
 
   return (
-    <div className="p-4 h-full">
-      <h1 className="text-2xl font-bold mb-4 capitalize">Data Administration - {props.tableName.replace("-", " ")}</h1>
+    <div className="p-4 h-full" role="region" aria-labelledby="data-admin-title">
+      <h1 id="data-admin-title" className="text-2xl font-bold mb-4 capitalize" tabIndex={0} role="heading">Data Administration - {props.tableName.replace("-", " ")}</h1>
 
       {isLoading ? (
-        <p>Loading...</p>
+        <p aria-live="polite">Loading...</p>
       ) : (
         <div className="h-80 overflow-y-auto mb-4">
-          <table className="table-auto w-full bg-white shadow-md rounded-lg">
+          <table className="table-auto w-full bg-white shadow-md rounded-lg" role="table">
             <thead>
-              <tr>
-                <th className="border px-4 py-2">ID</th>
+              <tr role="row">
+                <th role="columnheader" scope="col" className="border px-4 py-2">ID</th>
                 {fields.map((field) => (
-                  <th className="border px-4 py-2 capitalize" key={field}>
+                  <th role="columnheader" scope="col" className="border px-4 py-2 capitalize" key={field}>
                     {field.replace("_", " ")}
                   </th>
                 ))}
                 {props.populateFields?.map((field) => (
-                  <th className="border px-4 py-2 capitalize" key={field.name}>
+                  <th role="columnheader" scope="col" className="border px-4 py-2 capitalize" key={field.name}>
                     {field.name.replace("_", " ")}
                   </th>
                 ))}
-                <th className="border px-4 py-2">Actions</th>
+                <th role="columnheader" scope="col" className="border px-4 py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {data.map((record) => (
-                <tr key={record.id} className="hover:bg-gray-100 text-center">
-                  <td className="border px-4 py-2">{record.id}</td>
+              {data.map((record, idx) => (
+                <tr key={record.id} className="hover:bg-gray-100 text-center" role="row" aria-label={`Row ${idx + 1}`}>
+                  <td className="border px-4 py-2" role="cell">{record.id}</td>
                   {fields.map((field) => (
-                    <td className="border px-4 py-2" key={`${record.id}-${field}`}>
+                    <td className="border px-4 py-2" role="cell" key={`${record.id}-${field}`}>
                       {typeof record[field] === "boolean"
                         ? record[field]
                           ? "True"
@@ -255,15 +253,21 @@ export default function DataAdministration(props: DataAdministrationProps) {
                     </td>
                   ))}
                   {props.populateFields?.map((field) => (
-                    <td className="border px-4 py-2" key={`${record.id}-${field.name}`}>
+                    <td className="border px-4 py-2" role="cell" key={`${record.id}-${field.name}`}>
                       {record[field.name] || "N/A"}
                     </td>
                   ))}
-                  <td className="border px-4 py-2">
-                    <button className="text-blue-500 hover:text-blue-700" onClick={() => handleEditClick(record)}>
+                  <td className="border px-4 py-2" role="cell">
+                    <button
+                      className="text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label={`Edit record ${record.id}`}
+                      onClick={() => handleEditClick(record)}>
                       Edit
                     </button>
-                    <button className="text-red-500 hover:text-red-700 ml-2" onClick={() => deleteRecord(record.id!)}>
+                    <button
+                      className="text-red-500 hover:text-red-700 ml-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      aria-label={`Delete record ${record.id}`}
+                      onClick={() => deleteRecord(record.id!)}>
                       Delete
                     </button>
                   </td>
@@ -274,7 +278,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
         </div>
       )}
 
-      <h2 className="text-xl font-bold mt-4">{editingRecord ? "Edit Record" : "Add New Record"}</h2>
+      <h2 className="text-xl font-bold mt-4" tabIndex={0} role="heading">{editingRecord ? "Edit Record" : "Add New Record"}</h2>
       <div className="h-96 overflow-y-auto">
         <RecordForm
           record={editingRecord}

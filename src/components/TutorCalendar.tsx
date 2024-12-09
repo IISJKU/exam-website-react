@@ -40,7 +40,7 @@ export default function TutorCalendar() {
   }, []);
 
   if (loading) {
-    return <p>Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite">Loading exams...</p>; // Display loading indicator while fetching
   }
 
   function getWeekday(d: Date): string {

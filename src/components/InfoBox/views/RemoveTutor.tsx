@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams , useNavigate} from "react-router-dom";
 import moment from "moment";
 import { showToast } from "../components/ToastMessage";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
 import Exam from "../../classes/Exam";
-import { useNavigate } from "react-router-dom";
 
 export default function RemoveTutor() {
   const { id } = useParams();
@@ -127,62 +126,72 @@ export default function RemoveTutor() {
     }
   };
 
-  if (loading) return <p>Loading exam data...</p>;
-
-  if (!exam) return <p>No exam details found.</p>;
+  if (loading) return <p aria-live="polite">{t("Loading exam data...")}</p>;
+  if (!exam) return <p>{t("No exam details found.")}</p>;
 
   return (
-    <div className="m-5">
-      <h2 className="text-2xl font-bold mb-4">{t("Exam Details")}</h2>
+    <div className="m-5" role="main">
+      <h2 id="exam-details-heading" className="text-2xl font-bold mb-4">{t("Exam Details")}</h2>
 
-      {/* Display Exam Details in Read-Only Format */}
-      <p>
-        <strong>{t("Exam Title")}:</strong> {exam.title}
-      </p>
-      <p>
-        <strong>{t("LVA Num")}:</strong> {exam.lva_num}
-      </p>
-      <p>
-        <strong>{t("Date")}:</strong> {moment(exam.date).format("DD.MM.YYYY HH:mm")}
-      </p>
-      <p>
-        <strong>{t("Duration")}:</strong> {exam.duration} {t("minutes")}
-      </p>
+      <div aria-labelledby="exam-details-heading">
+        <p>
+          <strong>{t("Exam Title")}:</strong> {exam.title}
+        </p>
+        <p>
+          <strong>{t("LVA Num")}:</strong> {exam.lva_num}
+        </p>
+        <p>
+          <strong>{t("Date")}:</strong> {moment(exam.date).format("DD.MM.YYYY HH:mm")}
+        </p>
+        <p>
+          <strong>{t("Duration")}:</strong> {exam.duration} {t("minutes")}
+        </p>
 
-      <p>
-        <strong>{t("Student")}:</strong>{" "}
-        {exam.student && typeof exam.student === "object" ? `${exam.student.first_name} ${exam.student.last_name}` : t("Not Assigned")}
-      </p>
-      <p>
-        <strong>{t("Examiner")}:</strong>{" "}
-        {exam.examiner && typeof exam.examiner === "object" ? `${exam.examiner.first_name} ${exam.examiner.last_name}` : t("Not Assigned")}
-      </p>
+        <p>
+          <strong>{t("Student")}:</strong>{" "}
+          {exam.student && typeof exam.student === "object" ? `${exam.student.first_name} ${exam.student.last_name}` : t("Not Assigned")}
+        </p>
+        <p>
+          <strong>{t("Examiner")}:</strong>{" "}
+          {exam.examiner && typeof exam.examiner === "object" ? `${exam.examiner.first_name} ${exam.examiner.last_name}` : t("Not Assigned")}
+        </p>
 
-      <p>
-        <strong>{t("Major")}:</strong> {exam.major && typeof exam.major === "object" ? exam.major.name : t("Not Assigned")}
-      </p>
-      <p>
-        <strong>{t("Institute")}:</strong> {exam.institute && typeof exam.institute === "object" ? exam.institute.name : t("Not Assigned")}
-      </p>
-      <p>
-        <strong>{t("Room")}:</strong> {exam.room && typeof exam.room === "object" ? exam.room.name : t("Not Assigned")}
-      </p>
-      <p>
-        <strong>{t("Mode")}:</strong> {exam.exam_mode && typeof exam.exam_mode === "object" ? exam.exam_mode.name : t("Not Assigned")}
-      </p>
-      <p>
-        <strong>{t("Status")}:</strong> {exam.status}
-      </p>
+        <p>
+          <strong>{t("Major")}:</strong> {exam.major && typeof exam.major === "object" ? exam.major.name : t("Not Assigned")}
+        </p>
+        <p>
+          <strong>{t("Institute")}:</strong> {exam.institute && typeof exam.institute === "object" ? exam.institute.name : t("Not Assigned")}
+        </p>
+        <p>
+          <strong>{t("Room")}:</strong> {exam.room && typeof exam.room === "object" ? exam.room.name : t("Not Assigned")}
+        </p>
+        <p>
+          <strong>{t("Mode")}:</strong> {exam.exam_mode && typeof exam.exam_mode === "object" ? exam.exam_mode.name : t("Not Assigned")}
+        </p>
+        <p>
+          <strong>{t("Status")}:</strong> {exam.status}
+        </p>
+      </div>
 
-      {/* Remove Tutor Button */}
-      <button onClick={() => setShowConfirmDialog(true)} className="mt-4 border-2 border-blue-500 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+      <button onClick={() => setShowConfirmDialog(true)}
+        className="mt-4 border-2 border-blue-500 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        aria-haspopup="dialog"
+      >
         {t("Remove")}
       </button>
 
       {/* Confirmation Dialog */}
       {showConfirmDialog && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-dialog-heading"
+        >
           <div className="bg-white p-4 rounded shadow-lg max-w-sm">
+            <h3 id="confirm-dialog-heading" className="text-lg font-bold mb-4">
+              {t("Confirm Removal")}
+            </h3>
             <p className="mb-4">{t("Are you sure you want to remove the exam from the monitoring list?")}</p>
             <div className="flex justify-end">
               <button

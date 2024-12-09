@@ -1,6 +1,5 @@
 import { useState, useEffect, useTransition } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // Import useParams and useNavigate
-
 import Exam from "../../classes/Exam";
 import moment from "moment";
 import { showToast } from "../components/ToastMessage";
@@ -20,11 +19,8 @@ import fetchAll from "./FetchAll";
 
 export default function IndividualNotification() {
   const { id } = useParams(); // Get exam ID from URL params
-
   const { t } = useTranslation();
-
   const [notification, setNotification] = useState<Notification>();
-
   const [proposedExam, setProposedExam] = useState<Exam>(new Exam());
   const navigate = useNavigate(); // Initialize useNavigate for navigation
   const [loading, setLoading] = useState<boolean>(true);
@@ -402,7 +398,7 @@ export default function IndividualNotification() {
   };
 
   if (loading || !exam) {
-    return <p>Loading exam data...</p>;
+    return <p aria-live="polite">Loading exam data...</p>;
   }
 
   const dropdownOptions = (list: any[], firstNameField: string, lastNameField?: string) =>
@@ -431,98 +427,116 @@ export default function IndividualNotification() {
   };
 
   return (
-    <div className="m-5">
-      <div className="text-4xl font-bold">{t("Proposed Changes")}</div>
+    <div className="m-5" role="main" aria-labelledby="notification-heading">
+      <h1 id="notification-heading" className="text-4xl font-bold">
+        {t("Proposed Changes")}
+      </h1>
+      <section aria-label={t("Comparison Fields")}>
+        <ComparisonField
+          label={t("Title")}
+          options={[]}
+          value={title ? title.toString() : ""}
+          proposedVal={proposedExam.title || ""}
+          aria-label={t("Title comparison")}
+        />
+        <ComparisonField
+          label={t("LVA Num")}
+          options={[]}
+          value={lva_num?.toString() || ""}
+          proposedVal={proposedExam.lva_num?.toString() || ""}
+          aria-label={t("LVA number comparison")}
+        />
 
-      <ComparisonField
-        label={"Title"}
-        options={[]}
-        value={title ? title.toString() : ""}
-        proposedVal={proposedExam.title ? proposedExam.title.toString() : ""}
-      />
-      <ComparisonField
-        label={"LVA Num"}
-        options={[]}
-        value={lva_num ? lva_num.toString() : ""}
-        proposedVal={proposedExam.lva_num ? proposedExam.lva_num.toString() : ""}
-      />
+        <ComparisonField
+          label={t("Date")}
+          options={[]}
+          value={date != undefined ? moment(date).format("DD.MM.YYYY HH:mm") : ""}
+          proposedVal={proposedExam.date ? moment(proposedExam.date).format("DD.MM.YYYY HH:mm") : ""}
+          aria-label={t("Date comparison")}
+        />
 
-      <ComparisonField
-        label={"Date"}
-        options={[]}
-        value={date != undefined ? moment(date).format("DD.MM.YYYY HH:mm") : ""}
-        proposedVal={proposedExam.date ? moment(proposedExam.date).format("DD.MM.YYYY HH:mm") : ""}
-      />
+        <ComparisonField label={t("Duration")} options={[]} value={duration?.toString() || ""}
+          proposedVal={proposedExam.duration?.toString() || ""}
+          aria-label={t("Duration comparison")} />
 
-      <ComparisonField label={"Duration"} options={[]} value={duration ?? ""} proposedVal={proposedExam.duration ? proposedExam.duration.toString() : ""} />
+        <ComparisonField
+          label={"Student"}
+          options={dropdownOptions(options.students, "first_name", "last_name")}
+          value={student || ""}
+          proposedVal={match(options.students, proposedExam.student_id)}
+          aria-label={t("Student comparison")}
+        />
 
-      <ComparisonField
-        label={"Student"}
-        options={dropdownOptions(options.students, "first_name", "last_name")}
-        value={student ?? ""}
-        proposedVal={match(options.students, proposedExam.student_id)}
-      />
+        <ComparisonField
+          label={"Tutor"}
+          options={dropdownOptions(options.tutors, "first_name", "last_name")}
+          value={tutor || ""}
+          proposedVal={match(options.tutors, proposedExam.tutor_id)}
+          aria-label={t("Tutor comparison")}
+        />
 
-      <ComparisonField
-        label={"Tutor"}
-        options={dropdownOptions(options.tutors, "first_name", "last_name")}
-        value={tutor ?? ""}
-        proposedVal={match(options.tutors, proposedExam.tutor_id)}
-      />
+        <ComparisonField
+          label={t("Examiner")}
+          options={dropdownOptions(options.examiners, "first_name", "last_name")}
+          value={examiner || ""}
+          proposedVal={match(options.examiners, proposedExam.examiner_id)}
+          aria-label={t("Examiner comparison")}
+        />
 
-      <ComparisonField
-        label={t("Examiner")}
-        options={dropdownOptions(options.examiners, "first_name", "last_name")}
-        value={examiner ?? ""}
-        proposedVal={match(options.examiners, proposedExam.examiner_id)}
-      />
+        <ComparisonField
+          label={t("Major")}
+          options={dropdownOptions(options.majors, "name")}
+          value={major || ""}
+          proposedVal={match(options.majors, proposedExam.major_id)}
+          aria-label={t("Major comparison")}
+        />
 
-      <ComparisonField
-        label={t("Major")}
-        options={dropdownOptions(options.majors, "name")}
-        value={major ?? ""}
-        proposedVal={match(options.majors, proposedExam.major_id)}
-      />
+        <ComparisonField
+          label={t("Institute")}
+          options={dropdownOptions(options.institutes, "name")}
+          value={institute || ""}
+          proposedVal={match(options.institutes, proposedExam.institute_id)}
+          aria-label={t("Institute comparison")}
+        />
 
-      <ComparisonField
-        label={t("Institute")}
-        options={dropdownOptions(options.institutes, "name")}
-        value={institute ?? ""}
-        proposedVal={match(options.institutes, proposedExam.institute_id)}
-      />
+        <ComparisonField
+          label={t("Mode")}
+          options={dropdownOptions(options.modes, "name")}
+          value={mode || ""}
+          proposedVal={match(options.modes, proposedExam.exam_mode)}
+          aria-label={t("Mode comparison")}
+        />
 
-      <ComparisonField
-        label={t("Mode")}
-        options={dropdownOptions(options.modes, "name")}
-        value={mode ?? ""}
-        proposedVal={match(options.modes, proposedExam.exam_mode)}
-      />
+        <ComparisonField
+          label={t("Room")}
+          options={dropdownOptions(options.rooms, "name")}
+          value={room || ""}
+          proposedVal={match(options.rooms, proposedExam.room_id)}
+          aria-label={t("Room comparison")}
+        />
 
-      <ComparisonField
-        label={t("Room")}
-        options={dropdownOptions(options.rooms, "name")}
-        value={room ?? ""}
-        proposedVal={match(options.rooms, proposedExam.room_id)}
-      />
-
-      <ComparisonField label={"Status"} options={[]} value={status ?? ""} proposedVal={proposedExam.status} />
-
-      <button
-        onClick={() => {
-          handleUpdate(true);
-        }}
-        className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
-      >
-        {t("Accept Changes")}
-      </button>
-      <button
-        onClick={() => {
-          handleUpdate(false);
-        }}
-        className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
-      >
-        {t("Discard")}
-      </button>
+        <ComparisonField label={t("Status")} options={[]} value={status || ""} proposedVal={proposedExam.status} aria-label={t("Status comparison")}/>
+      </section>
+      <div className="mt-4 flex gap-4">
+        <button
+          onClick={() => {
+            handleUpdate(true);
+          }}
+          className="border-2 border-black p-2 rounded hover:bg-slate-400"
+          aria-label={t("Accept proposed changes")}
+        >
+          {t("Accept")}
+        </button>
+        <button
+          onClick={() => {
+            handleUpdate(false);
+          }}
+          className="border-2 border-black p-2 rounded hover:bg-slate-400"
+          aria-label={t("Discard proposed changes")}
+        >
+          {t("Discard")}
+        </button>
+      </div>
     </div>
   );
 }

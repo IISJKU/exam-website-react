@@ -24,10 +24,8 @@ export default function NotificationView() {
   const { id } = useParams(); // Get exam ID from URL params
 
   const [exams, setExams] = useState<Exam[]>();
-
   const [proposals, setProposals] = useState<Notification[]>([]);
   const [actionsRequired, setActionsRequired] = useState<Notification[]>([]);
-
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [seenNotifications, setSeenNotifications] = useState<Notification[]>([]);
   const [newNotifications, setNewNotifications] = useState<Notification[]>([]);
@@ -207,7 +205,11 @@ export default function NotificationView() {
 
       if (prop.length != 0) setProposals(prop.reverse());
       if (examData != undefined) setExams(examData);
-    } catch (error) {}
+    } catch (error) {
+      showToast({ message: `Error fetching notifications: ${error}.`, type: "error" });
+    } finally {
+      setLoading(false);
+  }
   };
 
   const fetchDropdownOptions = async () => {
@@ -294,17 +296,21 @@ export default function NotificationView() {
 
   const [openId, setOpenId] = useState<undefined | number>(Number(id));
 
+  if (loading) {
+    return <p aria-live="polite">Loading notifications...</p>;
+  }
+
   return (
-    <div className="w-full h-full p-5 select-none">
+    <div className="w-full h-full p-5 select-none" role="main" aria-labelledby="notifications-heading">
       <div className="flex w-full content-center items-center ">
-        <h2 className="text-4xl w-1/3 my-2 ">{t("Notifications")}</h2>
+        <h2 id="notifications-heading" className="text-4xl w-1/3 my-2 ">{t("Notifications")}</h2>
         {/*<SearchBar items={props.data} filter={setFilteredData} /> */}
       </div>
       <div className="h-5"></div>
-      <NotificationCategory notifications={proposals} text={"Proposed Exams"} exams={exams} options={options} />
-      <NotificationCategory notifications={sortNotifs(actionsRequired)} text={"Required Actions"} exams={exams} options={options} />
-      <NotificationCategory notifications={sortNotifs(newNotifications)} text={"New Notifications"} exams={exams} options={options} />
-      <NotificationCategory notifications={sortNotifs(seenNotifications)} text={"Old Notifications"} exams={exams} options={options} />
+      <NotificationCategory notifications={proposals} text={t("Proposed Exams")} exams={exams} options={options} />
+      <NotificationCategory notifications={sortNotifs(actionsRequired)} text={t("Required Actions")} exams={exams} options={options} />
+      <NotificationCategory notifications={sortNotifs(newNotifications)} text={t("New Notifications")} exams={exams} options={options} />
+      <NotificationCategory notifications={sortNotifs(seenNotifications)} text={t("Old Notifications")} exams={exams} options={options} />
     </div>
   );
 }

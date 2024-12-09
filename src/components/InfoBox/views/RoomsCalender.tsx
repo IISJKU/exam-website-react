@@ -70,7 +70,7 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
   );
 
   if (loading) {
-    return <p>Loading exams...</p>;
+    return <p aria-live="polite">Loading exams...</p>;
   }
 
   return (

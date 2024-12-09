@@ -250,7 +250,7 @@ export default function RequestExam() {
       label: lastNameField ? `${item[firstNameField]} ${item[lastNameField]}` : item[firstNameField],
     }));
 
-  if (loading) return <p>Loading exam data...</p>;
+  if (loading) return <p aria-live="polite">Loading exam data...</p>;
 
   return (
     <div className="m-5">

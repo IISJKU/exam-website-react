@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DataAdministration from "./DataAdministration";
-import { useEffect } from "react";
 
 // Configuration for tables
 const tableConfigurations = {
@@ -87,7 +86,7 @@ export default function DataAdministrationPage() {
     }, [config, navigate]);
   
     if (!config) {
-      return <div>Loading...</div>; // Display loading state while redirecting
+      return <div role="status" aria-live="polite">Loading...</div>; // Display loading state while redirecting
     }
   
     // Ensure tableName is defined before manipulating strings
@@ -96,15 +95,16 @@ export default function DataAdministrationPage() {
       : "Unknown Table";
   
     return (
-      <div className="container mx-auto mt-10 p-6 bg-gray-100 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+      <div className="container mx-auto mt-10 p-6 bg-gray-100 rounded-lg shadow-lg" role="region" aria-labelledby="data-admin-title">
+        <h1 id="data-admin-title" role="heading" tabIndex={0} className="text-3xl font-bold text-gray-800 mb-6 text-center">
           Data Administration - {displayName}
         </h1>
   
         {/* Back Button */}
         <button
           onClick={() => navigate("/admin/data-administration")} 
-          className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md"
+          className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="Go back to Data Administration menu"
         >
           Back
         </button>

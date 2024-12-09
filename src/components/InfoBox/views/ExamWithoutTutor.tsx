@@ -10,7 +10,7 @@ export default function ExamWithoutTutor() {
   const user = useAuth();
 
   const [exams, setExams] = useState([]); // Store exams
-  const [loading, setLoading] = useState<boolean>(true); // State for loading
+  const [loading, setLoading] = useState<boolean>(true);
   const [isMobileView, setIsMobileView] = useState<boolean>(false); // Track mobile view
 
   // Determine fields and keys dynamically based on screen size
@@ -98,7 +98,7 @@ export default function ExamWithoutTutor() {
   };
 
   if (loading) {
-    return <p>Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite">Loading exams...</p>; // Display loading indicator while fetching
   }
 
   return (

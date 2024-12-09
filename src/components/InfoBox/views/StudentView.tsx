@@ -54,7 +54,7 @@ export default function StudentView() {
   };
 
   if (loading) {
-    return <p>Loading students...</p>; // Display loading state while fetching data
+    return <p aria-live="polite">Loading students...</p>; // Display loading state while fetching data
   }
 
   return (

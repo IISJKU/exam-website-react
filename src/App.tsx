@@ -22,7 +22,6 @@ import NotificationView from "./components/InfoBox/views/NotificationView";
 import StudentLayout from "./components/StudentLayout";
 import RequestExam from "./components/InfoBox/views/RequestExam";
 import StudentExamView from "./components/InfoBox/views/StudentExamView";
-import StudentExamEditor from "./components/InfoBox/views/StudentExamEditor";
 import StudentBigCalender from "./components/InfoBox/views/StudentBigCalendar";
 import TutorLayout from "./components/TutorLayout";
 import TutorExamView from "./components/InfoBox/views/TutorExamView";

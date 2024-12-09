@@ -1,4 +1,4 @@
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // Import useParams and useNavigate
 import EditField from "../components/EditField";
 import DateField from "../components/DateField";
@@ -16,7 +16,6 @@ import Room from "../../classes/Room";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
-import Admin from "../../../Pages/Admin";
 
 export default function ExamEditor() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -54,7 +53,6 @@ export default function ExamEditor() {
     modes: [] as ExamMode[],
     rooms: [] as Room[],
   });
-  const studentId = user.userId;
 
   const formatExamData = (exam: Exam): Exam => {
     typeof exam.examiner == "number" ? (exam.examiner_id = exam.examiner) : (exam.examiner_id = exam.examiner.id);
@@ -393,7 +391,7 @@ export default function ExamEditor() {
   };
 
   if (loading || !exam) {
-    return <p>Loading exam data...</p>;
+    return <p aria-live="polite">Loading exam data...</p>;
   }
 
   const dropdownOptions = (list: any[], firstNameField: string, lastNameField?: string) =>
@@ -407,8 +405,12 @@ export default function ExamEditor() {
   //customise site layout depending on role of user
   if (user.role == "Admin")
     return (
-      <div className="m-5">
-        <EditField title={t("Exam Title")} editMode={editMode} text={title} hideTitle={false} onChange={(e) => setTitle(e.target.value)} />
+      <div className="m-5" role="region" aria-labelledby="exam-editor-title">
+        <h1 id="exam-editor-title" className="text-2xl font-bold mb-4 sr-only" tabIndex={0}>
+          {t("Exam Editor")}
+        </h1>
+        
+        <EditField title={t("Exam Title")} editMode={editMode} text={title} hideTitle={true} onChange={(e) => setTitle(e.target.value)} aria-label={t("Exam Title")}/>
 
         <EditField
           title={t("LVA Num")}
@@ -416,9 +418,10 @@ export default function ExamEditor() {
           text={lva_num ? lva_num.toString() : ""}
           hideTitle={false}
           onChange={(e) => setLvaNum(Number(e.target.value))}
+          aria-label={t("LVA course Number")}
         />
 
-        <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
+        <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} aria-label={t("Exam Date and Time")} />
 
         <EditField
           title={t("Duration")}
@@ -426,6 +429,7 @@ export default function ExamEditor() {
           text={duration ? duration.toString() : ""}
           hideTitle={false}
           onChange={(e) => setDuration(Number(e.target.value))}
+          aria-label={t("Exam Duration")}
         />
 
         <DropdownWithSearch
@@ -436,6 +440,7 @@ export default function ExamEditor() {
           onChange={(newValue) => setStudent(Number(newValue))}
           placeholder={t("Search student...")}
           disabled={!editMode}
+          aria-label={t("Exam Student")}
         />
 
         <DropdownWithSearch
@@ -446,6 +451,7 @@ export default function ExamEditor() {
           onChange={(newValue) => setTutor(Number(newValue))}
           placeholder={t("Search tutors...")}
           disabled={!editMode}
+          aria-label={t("Exam Tutor")}
         />
 
         <DropdownWithSearch
@@ -456,6 +462,7 @@ export default function ExamEditor() {
           onChange={(newVal) => setExaminer(Number(newVal))}
           placeholder={t("Search examiner...")}
           disabled={!editMode}
+          aria-label={t("Course Examiner")}
         />
 
         <DropdownWithSearch
@@ -466,6 +473,7 @@ export default function ExamEditor() {
           onChange={(newVal) => setMajor(Number(newVal))}
           placeholder={t("Search majors...")}
           disabled={!editMode}
+          aria-label={t("Course Major")}
         />
 
         <DropdownWithSearch
@@ -476,6 +484,7 @@ export default function ExamEditor() {
           onChange={(newVal) => setInstitute(Number(newVal))}
           placeholder={t("Search institutes...")}
           disabled={!editMode}
+          aria-label={t("Course Institute")}
         />
 
         <DropdownWithSearch
@@ -486,6 +495,7 @@ export default function ExamEditor() {
           onChange={(newVal) => setMode(Number(newVal))}
           placeholder={t("Search modes...")}
           disabled={!editMode}
+          aria-label={t("Exam Mode")}
         />
 
         <DropdownWithSearch
@@ -496,44 +506,65 @@ export default function ExamEditor() {
           onChange={(newVal) => handleRoomChange(Number(newVal))}
           placeholder={t("Search rooms...")}
           disabled={!editMode}
+          aria-label={t("Room Selector")}
         />
 
-        <EditField title={"Status"} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus(e.target.value)} />
+        <EditField title={"Status"} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus(e.target.value)} aria-label={t("Exam Status")} />
+        <div className="mt-4 flex space-x-2">
 
-        <button onClick={() => navigate(-1)} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline me-2">{("Back")}</button>
+        <button
+          onClick={() => navigate(-1)}
+          className="border-2 border-black p-1 hover:bg-slate-400 focus:ring-2 focus:ring-blue-500"
+          aria-label={t("Back to previous page")}
+        >
+          {("Back")}
+        </button>
         <button
           onClick={() => {
             setEditMode(!editMode);
             if (editMode) handleUpdate();
           }}
-          className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
+          className="border-2 border-black p-1 hover:bg-slate-400 focus:ring-2 focus:ring-blue-500"
+          aria-label={editMode ? t("Save changes") : t("Edit exam")}
         >
           {editMode ? t("Save") : t("Edit")}
         </button>
-        {editMode ? (
+        {editMode && (
           <button
-            className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline"
+            className="ml-2 border-2 border-black p-1 hover:bg-red-400 focus:ring-2 focus:ring-red-500"
             onClick={() => {
-              setEditMode(!editMode);
+              setEditMode(false);
             }}
+            aria-label={t("Cancel editing")}
           >
-            Cancel
+            {t("Cancel")}
           </button>
-        ) : (
-          <></>
-        )}
+         )}
+      </div>
         {showConfirmDialog && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-dialog-title"
+            aria-describedby="confirm-dialog-description"
+          >
             <div className="bg-white p-4 rounded shadow-lg max-w-sm">
-              <p className="mb-4">{t("The selected room has a capacity of 0. Do you want to continue?")}</p>
-              <div className="flex justify-end">
+            <h2 id="confirm-dialog-title" className="text-lg font-bold mb-4">
+              {t("Confirm Room Selection")}
+            </h2>
+              <p id="confirm-dialog-description" className="mb-4">{t("The selected room has a capacity of 0. Do you want to continue?")}</p>
+              <div className="flex justify-end space-x-2">
                 <button
                   onClick={handleCancelRoomSelection}
-                  className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded mr-2 hover:bg-gray-300"
+                  className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 focus:ring-2 focus:ring-gray-400"
+                  aria-label={t("Cancel room selection")}
                 >
                   {t("Cancel")}
                 </button>
-                <button onClick={handleConfirmRoomSelection} className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">
+                <button onClick={handleConfirmRoomSelection}
+                  className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 focus:ring-2 focus:ring-red-500"
+                  aria-label={t("Confirm room selection")}>
                   {t("Confirm")}
                 </button>
               </div>
@@ -544,11 +575,14 @@ export default function ExamEditor() {
     );
   else
     return (
-      <div className="m-5">
-        <EditField title={t("Exam Title")} editMode={editMode} text={title} onChange={(e) => setTitle(e.target.value)} />
-        <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} hideTitle={false} onChange={(e) => setLvaNum(Number(e.target.value))} />
-        <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
-        <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} hideTitle={false} onChange={(e) => setDuration(Number(e.target.value))} />
+      <div className="m-5" role="region" aria-labelledby="exam-editor-title">
+        <h1 id="exam-editor-title" className="text-2xl font-bold mb-4 sr-only" tabIndex={0}>
+          {t("Exam Editor")}
+        </h1>
+        <EditField title={t("Exam Title")} editMode={editMode} text={title} onChange={(e) => setTitle(e.target.value)} aria-label={t("Exam Title")}/>
+        <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} hideTitle={false} onChange={(e) => setLvaNum(Number(e.target.value))} aria-label={t("LVA course Number")}/>
+        <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} aria-label={t("Exam Date and Time")}/>
+        <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} hideTitle={false} onChange={(e) => setDuration(Number(e.target.value))} aria-label={t("Exam Duration")}/>
 
         <DropdownWithSearch
           tableName="examiners"
@@ -558,6 +592,7 @@ export default function ExamEditor() {
           onChange={(val) => setExaminer(Number(val))}
           placeholder={t("Search examiner...")}
           disabled={!editMode}
+          aria-label={t("Course Examiner")}
         />
         <DropdownWithSearch
           tableName="institutes"
@@ -567,6 +602,7 @@ export default function ExamEditor() {
           onChange={(val) => setInstitute(Number(val))}
           placeholder={t("Search institutes...")}
           disabled={!editMode}
+          aria-label={t("Course Institute")}
         />
         <DropdownWithSearch
           tableName="exam-modes"
@@ -576,32 +612,41 @@ export default function ExamEditor() {
           onChange={(val) => setMode(Number(val))}
           placeholder={t("Search modes...")}
           disabled={!editMode}
+          aria-label={t("Exam Mode")}
         />
 
-        <EditField title={t("Status")} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus("Pending")} />
-
-        <button onClick={() => navigate(-1)} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline me-2">{("Back")}</button>
+        <EditField title={t("Status")} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus("Pending")} aria-label={t("Exam Status")}/>
+        
+        <div className="mt-4 flex space-x-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="border-2 border-black p-1 hover:bg-slate-400 focus:ring-2 focus:ring-blue-500"
+            aria-label={t("Back to previous page")}
+          >
+            {t("Back")}
+          </button>
         <button
           onClick={() => {
             setEditMode(!editMode);
             if (editMode) handleUpdate();
           }}
-          className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
+          className="border-2 border-black p-1 hover:bg-slate-400 focus:ring-2 focus:ring-blue-500"
+          aria-label={editMode ? t("Save changes") : t("Edit exam")}
         >
           {editMode ? t("Save") : t("Edit")}
         </button>
-        {editMode ? (
+        {editMode && (
           <button
-            className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline"
-            onClick={() => {
+          className="border-2 border-black p-1 hover:bg-red-400 focus:ring-2 focus:ring-red-500"
+          onClick={() => {
               setEditMode(!editMode);
-            }}
+          }}
+          aria-label={t("Cancel editing")}
           >
-            Cancel
+            {t("Cancel")}
           </button>
-        ) : (
-          <></>
-        )}
+         )}
       </div>
+    </div>
     );
 }

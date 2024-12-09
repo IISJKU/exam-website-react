@@ -47,7 +47,7 @@ export default function TutorView() {
   };
 
   if (loading) {
-    return <p>Loading Tutors...</p>; // Display loading state while fetching data
+    return <p aria-live="polite">Loading Tutors...</p>; // Display loading state while fetching data
   }
 
   return (

@@ -45,7 +45,16 @@ export default function SearchBar(props: SearchProps) {
 
   return (
     <div className="relative w-full md:w-2/3 lg:max-w-md">
-      <input className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Search..." onChange={(e) => filter(e.target.value)}></input>
+      <label htmlFor="search-input" className="sr-only">Search</label>
+      <input
+        id="search-input"
+        type="search"
+        className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Search..."
+        aria-label="Search items"
+        onChange={(e) => filter(e.target.value)}
+        value={input}
+      />
       <div aria-hidden="true" className="absolute inset-y-0 right-3 flex items-center text-xl font-bold text-gray-500">🔎</div>
     </div>
   );
