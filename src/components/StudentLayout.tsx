@@ -6,21 +6,25 @@ import StudentMenu from "./StudentMenu";
 
 export default function StudentLayout() {
   return (
-    <div className="h-full w-full">
-      <Header />
-      <div className="md:flex flex-column h-full w-full">
-        {/* Side Menu */}
-        <div className="basis-1/6 h-max ">
-          <StudentMenu /> {/* Persistent Side Menu */}
-          <div className="h-max flex justify-center">
-            <LogoutButton />
-          </div>
-        </div>
+    <div className="h-full w-full" role="region" aria-label="Student Layout">
+      {/* Header Section */}
+      <header role="banner" aria-label="Application Header">
+        <Header />
+      </header>
 
-        {/* Main Content */}
-        <div className="basis-5/6 h-screen w-full">
-          <Outlet /> {/* This is where the routed content will be displayed */}
-        </div>
+      <div className="md:flex flex-column h-full w-full">
+        {/* Side Menu Section */}
+        <nav role="navigation" aria-label="Side Menu" className="basis-1/6 h-max" >
+          <StudentMenu />
+          <div className="h-max flex justify-center">
+            <LogoutButton aria-label="Logout from the application" />
+          </div>
+        </nav>
+
+        {/* Main Content Section */}
+        <main role="main" aria-label="Main Content Area" className="basis-5/6 h-full w-full" >
+          <Outlet />
+        </main>
       </div>
     </div>
   );

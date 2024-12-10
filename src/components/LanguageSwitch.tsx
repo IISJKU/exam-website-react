@@ -7,7 +7,7 @@ enum Language {
 }
 
 export default function LanguageSwitch() {
-  let initLang = i18n.language == "en" ? Language.EN : Language.DE; //this is so that the actual button depends on global langugae
+  let initLang = i18n.language == "en" ? Language.EN : Language.DE; //this is so that the actual button depends on global language
 
   const [lang, setLang] = useState<Language>(initLang);
 
@@ -24,9 +24,11 @@ export default function LanguageSwitch() {
         onClick={() => {
           switchLang(Language.DE);
         }}
-        className="select-none flex flex-row border-2 border-black text-2xl h-min w-min "
+        className="select-none flex flex-row border-2 border-black text-2xl h-min w-min focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-label="Switch to German language"
+        aria-live="polite"
       >
-        <div className="basis-1/2 bg-black text-white p-1" aria-current="true">
+        <div className="basis-1/2 bg-black text-white p-1" aria-current="true" aria-label="Current language: English">
           EN
         </div>
         <div className="basis-1/2 p-1">DE</div>
@@ -39,10 +41,12 @@ export default function LanguageSwitch() {
         onClick={() => {
           switchLang(Language.EN);
         }}
-        className="select-none flex flex-row border-2 border-black text-2xl h-min w-min"
+        className="select-none flex flex-row border-2 border-black text-2xl h-min w-min focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-label="Switch to English language"
+        aria-live="polite"
       >
         <div className="basis-1/2 p-1">EN</div>
-        <div className="basis-1/2 bg-black text-white p-1" aria-current="true">
+        <div className="basis-1/2 bg-black text-white p-1" aria-current="true" aria-label="Current language: German">
           DE
         </div>
       </button>

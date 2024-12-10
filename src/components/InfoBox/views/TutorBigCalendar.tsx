@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Calendar, momentLocalizer, Views, Event } from "react-big-calendar";
 import moment from "moment";
-import { useNavigate } from "react-router-dom";
 import { showToast } from "../components/ToastMessage";
 import Exam from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
+import { t } from "i18next";
 
 const localizer = momentLocalizer(moment);
 
@@ -53,7 +53,7 @@ export default function TutorBigCalender() {
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
     } finally {
-      setLoading(false); // Set loading to false when fetch is complete
+      setLoading(false);
     }
   };
 
@@ -87,11 +87,11 @@ export default function TutorBigCalender() {
   );
 
   if (loading) {
-    return <p aria-live="polite">Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>; // Display loading indicator while fetching
   }
 
   return (
-    <div>
+    <div role="region" aria-label="Tutor Exam Calendar" className="tutor-big-calendar">
       <Calendar
         defaultDate={defaultDate}
         defaultView={view}
@@ -105,7 +105,11 @@ export default function TutorBigCalender() {
         style={{ height: 700 }}
         onNavigate={(newDate) => setDate(newDate)}
         popup
+        aria-labelledby="calendar-title"
       />
+      <h2 id="calendar-title" className="sr-only">
+        {t("Tutor Exam Calendar")}
+      </h2>
     </div>
   );
 }

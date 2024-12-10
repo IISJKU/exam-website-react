@@ -4,13 +4,14 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import ContentView from "./ContentView";
 import Exam from "../../classes/Exam";
 import { showToast } from "../components/ToastMessage";
+import { t } from "i18next";
 
 export default function StudentExamView() {
   const navigate = useNavigate(); 
   const user = useAuth();
   const studentId = user.userId;
 
-  const [exams, setExams] = useState([]); 
+  const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState<boolean>(true); 
   const [isMobileView, setIsMobileView] = useState<boolean>(false); // Track mobile view
 
@@ -78,29 +79,36 @@ export default function StudentExamView() {
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
     } finally {
-      setLoading(false); // Set loading to false when the fetch is complete
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchStudentExams(studentId);
-  }, []);
+  }, [studentId]);
 
   const handleExamClick = (examId: number) => {
     navigate(`/student/exams/${examId}`);
   };
 
   if (loading) {
-    return <p aria-live="polite">Loading exams...</p>;
+    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>;
   }
 
   return (
-    <ContentView
-      title={"Upcoming Exams"}
-      onRowClick={handleExamClick} 
-      fields={fields} 
-      keys={keys} 
-      data={exams} 
-    />
+    <div role="region" aria-label="Upcoming Exams" className="student-exam-view">
+      <ContentView
+        title={t("Upcoming Exams")}
+        onRowClick={handleExamClick} 
+        fields={fields} 
+        keys={keys} 
+        data={exams.map((exam) => ({
+          ...exam,
+          tabIndex: 0,
+          role: "button",
+          "aria-label": `${exam.title}, scheduled for ${new Date(exam.date).toLocaleString()}`,
+        }))} 
+      />
+    </div>
   );
 }

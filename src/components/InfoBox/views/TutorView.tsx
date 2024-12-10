@@ -4,6 +4,7 @@ import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
+import { t } from "i18next";
 
 export default function TutorView() {
   const navigate = useNavigate(); // Initialize navigate for navigation
@@ -30,11 +31,11 @@ export default function TutorView() {
       if (!response.ok) {
         showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
       }
-      setTutors(data); // Update tutors with fetched data
+      setTutors(data); 
     } catch (error) {
       showToast({ message: `Error fetching tutors: ${error}.`, type: "error" });
     } finally {
-      setLoading(false); // Set loading to false when the fetch is complete
+      setLoading(false); 
     }
   };
 
@@ -43,20 +44,22 @@ export default function TutorView() {
   }, []);
 
   const handleTutorClick = (tutorId: number) => {
-    navigate(`/admin/tutors/${tutorId}`); // Navigate to individual tutor view with ID
+    navigate(`/admin/tutors/${tutorId}`); 
   };
 
   if (loading) {
-    return <p aria-live="polite">Loading Tutors...</p>; // Display loading state while fetching data
+    return <p aria-live="polite" aria-busy="true">{t("Loading Tutors...")}</p>; 
   }
 
   return (
-    <ContentView
-      title={"Tutors"}
-      onRowClick={handleTutorClick} // Pass the row click handler for tutor navigation
-      fields={fields}
-      keys={keys}
-      data={tutors} // Pass the tutor data to ContentView
-    />
+    <div role="region" aria-label="Tutor List" className="tutor-view">
+      <ContentView
+        title={"Tutors"}
+        onRowClick={handleTutorClick} // Pass the row click handler for tutor navigation
+        fields={fields}
+        keys={keys}
+        data={tutors} // Pass the tutor data to ContentView
+        />
+    </div>
   );
 }

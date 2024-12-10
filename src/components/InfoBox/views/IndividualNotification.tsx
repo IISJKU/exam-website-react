@@ -398,7 +398,7 @@ export default function IndividualNotification() {
   };
 
   if (loading || !exam) {
-    return <p aria-live="polite">Loading exam data...</p>;
+    return <p aria-live="polite" aria-busy="true">Loading exam data...</p>;
   }
 
   const dropdownOptions = (list: any[], firstNameField: string, lastNameField?: string) =>

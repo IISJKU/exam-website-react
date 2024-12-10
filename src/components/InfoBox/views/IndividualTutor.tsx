@@ -90,7 +90,7 @@ export default function IndividualTutor() {
   };
 
   if (loading || !tutor) {
-    return <p aria-live="polite">Loading tutor data...</p>;
+    return <p aria-live="polite" aria-busy="true">Loading tutor data...</p>;
   }
 
   return (

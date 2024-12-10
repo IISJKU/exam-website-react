@@ -50,7 +50,7 @@ export default function RequestExam() {
   const [room, setRoom] = useState<number | undefined>();
   const [status, setStatus] = useState<string>("Pending");
 
-  const [error, setErrorText] = useState<string>();
+  const [error, setErrorText] = useState<string | null>(null);
 
   // Define initial state with the correct type
   const [initialState, setInitialState] = useState<InitialState>({
@@ -110,14 +110,14 @@ export default function RequestExam() {
           status,
         });
       } catch (error) {
-        showToast({ message: "Error fetching dropdown options", type: "error" });
+        showToast({ message: t("Error fetching dropdown options"), type: "error" });
       } finally {
         setLoading(false);
       }
     };
 
     fetchDropdownOptions();
-  }, [user.token]);
+  }, [user.token, t]);
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDate = event.target.value;
@@ -157,6 +157,12 @@ export default function RequestExam() {
   }
 
   const handleSubmit = async () => {
+    if (!title || !date || !duration || !examiner || !institute || !mode || !room) {
+      setErrorText(t("Please fill in all of the fields"));
+      return;
+    }
+
+    setErrorText(null); // Clear error
     const data: Partial<Exam> = {
       title: title,
       date: date,
@@ -250,14 +256,24 @@ export default function RequestExam() {
       label: lastNameField ? `${item[firstNameField]} ${item[lastNameField]}` : item[firstNameField],
     }));
 
-  if (loading) return <p aria-live="polite">Loading exam data...</p>;
+  if (loading) return <p aria-live="polite" aria-busy="true">{t("Loading exam data...")}</p>;
 
   return (
-    <div className="m-5">
-      <EditField title={t("Exam Title")} editMode={editMode} text={title} onChange={(e) => setTitle(e.target.value)} />
-      <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} onChange={(e) => setLvaNum(Number(e.target.value))} />
-      <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
-      <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} onChange={(e) => setDuration(Number(e.target.value))} />
+    <div className="m-5" aria-labelledby="request-exam-heading" role="form">
+      <h1 id="request-exam-heading" className="text-2xl font-bold mb-4">{t("Request an Exam")}</h1>
+      {error && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="text-red-800 text-xl mb-4"
+        >
+          {error}
+        </div>
+      )}
+      <EditField title={t("Exam Title")} editMode={editMode} text={title} onChange={(e) => setTitle(e.target.value)} aria-label={t("Add Exam Title")} aria-required="true"/>
+      <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} onChange={(e) => setLvaNum(Number(e.target.value))} aria-label={t("Add Exam LVA Num")} aria-required="true" />
+      <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} aria-label={t("Add Exam Date and Time")} aria-required="true" />
+      <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} onChange={(e) => setDuration(Number(e.target.value))} aria-label={t("Add Exam Duration in minutes")} aria-required="true"/>
 
       <DropdownWithSearch
         tableName="examiners"
@@ -270,6 +286,8 @@ export default function RequestExam() {
         placeholder={t("Search examiner...")}
         disabled={!editMode}
         submit={submit}
+        aria-label={t("Add Exam Examiner")}
+        aria-required="true"
       />
       <DropdownWithSearch
         tableName="institutes"
@@ -280,6 +298,8 @@ export default function RequestExam() {
         placeholder={t("Search institutes...")}
         disabled={!editMode}
         submit={submit}
+        aria-label={t("Add Exam Institute")}
+        aria-required="true"
       />
       <DropdownWithSearch
         tableName="exam-modes"
@@ -290,14 +310,16 @@ export default function RequestExam() {
         placeholder={t("Search modes...")}
         disabled={!editMode}
         submit={submit}
+        aria-label={t("Add Exam Mode")}
+        aria-required="true"
       />
 
-      <EditField title={t("Status")} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus("Pending")} />
+      <EditField title={t("Status")} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus("Pending")} aria-label={t("Add Exam Status")} aria-required="true"/>
 
-      <button onClick={handleSubmit} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline">
+      <button onClick={handleSubmit} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline" aria-label={t("Submit Request")}>
         {t("Submit")}
       </button>
-      <button onClick={handleCancel} className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline">
+      <button onClick={handleCancel} className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline" aria-label={t("Cancel Request")}>
         {t("Cancel")}
       </button>
       {error ? <div className="text-red-800 text-xl">Please fill in all of the fields!</div> : <></>}

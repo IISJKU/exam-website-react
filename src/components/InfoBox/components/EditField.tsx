@@ -35,8 +35,10 @@ export default function EditField(props: EditFieldProps) {
       props.title === "Last Name" ||
       props.title === "Exam Title") &&
     !props.editMode
-  )
-    classList = "inline-block pr-2 text-3xl";
+  ) {
+    classList = "relative w-96 pr-2 text-3xl";
+  }
+   
   if (props.title === "Duration") additionalText = " min";
 
   return (
@@ -44,6 +46,7 @@ export default function EditField(props: EditFieldProps) {
       {props.title && (props.editMode || !hide) && (
         <label htmlFor={`edit-field-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{t(props.title) + " "}</label>
       )}
+      <div className="relative mt-1">
       {props.editMode ? (
         props.title === "Status" ? (
           <textarea 
@@ -71,6 +74,7 @@ export default function EditField(props: EditFieldProps) {
           {additionalText}
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { showToast } from "./InfoBox/components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import Exam from "./classes/Exam";
-
 import fetchAll from "./InfoBox/views/FetchAll";
 import { useAuth } from "../hooks/AuthProvider";
 
@@ -26,7 +25,7 @@ export default function Calendar() {
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
     } finally {
-      setLoading(false); // Set loading to false when the fetch is complete
+      setLoading(false);
     }
   };
 
@@ -35,7 +34,7 @@ export default function Calendar() {
   }, []);
 
   if (loading) {
-    return <p aria-live="polite">Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite" aria-busy="true" role="status">{t("Loading exams...")}</p>;
   }
 
   function getWeekday(d: Date): string {
@@ -46,7 +45,7 @@ export default function Calendar() {
   }
 
   function switchMonth(add: number): void {
-    const newDate = new Date(date.getFullYear(), date.getMonth() + add, 1); // Simplified switching
+    const newDate = new Date(date.getFullYear(), date.getMonth() + add, 1); 
     setDate(newDate);
   }
 
@@ -102,40 +101,48 @@ export default function Calendar() {
   }
 
   return (
-    <div className="w-full aspect-square select-none">
+    <div className="w-full aspect-square select-none" role="region" aria-label="Calendar View">
       <div className="bg-slate-100 border-2 border-black p-1 aspect-square">
-        <div className="bg-slate-300 w-full flex justify-center content-stretch my-1 text-sm">
-          <button className="basis-1/5 text-left hover:underline" onClick={() => switchMonth(-1)}>
-            &lt; Prev
+        <div className="bg-slate-300 w-full flex justify-center content-stretch my-1 text-sm" role="navigation" aria-label="Month Navigation">
+          <button className="basis-1/5 text-left hover:underline" onClick={() => switchMonth(-1)} aria-label={`Switch to previous month, ${t(month[(date.getMonth() + 11) % 12])}`}>
+            &lt; {t("Prev")}
           </button>
-          <div className="basis-3/5 text-center">
+          <div className="basis-3/5 text-center" aria-live="polite" aria-atomic="true">
             {t(month[date.getMonth()])} {date.getFullYear()}
           </div>
-          <button onClick={() => switchMonth(1)} className="basis-1/5 text-right hover:underline">
-            Next &gt;
+          <button onClick={() => switchMonth(1)} className="basis-1/5 text-right hover:underline" aria-label={`Switch to next month, ${t(month[(date.getMonth() + 1) % 12])}`}>
+          {t("Next")} &gt;
           </button>
         </div>
-        <table className="w-full text-sm text-left table-fixed">
+        <table className="w-full text-sm text-left table-fixed" role="table" aria-label="Monthly Calendar">
           <thead>
             <tr>
               {weekdays.map((weekday, index) => (
-                <th key={index}>{weekday.substring(0, 2)}</th>
+                <th key={index} role="columnheader" aria-label={t(weekday)}>{weekday.substring(0, 2)}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {getRows(date.getMonth(), date.getFullYear()).map((row, rowIndex) => (
-              <tr key={rowIndex}>
+              <tr key={rowIndex} role="row">
                 {row.map((day, dayIndex) => (
                   <td
                     key={dayIndex}
+                    tabIndex={day[1] !== "invisible" ? 0 : undefined}
                     onClick={() => {
                       if (day[1] !== "invisible" && day[0]) {
                         // Use navigate to move to a new route for the specific date
                         navigate(`admin/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
                       }
                     }}
+                    onKeyDown={(e) => {
+                      if ((e.key === "Enter" || e.key === " ") && day[1] !== "invisible" && day[0]) {
+                        navigate(`admin/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
+                      }
+                    }}
                     className={`hover:bg-slate-500 active:bg-slate-700 align-top border-2 border-black aspect-square ${day[1]}`}
+                    role="gridcell"
+                    aria-label={`Day ${day[0]} ${t(month[date.getMonth()])}`}
                   >
                     {day[0]}
                   </td>

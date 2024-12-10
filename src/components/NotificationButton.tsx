@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom"; // For navigation
+import { useNavigate } from "react-router-dom"; 
 import { useState, useEffect } from "react";
 import useInterval from "../hooks/UseInterval";
 import { useAuth } from "../hooks/AuthProvider";
@@ -29,7 +29,6 @@ export default function NotificationButton(props: NButtonProps) {
         },
       });
       const data = await response.json();
-
       let t: Notification[] = [];
 
       data.forEach((element: any) => {
@@ -62,13 +61,13 @@ export default function NotificationButton(props: NButtonProps) {
     }
     setUnreadNotifications(numNotifications);
   }
-
+  
   useEffect(() => {
-    if (user.token != undefined && user.token.length > 1) fetchNotifications();
+    if (user.token && user.token.length > 1) fetchNotifications();
   }, []);
 
   useInterval(() => {
-    if (user.token != undefined && user.token.length > 1) fetchNotifications();
+    if (user.token && user.token.length > 1) fetchNotifications();
   }, 3000); //check once every minute
 
   return (
@@ -77,13 +76,19 @@ export default function NotificationButton(props: NButtonProps) {
         navigate(props.path);
       }}
       className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline relative inline-block align-center"
+      tabIndex={0}
+      role="button"
+      aria-label={`Notifications button, ${unreadNotifications} unread notifications`}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          navigate(props.path);
+        }
+      }}
     >
-      {unreadNotifications != 0 ? (
-        <div className="h-5 w-5 inline-block align-center justify-center absolute right-1 top-2 text-sm select-none">
-          <p className="bg-red-400 rounded-full text-center m-0">{unreadNotifications}</p>
+      {unreadNotifications > 0 && (
+        <div className="h-5 w-5 inline-block align-center justify-center absolute right-1 top-2 text-sm select-none" aria-live="polite" aria-atomic="true">
+          <p className="bg-red-400 rounded-full text-center m-0" aria-label={`${unreadNotifications} unread notifications`}>{unreadNotifications}</p>
         </div>
-      ) : (
-        <></>
       )}
 
       {t("Notifications")}

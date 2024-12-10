@@ -15,22 +15,28 @@ const tableConfigurations = {
 
 export default function TableLinks() {
   return (
-    <div className="container mx-auto mt-10 p-6 bg-gray-100 rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Database Tables</h1>
+    <nav className="container mx-auto mt-10 p-6 bg-gray-100 rounded-lg shadow-lg" aria-label="Database Table Navigation">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center" id="table-links-title">Database Tables</h1>
 
-      {/* Grid with 4 columns on medium screens and higher, 2 columns on smaller screens */}
-      <ul className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <ul className="grid grid-cols-2 md:grid-cols-4 gap-6" role="list" aria-labelledby="table-links-title">
         {Object.keys(tableConfigurations).map((table) => (
-          <li key={table} className="bg-white rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+          <li
+            key={table}
+            className="bg-white rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500"
+            role="listitem"
+          >
             <Link
               to={`/admin/data-administration/${table}`} // Navigate to DataAdministration view
-              className="block w-full h-full text-center py-4 text-lg font-medium text-gray-800 hover:text-white hover:bg-blue-500 rounded-lg"
+              className="block w-full h-full text-center py-4 text-lg font-medium text-gray-800 hover:text-white hover:bg-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label={`Navigate to ${table
+                .charAt(0)
+                .toUpperCase()}${table.slice(1).replace("_", " ")} table`}
             >
               {table.charAt(0).toUpperCase() + table.slice(1).replace("_", " ")}
             </Link>
           </li>
         ))}
       </ul>
-    </div>
+    </nav>
   );
 }

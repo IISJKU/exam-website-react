@@ -4,7 +4,6 @@ import { showToast } from "./InfoBox/components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import Exam from "./classes/Exam";
 import { useAuth } from "../hooks/AuthProvider";
-
 import fetchAll from "./InfoBox/views/FetchAll";
 
 export default function StudentCalender() {
@@ -32,7 +31,7 @@ export default function StudentCalender() {
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
     } finally {
-      setLoading(false); // Set loading to false when the fetch is complete
+      setLoading(false); 
     }
   };
 
@@ -41,7 +40,7 @@ export default function StudentCalender() {
   }, []);
 
   if (loading) {
-    return <p aria-live="polite">Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>; // Display loading indicator while fetching
   }
 
   function getWeekday(d: Date): string {
@@ -108,30 +107,30 @@ export default function StudentCalender() {
   }
 
   return (
-    <div className="w-full aspect-square select-none">
+    <div className="w-full aspect-square select-none" role="region" aria-label={t("Student Calendar")}>
       <div className="bg-slate-100 border-2 border-black p-1 aspect-square">
         <div className="bg-slate-300 w-full flex justify-center content-stretch my-1 text-sm">
-          <button className="basis-1/5 text-left hover:underline" onClick={() => switchMonth(-1)}>
-            &lt; Prev
+          <button className="basis-1/5 text-left hover:underline" onClick={() => switchMonth(-1)} aria-label={t("Go to previous month")}>
+            &lt; {t("Prev")}
           </button>
-          <div className="basis-3/5 text-center">
+          <div className="basis-3/5 text-center" aria-live="polite">
             {t(month[date.getMonth()])} {date.getFullYear()}
           </div>
-          <button onClick={() => switchMonth(1)} className="basis-1/5 text-right hover:underline">
-            Next &gt;
+          <button onClick={() => switchMonth(1)} className="basis-1/5 text-right hover:underline" aria-label={t("Go to next month")}>
+          {t("Next")} &gt;
           </button>
         </div>
-        <table className="w-full text-sm text-left table-fixed">
+        <table className="w-full text-sm text-left table-fixed" aria-label={t("Calendar dates")}>
           <thead>
             <tr>
               {weekdays.map((weekday, index) => (
-                <th key={index}>{weekday.substring(0, 2)}</th>
+                <th key={index} scope="col" aria-label={weekday}>{weekday.substring(0, 2)}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {getRows(date.getMonth(), date.getFullYear()).map((row, rowIndex) => (
-              <tr key={rowIndex}>
+              <tr key={rowIndex} role="row">
                 {row.map((day, dayIndex) => (
                   <td
                     key={dayIndex}
@@ -141,7 +140,15 @@ export default function StudentCalender() {
                         navigate(`student/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
                       }
                     }}
+                    onKeyDown={(e) => {
+                      if ((e.key === "Enter" || e.key === " ") && day[1] !== "invisible" && day[0]) {
+                        navigate(`admin/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
+                      }
+                    }}
                     className={`hover:bg-slate-500 active:bg-slate-700 align-top border-2 border-black aspect-square ${day[1]}`}
+                    role="gridcell"
+                    tabIndex={day[1] !== "invisible" ? 0 : -1}
+                    aria-label={day[0] ? `${day[0]} ${t(month[date.getMonth()])}` : ""}
                   >
                     {day[0]}
                   </td>

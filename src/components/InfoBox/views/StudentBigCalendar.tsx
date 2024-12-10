@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { showToast } from "../components/ToastMessage";
 import Exam from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
+import { t } from "i18next";
 
 const localizer = momentLocalizer(moment);
 
@@ -70,6 +71,7 @@ export default function StudentBigCalender() {
         title: exam.title,
         start,
         end,
+        resource: exam,
       };
     });
     setEvents(newEvents);
@@ -87,11 +89,11 @@ export default function StudentBigCalender() {
   );
 
   if (loading) {
-    return <p aria-live="polite">Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>; // Display loading indicator while fetching
   }
 
   return (
-    <div>
+    <div role="region" aria-label="Student Exam Calendar" tabIndex={-1} className="student-calendar">
       <Calendar
         defaultDate={defaultDate}
         defaultView={view}
@@ -105,6 +107,34 @@ export default function StudentBigCalender() {
         style={{ height: 700 }}
         onNavigate={(newDate) => setDate(newDate)}
         popup
+        components={{
+          event: ({ event }: { event: Event }) => (
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label={`Exam: ${event.title}, starts at ${moment(event.start).format(
+                "h:mm A"
+              )} and ends at ${moment(event.end).format("h:mm A")}`}
+              onClick={() => handleSelectEvent(event)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  handleSelectEvent(event);
+                }
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              {event.title}
+            </div>
+          ),
+        }}
+        messages={{
+          week: "Week View",
+          day: "Day View",
+          month: "Month View",
+          today: "Today",
+          previous: "Previous",
+          next: "Next",
+        }}
       />
     </div>
   );

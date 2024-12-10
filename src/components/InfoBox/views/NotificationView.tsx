@@ -297,7 +297,7 @@ export default function NotificationView() {
   const [openId, setOpenId] = useState<undefined | number>(Number(id));
 
   if (loading) {
-    return <p aria-live="polite">Loading notifications...</p>;
+    return <p aria-live="polite" aria-busy="true">Loading notifications...</p>;
   }
 
   return (

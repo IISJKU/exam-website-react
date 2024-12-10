@@ -92,7 +92,7 @@ export default function ExamView() {
   };
 
   if (loading) {
-    return <p aria-live="polite">Loading exams...</p>; 
+    return <p aria-live="polite" aria-busy="true">Loading exams...</p>; 
   }
 
   return (

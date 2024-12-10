@@ -96,58 +96,65 @@ export default function TutorExamRequest() {
     }
   };
 
-  if (loading) return <p aria-live="polite">Loading exam data...</p>;
+  if (loading) return <p aria-live="polite" aria-busy="true">{t("Loading exam data...")}</p>;
 
-  if (!exam) return <p>No exam details found.</p>;
+  if (!exam) return <p aria-live="polite" aria-busy="true">{t("No exam details found.")}</p>;
 
   return (
-    <div className="m-5">
-      <h2 className="text-2xl font-bold mb-4">{t("Exam Details")}</h2>
-
-      {/* Display Exam Details in Read-Only Format */}
-      <p>
-        <strong>{t("Exam Title")}:</strong> {exam.title}
-      </p>
-      <p>
-        <strong>{t("LVA Num")}:</strong> {exam.lva_num}
-      </p>
-      <p>
-        <strong>{t("Date")}:</strong> {moment(exam.date).format("DD.MM.YYYY HH:mm")}
-      </p>
-      <p>
-        <strong>{t("Duration")}:</strong> {exam.duration} {t("minutes")}
-      </p>
-
-      {/* Check if student is an object before accessing properties */}
-      <p>
-        <strong>{t("Student")}:</strong>{" "}
-        {exam.student && typeof exam.student === "object" ? `${exam.student.first_name} ${exam.student.last_name}` : t("Not Assigned")}
-      </p>
-
-      {/* Check if examiner is an object before accessing properties */}
-      <p>
-        <strong>{t("Examiner")}:</strong>{" "}
-        {exam.examiner && typeof exam.examiner === "object" ? `${exam.examiner.first_name} ${exam.examiner.last_name}` : t("Not Assigned")}
-      </p>
-
-      <p>
-        <strong>{t("Major")}:</strong> {exam.major && typeof exam.major === "object" ? exam.major.name : t("Not Assigned")}
-      </p>
-      <p>
-        <strong>{t("Institute")}:</strong> {exam.institute && typeof exam.institute === "object" ? exam.institute.name : t("Not Assigned")}
-      </p>
-      <p>
-        <strong>{t("Room")}:</strong> {exam.room && typeof exam.room === "object" ? exam.room.name : t("Not Assigned")}
-      </p>
-      <p>
-        <strong>{t("Mode")}:</strong> {exam.exam_mode && typeof exam.exam_mode === "object" ? exam.exam_mode.name : t("Not Assigned")}
-      </p>
-      <p>
-        <strong>{t("Status")}:</strong> {exam.status}
-      </p>
-
+    <div className="m-5" aria-labelledby="tutor-request-heading" role="form">
+      <h2 id="tutor-request-heading" className="text-2xl font-bold mb-4">{t("Exam Details")}</h2>
+      <dl>
+        <div>
+          <dt><strong>{t("Exam Title")}:</strong></dt>
+          <dd>{exam.title}</dd>
+        </div>
+        <div>
+          <dt><strong>{t("LVA Num")}:</strong></dt>
+          <dd>{exam.lva_num}</dd>
+        </div>
+        <div>
+          <dt><strong>{t("Date")}:</strong></dt>
+          <dd>{moment(exam.date).format("DD.MM.YYYY HH:mm")}</dd>
+        </div>
+        <div>
+          <dt><strong>{t("Duration")}:</strong></dt>
+          <dd>{exam.duration} {t("minutes")}</dd>
+        </div>
+        <div>
+          <dt><strong>{t("Student")}:</strong></dt>
+          <dd>{exam.student && typeof exam.student === "object" ? `${exam.student.first_name} ${exam.student.last_name}` : t("Not Assigned")}</dd>
+        </div>
+        <div>
+          <dt><strong>{t("Examiner")}:</strong></dt>
+          <dd>{exam.examiner && typeof exam.examiner === "object" ? `${exam.examiner.first_name} ${exam.examiner.last_name}` : t("Not Assigned")}</dd>
+        </div>
+        <div>
+          <dt><strong>{t("Major")}:</strong></dt>
+          <dd>{exam.major && typeof exam.major === "object" ? exam.major.name : t("Not Assigned")}</dd>
+        </div>
+        <div>
+          <dt><strong>{t("Institute")}:</strong></dt>
+          <dd>{exam.institute && typeof exam.institute === "object" ? exam.institute.name : t("Not Assigned")}</dd>
+        </div>
+        <div>
+          <dt><strong>{t("Room")}:</strong></dt>
+          <dd>{exam.room && typeof exam.room === "object" ? exam.room.name : t("Not Assigned")}</dd>
+        </div>
+        <div>
+          <dt><strong>{t("Mode")}:</strong></dt>
+          <dd>{exam.exam_mode && typeof exam.exam_mode === "object" ? exam.exam_mode.name : t("Not Assigned")}</dd>
+        </div>
+        <div>
+          <dt><strong>{t("Status")}:</strong></dt>
+          <dd>{exam.status}</dd>
+        </div>
+      </dl>
       {/* Request to Monitor Button */}
-      <button onClick={handleRequest} className="mt-4 border-2 border-blue-500 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+      <button
+        onClick={handleRequest}
+        className="mt-4 border-2 border-blue-500 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-label={t("Request to Monitor Exam")}
+      >
         {t("Request to Monitor")}
       </button>
     </div>

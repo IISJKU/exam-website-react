@@ -86,7 +86,7 @@ export default function DataAdministrationPage() {
     }, [config, navigate]);
   
     if (!config) {
-      return <div role="status" aria-live="polite">Loading...</div>; // Display loading state while redirecting
+      return <div role="status" aria-live="polite" aria-busy="true">Loading...</div>; // Display loading state while redirecting
     }
   
     // Ensure tableName is defined before manipulating strings

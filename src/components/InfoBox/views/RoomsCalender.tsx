@@ -6,6 +6,7 @@ import { showToast } from "../components/ToastMessage";
 import Exam from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
 import fetchAll from "./FetchAll";
+import { t } from "i18next";
 
 const localizer = momentLocalizer(moment);
 
@@ -35,7 +36,7 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
       const filteredExams = selectedRoomId ? data.filter((exam) => exam.room_id === selectedRoomId) : [];
       setExams(filteredExams);
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
+      showToast({ message: `Error fetching exams: ${error}.`, type: "error"});
     } finally {
       setLoading(false);
     }
@@ -54,6 +55,7 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
         title: exam.title,
         start,
         end,
+        resource: exam,
       };
     });
     setEvents(newEvents);
@@ -70,20 +72,50 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
   );
 
   if (loading) {
-    return <p aria-live="polite">Loading exams...</p>;
+    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>;
   }
 
   return (
-    <BigCalendar
-      defaultDate={defaultDate}
-      defaultView={Views.WEEK}
-      scrollToTime={scrollToTime}
-      localizer={localizer}
-      events={events}
-      startAccessor="start"
-      endAccessor="end"
-      onSelectEvent={handleSelectEvent}
-      style={{ height: 700 }}
-    />
+    <div role="region" aria-label="Rooms Calendar" tabIndex={-1} className="rooms-calendar">
+      <BigCalendar
+        defaultDate={defaultDate}
+        defaultView={Views.WEEK}
+        scrollToTime={scrollToTime}
+        localizer={localizer}
+        events={events}
+        startAccessor="start"
+        endAccessor="end"
+        onSelectEvent={handleSelectEvent}
+        style={{ height: 700 }}
+        components={{
+          event: ({ event }: { event: Event }) => (
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label={`Exam: ${event.title}, starts at ${moment(event.start).format(
+                "h:mm A"
+              )} and ends at ${moment(event.end).format("h:mm A")}`}
+              onClick={() => handleSelectEvent(event)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  handleSelectEvent(event);
+                }
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              {event.title}
+            </div>
+          ),
+        }}
+        messages={{
+          week: "Week View",
+          day: "Day View",
+          month: "Month View",
+          today: "Today",
+          previous: "Previous",
+          next: "Next",
+        }}
+      />
+    </div>
   );
 }

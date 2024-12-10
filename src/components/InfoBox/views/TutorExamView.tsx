@@ -4,6 +4,7 @@ import { showToast } from "../components/ToastMessage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
+import { t } from "i18next";
 
 export default function TutorExamView() {
   const navigate = useNavigate(); // Initialize navigate
@@ -76,11 +77,11 @@ export default function TutorExamView() {
         return updatedExam;
       });
 
-      setExams(updatedData); // Set the updated data to exams
+      setExams(updatedData);
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
     } finally {
-      setLoading(false); // Set loading to false when the fetch is complete
+      setLoading(false);
     }
   };
 
@@ -93,17 +94,19 @@ export default function TutorExamView() {
   };
 
   if (loading) {
-    return <p aria-live="polite">Loading exams...</p>; 
+    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>; 
   }
 
   return (
-    <ContentView
-      title={"Upcoming Monitored Exams"}
-      onRowClick={handleExamClick} // Pass the click handler for navigation
-      fields={fields}
-      keys={keys}
-      buttonName="Remove"
-      data={exams} 
-    />
+    <div role="region" aria-label="Tutor's Upcoming Monitored Exams" className="tutor-exam-view">
+      <ContentView
+        title={"Upcoming Monitored Exams"}
+        onRowClick={handleExamClick} // Pass the click handler for navigation
+        fields={fields}
+        keys={keys}
+        buttonName="Remove"
+        data={exams} 
+      />
+    </div>
   );
 }

@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout"; // Import the layout
 import Login from "./Pages/Login";
-import Register from "./Pages/Register";
 import Admin from "./Pages/Admin";
 import TableLinks from "./components/InfoBox/views/TableLinks";
 import ExamView from "./components/InfoBox/views/ExamView";
@@ -16,7 +15,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BigCalendar from "./components/InfoBox/views/BigCalendar";
 import IndividualNotification from "./components/InfoBox/views/IndividualNotification";
-
 import AuthProvider from "./hooks/AuthProvider";
 import NotificationView from "./components/InfoBox/views/NotificationView";
 import StudentLayout from "./components/StudentLayout";
@@ -35,17 +33,15 @@ import { useEffect } from "react";
 export default function App() {
   return (
     <Router>
-      <div className="App">
+      <div className="App" role="application" aria-label="Exam Management Application">
         {/* AuthProvider handles login*/}
         <AuthProvider>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Login />} />
-            <Route path="/register" element={<Register />} />
 
             {/* Protected Admin Routes (Inside Layout) */}
             <Route element={<AdminLayout />}>
-              {" "}
               {/* Layout keeps the side menu persistent */}
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/exams" element={<ExamView />} />
@@ -85,7 +81,7 @@ export default function App() {
           </Routes>
 
           {/* ToastContainer for notifications */}
-          <ToastContainer />
+          <ToastContainer role="alert" aria-live="assertive" aria-relevant="all"/>
         </AuthProvider>
       </div>
     </Router>

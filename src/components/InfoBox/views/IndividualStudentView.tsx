@@ -123,7 +123,7 @@ export default function IndividualStudent() {
   }));
 
   if (loading || !student) {
-    return <p aria-live="polite">Loading student data...</p>;
+    return <p aria-live="polite" aria-busy="true">Loading student data...</p>;
   }
 
   return (

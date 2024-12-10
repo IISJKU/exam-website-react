@@ -78,7 +78,7 @@ export default function BigCalendar() {
   );
 
   if (loading) {
-    return <p aria-live="polite">Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite" aria-busy="true">Loading exams...</p>; // Display loading indicator while fetching
   }
 
   return (

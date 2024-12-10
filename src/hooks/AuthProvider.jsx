@@ -1,5 +1,6 @@
 import { useContext, createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { showToast } from "../components/InfoBox/components/ToastMessage";
 
 const AuthContext = createContext();
 const url = "http://localhost:1337";
@@ -15,25 +16,26 @@ const AuthProvider = ({ children }) => {
 
   const userData = async (token2) => {
     if (token2) {
-      const response = await fetch(url + "/api/users/me?populate=*", {
-        headers: {
-          Authorization: `Bearer ${token2}`,
-        },
-      });
+      try {
+        const response = await fetch(url + "/api/users/me?populate=*", {
+          headers: {
+            Authorization: `Bearer ${token2}`,
+          },
+        });
 
-      if (!response.ok) throw new Error(response.message);
+        if (!response.ok) throw new Error(response.message);
 
-      const res = await response.json();
+        const res = await response.json();
 
-      //if (!res.ok) throw new Error(res.message);
-      console.log("res");
-      console.log(res);
-
-      return res;
+        return res;
+      } catch (error) {
+        showToast({ message: `Error fetching user data: ${error}.`, type: "error" });
+      }
     }
-  };
+  }
 
   const loginAction = async (data) => {
+    try {
     const response = await fetch(url + "/api/auth/local?populate=*", {
       method: "POST",
       headers: {
@@ -46,8 +48,7 @@ const AuthProvider = ({ children }) => {
     if (!response.ok) throw Error(response.message);
 
     const res = await response.json();
-    if (res) {
-      try {
+      if (res) {
         console.log(res);
         const userRes = await userData(res.jwt);
 
@@ -66,12 +67,9 @@ const AuthProvider = ({ children }) => {
           }
         }
         setToken(res.jwt);
-      } catch (error) {
-        throw new Error(res.message);
       }
-
-      console.log("----------------------------");
-      return;
+    } catch (error) {
+      showToast({ message: `Error fetching user data: ${error}.`, type: "error" });
     }
   };
 

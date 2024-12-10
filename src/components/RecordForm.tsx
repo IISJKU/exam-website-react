@@ -95,22 +95,27 @@ export default function RecordForm(props: RecordFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4">
+    <form onSubmit={handleSubmit} aria-labelledby="record-form-title" className="mt-4">
+
       {props.fields.map((field) => {
         const isRequired = !(props.optionalFields ?? []).includes(field);
+        const errorId = `${field}-error`;
 
         if (props.booleanFields?.includes(field)) {
           return (
             <div className="mb-4" key={field}>
-              <label className="block text-gray-700 capitalize">
+              <label id={`${field}-label`} htmlFor={field} className="block text-gray-700 capitalize">
                 {field.replace("_", " ")}:
               </label>
               <select
+                id={field}
                 name={field}
                 value={formData[field] !== undefined ? String(formData[field]) : ""}
                 onChange={handleChange}
                 className="border border-gray-300 p-2 w-full rounded-md"
                 required={isRequired}
+                aria-required={isRequired}
+                aria-labelledby={`${field}-label`}
               >
                 <option value="">Select {field}</option>
                 <option value="true">True</option>
@@ -122,20 +127,24 @@ export default function RecordForm(props: RecordFormProps) {
 
         return (
           <div className="mb-4" key={field}>
-            <label className="block text-gray-700 capitalize">
+            <label id={`${field}-label`} htmlFor={field} className="block text-gray-700 capitalize">
               {field.replace("_", " ")}:
             </label>
-            {field === "date" ? 
+            {field === "date" ? (
             <DateField editMode={true} dateValue={formData[field]} />
-            : <input
-              type={"text"}
-              name={field}
-              value={formData[field] || ""}
-              onChange={handleChange}
-              className="border border-gray-300 p-2 w-full rounded-md"
-              required={isRequired}
-              min="3"
-            /> }
+            ) : (
+              <input
+                type="text"
+                id={field}
+                name={field}
+                value={formData[field] || ""}
+                onChange={handleChange}
+                className="border border-gray-300 p-2 w-full rounded-md"
+                required={isRequired}
+                min="3"
+                aria-required={isRequired}
+                aria-describedby={isRequired ? errorId : undefined}
+            /> )}
           </div>
         );
       })}
@@ -145,7 +154,6 @@ export default function RecordForm(props: RecordFormProps) {
         .filter(field => !props.fields.includes(field.name))
         .map((field) => {
           const isRequired = !(props.optionalFields ?? []).includes(field.name);
-
           const containsRoleField = props.relationalFields?.some(
             (field) => field.name === "role"
           );
@@ -157,7 +165,7 @@ export default function RecordForm(props: RecordFormProps) {
 
           return (
             <div className="mb-4" key={field.name}>
-              <label className="block text-gray-700 capitalize">
+              <label id={`${field}-label`} htmlFor={field.name} className="block text-gray-700 capitalize">
                 {field.name.replace("_", " ")}:
               </label>
               <select
@@ -167,6 +175,8 @@ export default function RecordForm(props: RecordFormProps) {
                 className={`border border-gray-300 p-2 w-full rounded-md ${isDisabled ? "opacity-50" : ""}`}
                 disabled={isDisabled}
                 required={isRequired}
+                aria-required={isRequired}
+                aria-labelledby={`${field.name}-label`}
               >
                 <option value="">
                   Select {(field.name.charAt(0).toUpperCase() + field.name.slice(1)).replace("_", " ")}
@@ -185,6 +195,7 @@ export default function RecordForm(props: RecordFormProps) {
         <button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+          aria-label={props.record ? "Update record" : "Add record"}
         >
           {props.record ? "Update" : "Add"}
         </button>
@@ -192,6 +203,7 @@ export default function RecordForm(props: RecordFormProps) {
           type="button"
           onClick={handleCancel}
           className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
+          aria-label="Cancel form"
         >
           Cancel
         </button>

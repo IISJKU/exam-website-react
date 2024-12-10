@@ -5,7 +5,11 @@ import App from "./App";
 import "./i18n";
 import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+// Add accessible label to the root element
+const rootElement = document.getElementById("root") as HTMLElement;
+rootElement.setAttribute("aria-label", "Application Root");
+
+const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <App />

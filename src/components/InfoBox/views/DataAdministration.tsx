@@ -214,7 +214,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
       <h1 id="data-admin-title" className="text-2xl font-bold mb-4 capitalize" tabIndex={0} role="heading">Data Administration - {props.tableName.replace("-", " ")}</h1>
 
       {isLoading ? (
-        <p aria-live="polite">Loading...</p>
+        <p aria-live="polite" aria-busy="true">Loading...</p>
       ) : (
         <div className="h-80 overflow-y-auto mb-4">
           <table className="table-auto w-full bg-white shadow-md rounded-lg" role="table">
@@ -278,7 +278,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
         </div>
       )}
 
-      <h2 className="text-xl font-bold mt-4" tabIndex={0} role="heading">{editingRecord ? "Edit Record" : "Add New Record"}</h2>
+      <h2 id="record-form-title" className="text-xl font-bold mt-4" tabIndex={0} role="heading">{editingRecord ? "Edit Record" : "Add Record"}</h2>
       <div className="h-96 overflow-y-auto">
         <RecordForm
           record={editingRecord}

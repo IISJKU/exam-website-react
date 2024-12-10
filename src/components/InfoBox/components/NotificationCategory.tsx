@@ -75,5 +75,5 @@ export default function NotificationCategory(props: NotificationCategoryProps) {
         </ul>
       </div>
     );
-  else return <div aria-live="polite">{props.text} - No notifications available.</div>;
+  else return <div aria-live="polite" aria-busy="true">{props.text} - No notifications available.</div>;
 }

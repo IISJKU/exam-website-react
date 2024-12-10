@@ -4,6 +4,7 @@ import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
+import { t } from "i18next";
 
 export default function StudentView() {
   const navigate = useNavigate(); // Initialize navigate for navigation
@@ -30,6 +31,7 @@ export default function StudentView() {
       
       if (!response.ok) {
         showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+        return;
        }
       // Map and modify data to extract the 'major' name
       const updatedData = data.map((student: any) => ({
@@ -54,16 +56,18 @@ export default function StudentView() {
   };
 
   if (loading) {
-    return <p aria-live="polite">Loading students...</p>; // Display loading state while fetching data
+    return <p aria-live="polite" aria-busy="true">{t("Loading students...")}</p>; // Display loading state while fetching data
   }
 
   return (
-    <ContentView
-      title={"Students"}
-      onRowClick={handleStudentClick} // Pass the row click handler for student navigation
-      fields={fields}
-      keys={keys}
-      data={studentData} // Pass the student data to ContentView
-    />
+    <div role="region" aria-label="Student List" className="student-view">
+      <ContentView
+        title={t("Students")}
+        onRowClick={handleStudentClick}
+        fields={fields}
+        keys={keys}
+        data={studentData} 
+      />
+    </div>
   );
 }

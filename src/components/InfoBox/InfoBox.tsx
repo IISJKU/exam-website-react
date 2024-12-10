@@ -15,14 +15,23 @@ export enum InfoBoxView {
 
 export default function InfoBox({ selectedDate }: { selectedDate?: Date }) {
 
-  // Switch statement would be replaced with routes, but for example:
   return (
-    <>
-      {/* These would normally be routes */}
+    <div role="region" aria-label="Main Information Box">
+    {/* Exam View Section */}
+    <section aria-label="Exam View" className="info-box-section">
       <ExamView />
-      <StudentView  />
-      <TutorView  />
-      {/* ... other views */}
-    </>
+    </section>
+
+    {/* Student View Section */}
+    <section aria-label="Student View" className="info-box-section">
+      <StudentView />
+    </section>
+
+    {/* Tutor View Section */}
+    <section aria-label="Tutor View" className="info-box-section">
+      <TutorView />
+    </section>
+
+  </div>
   );
 }
