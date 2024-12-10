@@ -14,7 +14,7 @@ export default function TutorMenu() {
       <NotificationButton path="tutor/notifications" />
       <button
         onClick={() => navigate("tutor/exams")}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "tutor/exams" ? "page" : undefined}
         aria-label={t("Go to Exam Overview")}
       >
@@ -22,7 +22,7 @@ export default function TutorMenu() {
       </button>
       <button
         onClick={() => navigate("tutor/upcoming-exams")}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "tutor/upcoming-exams" ? "page" : undefined}
         aria-label={t("Go to Upcoming Monitored Exams")}
       >
@@ -30,7 +30,7 @@ export default function TutorMenu() {
       </button>
       <button
         onClick={() => navigate("tutor/exams/without-tutor")}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "tutor/exams/without-tutor" ? "page" : undefined}
         aria-label={t("Go to Request Exam Monitoring")}
       >

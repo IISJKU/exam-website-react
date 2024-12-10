@@ -108,7 +108,7 @@ export default function StudentCalender() {
 
   return (
     <div className="w-full aspect-square select-none" role="region" aria-label={t("Student Calendar")}>
-      <div className="bg-slate-100 border-2 border-black p-1 aspect-square">
+      <div className="bg-slate-100 border-2 border-grey p-1 aspect-square">
         <div className="bg-slate-300 w-full flex justify-center content-stretch my-1 text-sm">
           <button className="basis-1/5 text-left hover:underline" onClick={() => switchMonth(-1)} aria-label={t("Go to previous month")}>
             &lt; {t("Prev")}

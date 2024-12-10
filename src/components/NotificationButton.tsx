@@ -75,7 +75,7 @@ export default function NotificationButton(props: NButtonProps) {
       onClick={() => {
         navigate(props.path);
       }}
-      className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline relative inline-block align-center"
+      className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline relative inline-block align-center"
       tabIndex={0}
       role="button"
       aria-label={`Notifications button, ${unreadNotifications} unread notifications`}

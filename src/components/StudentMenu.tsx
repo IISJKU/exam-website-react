@@ -14,7 +14,7 @@ export default function StudentMenu() {
       {/* Exams Overview Button */}
       <button
         onClick={() => navigate("student/all-exams")}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "student/all-exams" ? "page" : undefined}
         aria-label={t("Go to Exam Overview")}      
       >
@@ -22,7 +22,7 @@ export default function StudentMenu() {
       </button>
       <button
         onClick={() => navigate("student/request-exam")}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "student/request-exam" ? "page" : undefined}
         aria-label={t("Go to Request New Exam")} 
       >

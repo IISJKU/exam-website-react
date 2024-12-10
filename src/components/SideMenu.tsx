@@ -14,7 +14,7 @@ export default function SideMenu() {
       {/* Exams Overview Button */}
       <button
         onClick={() => navigate("admin/exams")}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "/admin/exams" ? "page" : undefined}
         aria-label={t("Go to Exam Overview")}
       >
@@ -24,7 +24,7 @@ export default function SideMenu() {
       {/* Students Button */}
       <button
         onClick={() => navigate("admin/students")}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "/admin/students" ? "page" : undefined}
         aria-label={t("Go to Students Management")}
       >
@@ -34,7 +34,7 @@ export default function SideMenu() {
       {/* Tutors Button */}
       <button
         onClick={() => navigate("admin/tutors")}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "/admin/tutors" ? "page" : undefined}
         aria-label={t("Go to Tutors Management")}
       >
@@ -44,7 +44,7 @@ export default function SideMenu() {
       {/* Data Administration Button */}
       <button
         onClick={() => navigate("admin/data-administration")}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "/admin/data-administration" ? "page" : undefined}
         aria-label={t("Go to Data Administration")}
       >
@@ -52,7 +52,7 @@ export default function SideMenu() {
       </button>
       <button
         onClick={() => navigate("admin/room-management")}
-        className="w-full text-left border-2 bg-white active:bg-slate-600 border-black my-1 p-1 hover:bg-slate-400 hover:underline"
+        className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "/admin/room-management" ? "page" : undefined}
         aria-label={t("Go to Room Management")}
       >

@@ -76,7 +76,7 @@ export default function SortableHeaders<T extends { id?: number }>(props: SHProp
   }
 
   return (
-    <tr className="select-none border-2 border-black">
+    <tr className="select-none border-2 border-grey ">
       {props.fields.map((field, index) => (
         <Sorter
           key={index}
