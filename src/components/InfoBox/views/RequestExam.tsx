@@ -317,10 +317,10 @@ export default function RequestExam() {
 
       <EditField title={t("Status")} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus("Pending")} aria-label={t("Add Exam Status")} aria-required="true"/>
 
-      <button type="submit" className="border-2 border-black p-1 hover:bg-slate-400 hover:underline" aria-label={t("Submit Request")}>
+      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700" aria-label={t("Submit Request")}>
         {t("Submit")}
       </button>
-      <button onClick={handleCancel} className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline" aria-label={t("Cancel Request")}>
+      <button onClick={handleCancel} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700" aria-label={t("Cancel Request")}>
         {t("Cancel")}
       </button>
     </form>

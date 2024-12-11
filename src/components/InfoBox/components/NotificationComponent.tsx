@@ -193,7 +193,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                   tabIndex={0}
                   aria-label="Edit notification details"
                 >
-                Edit
+                {t("Edit")}
               </a>
             )}
           </div>

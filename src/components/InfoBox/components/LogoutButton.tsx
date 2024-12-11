@@ -29,7 +29,7 @@ export default function LogoutButton() {
   return (
     <div>
       <button
-        className="mx-6 my-4 px-2 text-2xl border border-slate-900 hover:underline"
+        className="mx-6 my-4 px-2 text-2xl border-slate-900 underline"
         id="logout"
         onClick={() => setShowDialog(true)}
         aria-haspopup="dialog" 

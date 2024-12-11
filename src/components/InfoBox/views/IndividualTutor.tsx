@@ -105,25 +105,25 @@ export default function IndividualTutor() {
       <EditField title="Course" editMode={editMode} text={course} hideTitle={false} onChange={(e) => setCourse(e.target.value)} aria-label={t("Edit tutor's course")}/>
       <div className="mt-4 flex gap-4">
         <button onClick={() => navigate(-1)}
-          className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
+          className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
           aria-label="Go back to the previous page">{t("Back")}</button>
         <button
           onClick={() => {
             setEditMode(!editMode);
             if (editMode) handleUpdate();
           }}
-          className="border-2 border-black p-1 hover:bg-slate-400 hover:underline"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
           aria-label={editMode ? "Save changes" : "Enable edit mode"}
         >
-          {editMode ? "Save" : "Edit"}
+          {editMode ? t("Save") : t("Edit")}
         </button>
         {editMode && (
           <button
-            className="border-2 border-red-500 p-1 hover:bg-red-400 hover:underline"
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
             onClick={() => setEditMode(false)}
             aria-label="Cancel editing"
           >
-            Cancel
+            {t("Cancel")}
           </button>
         )}
       </div>

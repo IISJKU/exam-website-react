@@ -123,8 +123,19 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
           console.log(filteredOptions);
         } else handleAddNewRecord(); // Add a new record if no option is selected
       } else setIsDropdownOpen(true);
-    } else {
-      //setIsDropdownOpen(true);
+    } else if (e.key === "Tab") {
+      if (e.shiftKey) {
+        // If Shift + Tab is pressed, close dropdown if focus moves to the input
+        if (document.activeElement === inputFieldRef.current) {
+          setIsDropdownOpen(false);
+        }
+      } else {
+        // Close the dropdown when focus moves past the last option
+        const lastItem = document.querySelector(`#dropdown-list li:last-child`) as HTMLElement;
+        if (document.activeElement === lastItem) {
+          setIsDropdownOpen(false);
+        }
+      }
     }
   };
 

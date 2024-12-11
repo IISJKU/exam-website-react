@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DateField from "./InfoBox/components/DateField";
+import { t } from "i18next";
 
 interface RecordFormProps {
   record: DataRecord | null;
@@ -194,18 +195,18 @@ export default function RecordForm(props: RecordFormProps) {
       <div className="flex justify-between">
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
           aria-label={props.record ? "Update record" : "Add record"}
         >
-          {props.record ? "Update" : "Add"}
+          {props.record ? t("Update") : t("Add")}
         </button>
         <button
           type="button"
           onClick={handleCancel}
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
-          aria-label="Cancel form"
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
+          aria-label={t("Cancel form")}
         >
-          Cancel
+          {t("Cancel")}
         </button>
       </div>
     </form>

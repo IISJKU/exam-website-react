@@ -514,7 +514,7 @@ export default function ExamEditor() {
 
         <button
           onClick={() => navigate(-1)}
-          className="border-2 border-black p-1 hover:bg-slate-400 focus:ring-2 focus:ring-blue-500"
+            className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
           aria-label={t("Back to previous page")}
         >
           {("Back")}
@@ -524,14 +524,14 @@ export default function ExamEditor() {
             setEditMode(!editMode);
             if (editMode) handleUpdate();
           }}
-          className="border-2 border-black p-1 hover:bg-slate-400 focus:ring-2 focus:ring-blue-500"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
           aria-label={editMode ? t("Save changes") : t("Edit exam")}
         >
           {editMode ? t("Save") : t("Edit")}
         </button>
         {editMode && (
           <button
-            className="ml-2 border-2 border-black p-1 hover:bg-red-400 focus:ring-2 focus:ring-red-500"
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
             onClick={() => {
               setEditMode(false);
             }}
@@ -620,7 +620,7 @@ export default function ExamEditor() {
         <div className="mt-4 flex space-x-2">
           <button
             onClick={() => navigate(-1)}
-            className="border-2 border-black p-1 hover:bg-slate-400 focus:ring-2 focus:ring-blue-500"
+            className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
             aria-label={t("Back to previous page")}
           >
             {t("Back")}
@@ -630,14 +630,14 @@ export default function ExamEditor() {
             setEditMode(!editMode);
             if (editMode) handleUpdate();
           }}
-          className="border-2 border-black p-1 hover:bg-slate-400 focus:ring-2 focus:ring-blue-500"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
           aria-label={editMode ? t("Save changes") : t("Edit exam")}
         >
           {editMode ? t("Save") : t("Edit")}
         </button>
         {editMode && (
           <button
-          className="border-2 border-black p-1 hover:bg-red-400 focus:ring-2 focus:ring-red-500"
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
           onClick={() => {
               setEditMode(!editMode);
           }}
