@@ -35,7 +35,7 @@ export default function NotificationButton(props: NButtonProps) {
 
         e.seenBy = element.seenBy;
         e.type = element.type;
-        if (element.seenBy == null) console.log(element);
+        //if (element.seenBy == null) console.log(element);
 
         if ((e.seenBy == undefined || !e.seenBy.includes(user.user) || !e.sentBy == user.user) && e.sentBy != user.user) {
           t.push(e);
