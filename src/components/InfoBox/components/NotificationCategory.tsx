@@ -49,7 +49,7 @@ export default function NotificationCategory(props: NotificationCategoryProps) {
 
   if (props.notifications.length != 0)
     return (
-      <div>
+      <div tabIndex={0}>
         <h2 className="text-4xl p-3 pl-0" id="notification-category-title" key={props.text}>
           {props.text}
         </h2>
@@ -57,13 +57,13 @@ export default function NotificationCategory(props: NotificationCategoryProps) {
           {props.notifications.map((elem, index) => (
             <>
               {index === 0 || moment(elem.createdAt).format("MMMM") !== moment(props.notifications[index - 1]?.createdAt).format("MMMM") ? (
-                <div className="p-1 text-xl" role="heading" aria-level={2}>
+                <div className="p-1 text-xl" role="heading" aria-level={2} tabIndex={0}>
                   {" "}
                   {moment(elem.createdAt).format("MMMM YYYY")}{" "}
                 </div>
               ) : null}
               {index === 0 || moment(elem.createdAt).format("YYYY-MM-DD") !== moment(props.notifications[index - 1]?.createdAt).format("YYYY-MM-DD") ? (
-                <div className="p-0.5 text-xl font-bold" role="heading" aria-level={3}>
+                <div className="p-0.5 text-xl font-bold" role="heading" aria-level={3} tabIndex={0}>
                   {moment(elem.createdAt).format("DD.MM.YY")}
                 </div>
               ) : null}

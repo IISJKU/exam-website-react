@@ -293,7 +293,7 @@ export default function NotificationView() {
   return (
     <div className="w-full h-full p-5 select-none" role="main" aria-labelledby="notifications-heading">
       <div className="flex w-full content-center items-center ">
-        <h2 id="notifications-heading" className="text-4xl w-1/3 my-2 ">
+        <h2 id="notifications-heading" className="text-4xl w-1/3 my-2 " tabIndex={0}>
           {t("Notifications")}
         </h2>
         {/*<SearchBar items={props.data} filter={setFilteredData} /> */}

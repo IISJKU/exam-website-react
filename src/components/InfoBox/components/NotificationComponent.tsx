@@ -160,18 +160,39 @@ export default function NotificationComponent(props: NotificationComponentProps)
       key={props.id}
       className={color == "" ? "even:bg-slate-200 odd:bg-slate-100 cursor-pointer border border-white hover:border-black " : color.toString()}
       onClick={() => toggleInfoPannel()}
+      role="button"
+      aria-expanded={infoOpen}
+      aria-label={`Notification from ${getName()}, click to ${infoOpen ? "collapse" : "expand"} details`}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          toggleInfoPannel();
+        }
+      }}
     >
-      <div className="relative">
-        <p className="inline-block w-60 font-bold">{moment(notifications[0].createdAt).format("DD.MM.YYYY HH:mm") + ""}</p>
+      <div className="relative" tabIndex={0}>
+        <p className="inline-block w-60 font-bold" >{moment(notifications[0].createdAt).format("DD.MM.YYYY HH:mm") + ""}</p>
         {props.notification[0].type == NotificationType.createExam ? (
           <div className="inline-block " id={"notification" + props.id.toString() + "_div"}>
             {getName()} proposed a new Exam
             {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) ||
             auth.role == "Tutor" ||
-            auth.role == "Student" ? (
-              <></>
-            ) : (
-              <a className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>
+            auth.role == "Student" ? null : (
+                <a
+                  className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent parent toggle
+                    handleClick(props.id);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.stopPropagation();
+                      handleClick(props.id);
+                    }
+                  }}
+                  role="button" 
+                  tabIndex={0}
+                  aria-label="Edit notification details"
+                >
                 Edit
               </a>
             )}
@@ -180,33 +201,46 @@ export default function NotificationComponent(props: NotificationComponentProps)
           <div className="inline-block w-max">
             {props.exam.title != undefined
               ? notifications[0].type == NotificationType.tutorConfirm
-                ? getName() + " will monitor " + props.exam.title
+                ? `${getName()} will monitor ${props.exam.title}`
                 : notifications[0].type == NotificationType.tutorDecline
-                ? getName() + " will no longer monitor " + props.exam.title
-                : props.exam.title + " was edited by " + getName()
-              : "Exam was declined by " + getName()}
+                ? `${getName()} will no longer monitor ${props.exam.title}`
+                : `${props.exam.title} was edited by ${getName()}`
+              : `Exam was declined by ${getName()}`}
             {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) ||
             auth.role == "Tutor" ||
-            auth.role == "Student" ? (
-              <></>
-            ) : (
-              <a className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10" onClick={() => handleClick(props.id)}>
+            auth.role == "Student" ? null : (
+                  <a
+                    className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent parent toggle
+                      handleClick(props.id);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.stopPropagation();
+                        handleClick(props.id);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Edit notification details"
+                  >
                 Edit
               </a>
             )}
           </div>
         )}
-        {infoOpen ? (
+        {infoOpen && (
           <div className="">
             {notifications.map((notification: Notification, index) => (
-              <div className="cursor-default" key={"divcontainer_" + notification.id}>
-                <ul className="p-4">
+              <div className="cursor-default" key={`divcontainer_${notification.id}`}>
+                <ul className="p-4" tabIndex={0}>
                   {notification.type == NotificationType.proposeChange ||
                   notification.type == NotificationType.adminChange ||
                   notification.type == NotificationType.createExamOld ||
                   notification.type == NotificationType.createExam ? (
-                    <div className={("pl-" + tabs[index]).toString()}>
-                      At {moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm") ?? ""} {notification.sentBy}{" "}
+                    <div className={`pl-${tabs[index]}`}>
+                      At{" "}{moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm")}{" "}{notification.sentBy}{" "}
                       {notification.type == NotificationType.adminChange
                         ? "changed"
                         : notification.type == NotificationType.createExamOld
@@ -214,7 +248,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                         : "proposed a change"}
                       :
                       {Object.keys(JSON.parse(notification.information)).map((elem: string) => (
-                        <li className="bg-white border border-black p-1" key={"entry2_" + notification.id}>
+                        <li className="bg-white border border-grey p-1" key={`entry2_${notification.id}`}>
                           {notification.type == NotificationType.createExam || notification.type == NotificationType.createExamOld
                             ? getTitle(JSON.parse(notification.information)[elem], elem) + ": " + getElem(JSON.parse(notification.information)[elem], elem)
                             : getElem(JSON.parse(notification.oldInformation)[elem], elem) + " -> " + getElem(JSON.parse(notification.information)[elem], elem)}
@@ -223,23 +257,25 @@ export default function NotificationComponent(props: NotificationComponentProps)
                     </div>
                   ) : notification.type == NotificationType.tutorConfirm || notification.type == NotificationType.tutorDecline ? (
                     <div
+                      tabIndex={0}
                       className={(
                         "border border-black p-2 " +
                         (notification.type == NotificationType.tutorConfirm ? "bg-teal-300 " : "bg-red-400 border-dotted ") +
                         "font-bold"
                       ).toString()}
                     >
-                      Tutor {notification.sentBy} {notification.type == NotificationType.tutorConfirm ? "registered to " : "canceled to "} monitor the exam.
+                        Tutor {notification.sentBy}{" "}{notification.type === NotificationType.tutorConfirm ? "registered to monitor the exam." : "canceled to monitor the exam."}
                     </div>
                   ) : (
                     <div
+                      tabIndex={0}
                       className={(
                         "border border-black p-2 " +
                         (notification.type == NotificationType.confirmChange ? "bg-lime-200 " : "bg-red-400 border-dotted ") +
                         "font-bold"
                       ).toString()}
                     >
-                      {notification.sentBy} {notification.type == NotificationType.confirmChange ? "approved" : "declined"} the changes.
+                      {notification.sentBy}{" "}{notification.type === NotificationType.confirmChange ? "approved the changes.": "declined the changes."}
                       {notification.oldInformation != "" &&
                         Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) => (
                           <li
@@ -257,8 +293,6 @@ export default function NotificationComponent(props: NotificationComponentProps)
               </div>
             ))}
           </div>
-        ) : (
-          <></>
         )}
       </div>
     </li>

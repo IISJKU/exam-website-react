@@ -519,20 +519,28 @@ export default function IndividualNotification() {
       </section>
       <div className="mt-4 flex gap-4">
         <button
-          onClick={() => {
-            handleUpdate(true);
-          }}
+          onClick={() => handleUpdate(true)}
           className="border-2 border-black p-2 rounded hover:bg-slate-400"
           aria-label={t("Accept proposed changes")}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              handleUpdate(true);
+            }
+          }}
         >
           {t("Accept")}
         </button>
         <button
-          onClick={() => {
-            handleUpdate(false);
-          }}
+          onClick={() => handleUpdate(false)}
           className="border-2 border-black p-2 rounded hover:bg-slate-400"
           aria-label={t("Discard proposed changes")}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              handleUpdate(false);
+            }
+          }}
         >
           {t("Discard")}
         </button>
