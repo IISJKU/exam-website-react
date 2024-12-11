@@ -26,6 +26,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
   const [filteredOptions, setFilteredOptions] = useState<DropdownOption[]>([]); // For filtered options
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false); // Track if dropdown is open
   const dropdownRef = useRef<HTMLDivElement>(null); // Create a ref for the dropdown container
+  const inputFieldRef = useRef<HTMLInputElement>(null);
 
   // Handle clicks outside the dropdown to close it
   useEffect(() => {
@@ -51,11 +52,12 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
   }, [searchTerm, props.options]);
 
   const handleSelectOption = (optionValue: string | number) => {
-    console.log(optionValue);
     props.onChange(optionValue); // Call onChange function passed from the parent component
     if (typeof optionValue == "string") optionValue = JSON.parse(optionValue).searchTerm;
     setIsDropdownOpen(false); // Close dropdown after selection
     if (typeof optionValue == "number") setSearchTerm(""); // Clear search term after selection
+
+    console.log(optionValue);
   };
 
   function newRecord() {
@@ -115,11 +117,14 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      if (isDropdownOpen && filteredOptions.length > 0) {
-        handleSelectOption(filteredOptions[0].value); // Select the first filtered option
-      } else {
-        handleAddNewRecord(); // Add a new record if no option is selected
-      }
+      if (isDropdownOpen) {
+        if (filteredOptions.length > 0) {
+          //handleSelectOption(filteredOptions[0].value); // Select the first filtered option}
+          console.log(filteredOptions);
+        } else handleAddNewRecord(); // Add a new record if no option is selected
+      } else setIsDropdownOpen(true);
+    } else {
+      //setIsDropdownOpen(true);
     }
   };
 
@@ -145,16 +150,17 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
           <input
             id="dropdown-input"
             type="text"
+            ref={inputFieldRef}
             tabIndex={0}
             placeholder={selectedOptionLabel || props.placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className={`mb-2 border border-gray-300 p-2 w-80 rounded-md px-1 placeholder-black ${
-                searchTerm === "" && props.value ? "text-black" : "text-black"
-                }`}
+              searchTerm === "" && props.value ? "text-black" : "text-black"
+            }`}
             aria-autocomplete="list"
-            aria-controls="dropdown-list" 
+            aria-controls="dropdown-list"
             aria-activedescendant={isDropdownOpen && filteredOptions.length > 0 ? `option-${filteredOptions[0].value}` : undefined}
             aria-disabled={props.disabled || false}
             required={props.required} 
@@ -199,5 +205,5 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
         </div>
       )}
     </div>
-  );  
+  );
 }

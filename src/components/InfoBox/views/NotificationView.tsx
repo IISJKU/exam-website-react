@@ -38,10 +38,6 @@ export default function NotificationView() {
   let tutRoute = "http://localhost:1337/api/tutors";
   let studentRoute = "http://localhost:1337/api/students";
 
-  console.log("?????");
-  console.log(user.role);
-  console.log(user.token);
-
   if (user.role == "Student") {
     notificationRoute = `http://localhost:1337/api/notifications/me`;
     examRoute = `http://localhost:1337/api/exams/me`;
