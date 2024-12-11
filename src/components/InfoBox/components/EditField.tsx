@@ -7,6 +7,7 @@ interface EditFieldProps {
   title?: string;
   hideTitle?: boolean;
   onChange?: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  required?: boolean;
 }
 
 export default function EditField(props: EditFieldProps) {
@@ -44,7 +45,9 @@ export default function EditField(props: EditFieldProps) {
   return (
     <div className={classList} tabIndex={0}>
       {props.title && (props.editMode || !hide) && (
-        <label htmlFor={`edit-field-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{t(props.title) + " "}</label>
+        <label htmlFor={`edit-field-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{t(props.title) + " "}
+          {props.required && <span className="text-red-500">{" "}*</span>}
+        </label>
       )}
       <div className="relative mt-1">
       {props.editMode ? (
@@ -57,6 +60,7 @@ export default function EditField(props: EditFieldProps) {
             cols={40} 
             value={value}
             aria-label={props.title}
+            required={props.required} 
           />
         ) : (
           <input
@@ -64,8 +68,9 @@ export default function EditField(props: EditFieldProps) {
             onChange={handleChange}
             className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
             type="text"
-              value={value}
-              aria-label={props.title}
+            value={value}
+            aria-label={props.title}
+            required={props.required} 
             />
         )
       ) : (

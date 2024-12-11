@@ -7,6 +7,7 @@ interface DateFieldProps {
   dateValue: string; // The full ISO date-time string
   onDateChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onTimeChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
 }
 
 export default function DateField(props: DateFieldProps) {
@@ -16,7 +17,9 @@ export default function DateField(props: DateFieldProps) {
 
   return (
     <div role="group" aria-labelledby={props.title ? `datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}` : undefined} tabIndex={0}>
-      {props.title ? <label id={`datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{props.title + " "}</label> : null}
+      {props.title ? <label id={`datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{props.title + " "}
+        {props.required && <span className="text-red-500">{" "}*</span>}  
+      </label> : null}
       {props.editMode ? (
         <div>
           {/* Date Input */}
@@ -31,13 +34,14 @@ export default function DateField(props: DateFieldProps) {
             className="border border-gray-300 p-2 w-48 rounded-md"
             aria-required="true"
             aria-label="Enter date"
+            required={props.required} 
           />
           {/* Time Input */}
           <label htmlFor="time-input" className="sr-only">
             Enter time
           </label>
           <input id="time-input" type="time" value={formattedTime} onChange={props.onTimeChange} className="border border-gray-300 p-2 w-32 rounded-md ml-1" aria-required="true"
-            aria-label="Enter time" />
+            aria-label="Enter time" required={props.required}/>
         </div>
       ) : (
         <div>

@@ -26,7 +26,6 @@ interface InitialState {
   examiner?: number | string;
   institute?: number | string;
   mode?: number;
-  room?: number;
   status: string;
 }
 
@@ -47,10 +46,7 @@ export default function RequestExam() {
   const [examiner, setExaminer] = useState<number | string | undefined>();
   const [institute, setInstitute] = useState<number | string | undefined>();
   const [mode, setMode] = useState<number | undefined>();
-  const [room, setRoom] = useState<number | undefined>();
   const [status, setStatus] = useState<string>("Pending");
-
-  const [error, setErrorText] = useState<string | null>(null);
 
   // Define initial state with the correct type
   const [initialState, setInitialState] = useState<InitialState>({
@@ -63,7 +59,6 @@ export default function RequestExam() {
     examiner: undefined,
     institute: undefined,
     mode: undefined,
-    room: undefined,
     status: "Pending",
   });
 
@@ -71,27 +66,24 @@ export default function RequestExam() {
     examiners: [] as Examiner[],
     institutes: [] as Institute[],
     modes: [] as ExamMode[],
-    rooms: [] as Room[],
   });
 
   useEffect(() => {
     const fetchDropdownOptions = async () => {
       try {
-        const [examinersRes, studentRes, institutesRes, modesRes, roomsRes] = await Promise.all([
+        const [examinersRes, studentRes, institutesRes, modesRes] = await Promise.all([
           fetch("http://localhost:1337/api/examiners", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/institutes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } })
             .then((res) => res.json())
-            .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)),
         ]);
 
         setOptions({
           examiners: examinersRes ?? [],
           institutes: institutesRes ?? [],
           modes: modesRes ?? [],
-          rooms: roomsRes ?? [],
         });
 
         setStudent(studentRes[0].id);
@@ -106,7 +98,6 @@ export default function RequestExam() {
           examiner,
           institute,
           mode,
-          room,
           status,
         });
       } catch (error) {
@@ -143,7 +134,6 @@ export default function RequestExam() {
     t = t + ' "status" : "' + status + '",';
 
     t = t + ' "student_id" : "' + student + '",';
-    t = t + ' "room_id" : "' + room + '",';
     t = t + ' "examiner_id" : "' + examiner + '",';
     t = t + ' "institute_id" : "' + institute + '",';
     t = t + ' "exam_mode" : "' + mode + '",';
@@ -157,12 +147,30 @@ export default function RequestExam() {
   }
 
   const handleSubmit = async () => {
-    if (!title || !date || !duration || !examiner || !institute || !mode || !room) {
-      setErrorText(t("Please fill in all of the fields"));
+    // Mapping of fields to their labels
+    const fieldMapping = {
+      title: t("Exam Title"),
+      lva_num: t("LVA Number"),
+      date: t("Date/Time"),
+      duration: t("Duration"),
+      examiner: t("Examiner"),
+      institute: t("Institute"),
+      mode: t("Mode"),
+    };
+
+    // Find missing fields
+    const missingFields = Object.entries(fieldMapping)
+      .filter(([field]) => !eval(field)) // Dynamically check if the field is missing
+      .map(([, label]) => label); // Get the user-friendly label
+
+    if (missingFields.length > 0) {
+      showToast({
+        message: `${t("Please fill in the following fields")}: ${missingFields.join(", ")}`,
+        type: "error",
+      });
       return;
     }
 
-    setErrorText(null); // Clear error
     const data: Partial<Exam> = {
       title: title,
       date: date,
@@ -172,7 +180,6 @@ export default function RequestExam() {
       examiner: undefined,
       institute_id: 0,
       exam_mode: mode,
-      room_id: room,
       lva_num,
       status,
     };
@@ -244,7 +251,6 @@ export default function RequestExam() {
     setExaminer(initialState.examiner);
     setInstitute(initialState.institute);
     setMode(initialState.mode);
-    setRoom(initialState.room);
     setStatus(initialState.status);
 
     navigate("/student/all-exams");
@@ -259,21 +265,13 @@ export default function RequestExam() {
   if (loading) return <p aria-live="polite" aria-busy="true">{t("Loading exam data...")}</p>;
 
   return (
-    <div className="m-5" aria-labelledby="request-exam-heading" role="form">
+    <form onSubmit={handleSubmit} className="m-5" aria-labelledby="request-exam-heading" role="form">
       <h1 id="request-exam-heading" className="text-2xl font-bold mb-4">{t("Request an Exam")}</h1>
-      {error && (
-        <div
-          role="alert"
-          aria-live="assertive"
-          className="text-red-800 text-xl mb-4"
-        >
-          {error}
-        </div>
-      )}
-      <EditField title={t("Exam Title")} editMode={editMode} text={title} onChange={(e) => setTitle(e.target.value)} aria-label={t("Add Exam Title")} aria-required="true"/>
-      <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} onChange={(e) => setLvaNum(Number(e.target.value))} aria-label={t("Add Exam LVA Num")} aria-required="true" />
-      <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} aria-label={t("Add Exam Date and Time")} aria-required="true" />
-      <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} onChange={(e) => setDuration(Number(e.target.value))} aria-label={t("Add Exam Duration in minutes")} aria-required="true"/>
+      <EditField title={t("Exam Title")} editMode={editMode} text={title} onChange={(e) => setTitle(e.target.value)} aria-label={t("Add Exam Title")} required={true} aria-required="true"/>
+      <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} onChange={(e) => setLvaNum(Number(e.target.value))} aria-label={t("Add Exam LVA Num")} required={true} aria-required="true" />
+      <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} aria-label={t("Add Exam Date and Time")} required={true} aria-required="true" />
+      <div className="m-2"></div>
+      <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} onChange={(e) => setDuration(Number(e.target.value))} aria-label={t("Add Exam Duration in minutes")} required={true} aria-required="true" />
 
       <DropdownWithSearch
         tableName="examiners"
@@ -287,6 +285,7 @@ export default function RequestExam() {
         disabled={!editMode}
         submit={submit}
         aria-label={t("Add Exam Examiner")}
+        required={true}
         aria-required="true"
       />
       <DropdownWithSearch
@@ -299,6 +298,7 @@ export default function RequestExam() {
         disabled={!editMode}
         submit={submit}
         aria-label={t("Add Exam Institute")}
+        required={true}
         aria-required="true"
       />
       <DropdownWithSearch
@@ -311,18 +311,18 @@ export default function RequestExam() {
         disabled={!editMode}
         submit={submit}
         aria-label={t("Add Exam Mode")}
+        required={true}
         aria-required="true"
       />
 
       <EditField title={t("Status")} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus("Pending")} aria-label={t("Add Exam Status")} aria-required="true"/>
 
-      <button onClick={handleSubmit} className="border-2 border-black p-1 hover:bg-slate-400 hover:underline" aria-label={t("Submit Request")}>
+      <button type="submit" className="border-2 border-black p-1 hover:bg-slate-400 hover:underline" aria-label={t("Submit Request")}>
         {t("Submit")}
       </button>
       <button onClick={handleCancel} className="ml-2 border-2 border-black p-1 hover:bg-red-400 hover:underline" aria-label={t("Cancel Request")}>
         {t("Cancel")}
       </button>
-      {error ? <div className="text-red-800 text-xl">Please fill in all of the fields!</div> : <></>}
-    </div>
+    </form>
   );
 }
