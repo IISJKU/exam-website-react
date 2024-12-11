@@ -59,7 +59,6 @@ export default function NotificationComponent(props: NotificationComponentProps)
   };
 
   const getElem = (index: any, type: string): string => {
-    console.log(index);
     if (index != undefined && index.id != undefined) {
       index = index.id;
     }
@@ -146,7 +145,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
   calcTabs();
 
   useEffect(() => {
-    const div = document.getElementById("notification" + props.id.toString() + "_div");
+    const div = document.getElementById("notification" + props.id?.toString() + "_div");
     div?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
@@ -157,7 +156,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
 
   return (
     <li
-      id={"notification" + props.id.toString()}
+      id={"notification" + (props.id?.toString() || "tempID")}
       key={props.id}
       className={color == "" ? "even:bg-slate-200 odd:bg-slate-100 cursor-pointer border border-white hover:border-black " : color.toString()}
       onClick={() => toggleInfoPannel()}

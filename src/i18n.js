@@ -52,7 +52,7 @@ const resources = {
       Mode: "Modus",
       Room: "Raum",
       Save: "Speichern",
-      Edit: "Editieren",
+      Edit: "Bearbeiten",
       "Search student...": "Suche Student*in",
       "Search tutors...": "Suche Tutor*in",
       "Search examiner...": "Suche Prüfer*in",
@@ -62,7 +62,9 @@ const resources = {
       "Search rooms...": "Suche Raum",
       "Matrikel Number": "Matrikelnummer",
       Notifications: "Benachrichtigungen",
+      "Old Notifications": "Alte Benachrichtigungen",
       "Proposed Changes": "Vorgeschlagene Veränderungen",
+      "Proposed Exams": "Vorgeschlagene Prüfungen",
     },
   },
 };

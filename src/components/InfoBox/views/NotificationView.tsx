@@ -38,6 +38,10 @@ export default function NotificationView() {
   let tutRoute = "http://localhost:1337/api/tutors";
   let studentRoute = "http://localhost:1337/api/students";
 
+  console.log("?????");
+  console.log(user.role);
+  console.log(user.token);
+
   if (user.role == "Student") {
     notificationRoute = `http://localhost:1337/api/notifications/me`;
     examRoute = `http://localhost:1337/api/exams/me`;
@@ -76,13 +80,6 @@ export default function NotificationView() {
     for (let i = 0; i < notifications.length; i++)
       if (Number(notifications[notifications.length - 1 - i].exam_id) == Number(n.exam_id)) notifs.push(notifications[notifications.length - 1 - i]);
 
-    /*
-    seenNotifications.forEach((element) => {
-      if (Number(element.id) == Number(id)) {
-        notifs.push(element);
-      }
-    }); */
-
     return notifs;
   };
 
@@ -120,20 +117,9 @@ export default function NotificationView() {
   // Fetch data from Strapi API
   const fetchNotifications = async () => {
     try {
-      const response = await fetch(notificationRoute, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-
       //let c = await response.json();
-      let data = await response.json(); //should probably rewrite api response, instead of changing stuff here
-      //if (user.role == "Admin") data = data.data;
-
-      if (!response.ok) {
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
-      }
+      //let data = await response.json(); //should probably rewrite api response, instead of changing stuff here
+      let data = (await fetchAll(notificationRoute, user.token)) as any;
 
       let examsLink = "http://localhost:1337/api/exams";
       if (user.role == "Student") examsLink = "http://localhost:1337/api/exams/me";
@@ -194,7 +180,7 @@ export default function NotificationView() {
         thread.forEach((notif) => {
           if (hasUnread && !hasThread([tempNew, tempOld, accReq], notif)) tempNew.push(notif);
           else if (!hasThread([tempNew, tempOld, accReq], notif) && !hasChange) tempOld.push(notif);
-          else if (!hasThread([tempNew, tempOld, accReq], notif)) accReq.push(notif);
+          else if (!hasThread([tempNew, tempOld, accReq], notif) && !notif.seenBy.includes(user.user)) accReq.push(notif);
         });
       });
 
@@ -209,7 +195,7 @@ export default function NotificationView() {
       showToast({ message: `Error fetching notifications: ${error}.`, type: "error" });
     } finally {
       setLoading(false);
-  }
+    }
   };
 
   const fetchDropdownOptions = async () => {
@@ -297,13 +283,19 @@ export default function NotificationView() {
   const [openId, setOpenId] = useState<undefined | number>(Number(id));
 
   if (loading) {
-    return <p aria-live="polite" aria-busy="true">Loading notifications...</p>;
+    return (
+      <p aria-live="polite" aria-busy="true">
+        Loading notifications...
+      </p>
+    );
   }
 
   return (
     <div className="w-full h-full p-5 select-none" role="main" aria-labelledby="notifications-heading">
       <div className="flex w-full content-center items-center ">
-        <h2 id="notifications-heading" className="text-4xl w-1/3 my-2 ">{t("Notifications")}</h2>
+        <h2 id="notifications-heading" className="text-4xl w-1/3 my-2 ">
+          {t("Notifications")}
+        </h2>
         {/*<SearchBar items={props.data} filter={setFilteredData} /> */}
       </div>
       <div className="h-5"></div>

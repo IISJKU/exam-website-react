@@ -18,6 +18,8 @@ export default function Login() {
 
   const auth = useAuth();
 
+  auth.redirectIfLoggedIn();
+
   // Handle login submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent the form from refreshing the page
@@ -30,8 +32,7 @@ export default function Login() {
       if (error instanceof TypeError) {
         setErrorText("Server can't be reached");
         showToast({ message: `Server can't be reached: ${error}.`, type: "error" });
-      }
-      else {
+      } else {
         setErrorText("Username or Password don't match.");
         showToast({ message: `Username or Password don't match.`, type: "error" });
       }
@@ -42,8 +43,16 @@ export default function Login() {
     <>
       <Header />
       <form onSubmit={handleSubmit} aria-label={t("Login Form")}>
-        <FormField label={t("Email")} id="identifier" type="text" value={formValues.identifier} onChange={handleChange} aria-labelledby="email-label"/>
-        <FormField label={t("Password")} id="password" type="password" value={formValues.password} onChange={handleChange} errorText={errorText} aria-labelledby="password-label"/>
+        <FormField label={t("Email")} id="identifier" type="text" value={formValues.identifier} onChange={handleChange} aria-labelledby="email-label" />
+        <FormField
+          label={t("Password")}
+          id="password"
+          type="password"
+          value={formValues.password}
+          onChange={handleChange}
+          errorText={errorText}
+          aria-labelledby="password-label"
+        />
         <button type="submit" className="mx-6 my-4 px-2 text-2xl border border-slate-900 hover:underline" aria-label={t("Submit Login Form")}>
           {t("Login")}
         </button>
