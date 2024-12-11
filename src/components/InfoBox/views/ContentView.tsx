@@ -78,7 +78,7 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
               }}
             >
               {props.keys.map((key, idx) => (
-                <td key={`${String(key)}-${idx}`} className="pl-2" role="cell">
+                <td key={`${String(key)}-${idx}`} className="pl-2" tabIndex={0} role="cell">
                   {typeof element[key] === "string"
                     ? !isDate(element[key] as string)
                       ? (element[key] as string)
