@@ -15,7 +15,7 @@ export default function DateField(props: DateFieldProps) {
   const formattedTime = props.dateValue ? moment(props.dateValue).format("HH:mm") : "";
 
   return (
-    <div role="group" aria-labelledby={props.title ? `datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}` : undefined} >
+    <div role="group" aria-labelledby={props.title ? `datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}` : undefined} tabIndex={0}>
       {props.title ? <label id={`datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{props.title + " "}</label> : null}
       {props.editMode ? (
         <div>

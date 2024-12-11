@@ -42,7 +42,7 @@ export default function EditField(props: EditFieldProps) {
   if (props.title === "Duration") additionalText = " min";
 
   return (
-    <div className={classList}>
+    <div className={classList} tabIndex={0}>
       {props.title && (props.editMode || !hide) && (
         <label htmlFor={`edit-field-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{t(props.title) + " "}</label>
       )}

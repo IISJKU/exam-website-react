@@ -50,6 +50,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
   }, [searchTerm, props.options]);
 
   const handleSelectOption = (optionValue: string | number) => {
+    console.log(optionValue);
     props.onChange(optionValue); // Call onChange function passed from the parent component
     if (typeof optionValue == "string") optionValue = JSON.parse(optionValue).searchTerm;
     setIsDropdownOpen(false); // Close dropdown after selection
@@ -111,18 +112,28 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
   // Get the label of the currently selected value (if any)
   const selectedOptionLabel = props.options.find((option) => option.value === props.value)?.label || "";
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "Enter") {
-      handleAddNewRecord();
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      if (isDropdownOpen && filteredOptions.length > 0) {
+        handleSelectOption(filteredOptions[0].value); // Select the first filtered option
+      } else {
+        handleAddNewRecord(); // Add a new record if no option is selected
+      }
     }
   };
 
   return (
-    <div className="relative w-96" ref={dropdownRef} onKeyDown={handleKeyPress} role="combobox"
+    <div
+      className="relative w-96"
+      ref={dropdownRef}
+      onKeyDown={handleKeyDown}
+      role="combobox"
       aria-haspopup="listbox"
       aria-expanded={isDropdownOpen}
       aria-owns="dropdown-list"
-      aria-labelledby={`dropdown-label-${props.label}`}>
+      aria-labelledby={`dropdown-label-${props.label}`}
+      tabIndex={0}
+    >
       {props.label && <label id={`dropdown-label-${props.label}`} className="font-bold" htmlFor="dropdown-input">{props.label}</label>}
       {props.disabled ? (
         <div className="mb-2">{selectedOptionLabel}</div>
@@ -131,6 +142,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
           <input
             id="dropdown-input"
             type="text"
+            tabIndex={0}
             placeholder={selectedOptionLabel || props.placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -144,14 +156,20 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
             aria-disabled={props.disabled || false}
           />
           {isDropdownOpen && (
-            <ul id="dropdown-list" role="listbox" className="absolute bg-white shadow-lg z-50 w-80 max-h-40 overflow-auto">
+            <ul id="dropdown-list" role="listbox" className="absolute bg-white shadow-lg z-50 w-80 max-h-40 overflow-auto" tabIndex={-1}>
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => (
                   <li
+                    tabIndex={0}
                     key={option.value}
                     id={`option-${option.value}`}
                     role="option"
                     onClick={() => handleSelectOption(option.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSelectOption(option.value);
+                      }
+                    }}
                     className={`cursor-pointer select-none py-2 pl-3 pr-9 ${
                       option.value === props.value ? "bg-gray-100 text-black font-bold" : "text-gray-900"
                     } hover:bg-indigo-500 hover:text-white`}
@@ -163,6 +181,11 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
                 <li
                   className="text-black-500 cursor-pointer select-none py-2 pl-3 pr-9 hover:text-indigo-500"
                   onClick={handleAddNewRecord}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleAddNewRecord();
+                    }
+                  }}
                 >
                   "{searchTerm}"
                 </li>
