@@ -40,7 +40,7 @@ export default function StudentCalender() {
   }, []);
 
   if (loading) {
-    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>; // Display loading indicator while fetching
+    return <p aria-live="polite" aria-busy="true" role="status">{t("Loading exams...")}</p>; 
   }
 
   function getWeekday(d: Date): string {
@@ -124,7 +124,7 @@ export default function StudentCalender() {
           <thead>
             <tr>
               {weekdays.map((weekday, index) => (
-                <th key={index} scope="col" aria-label={weekday}>{weekday.substring(0, 2)}</th>
+                <th key={index} scope="columnheader" aria-label={weekday}>{weekday.substring(0, 2)}</th>
               ))}
             </tr>
           </thead>
@@ -134,6 +134,7 @@ export default function StudentCalender() {
                 {row.map((day, dayIndex) => (
                   <td
                     key={dayIndex}
+                    tabIndex={day[1] === "bg-slate-400" ? 0 : undefined}
                     onClick={() => {
                       if (day[1] !== "invisible" && day[0]) {
                         // Use navigate to move to a new route for the specific date
@@ -142,13 +143,12 @@ export default function StudentCalender() {
                     }}
                     onKeyDown={(e) => {
                       if ((e.key === "Enter" || e.key === " ") && day[1] !== "invisible" && day[0]) {
-                        navigate(`admin/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
+                        navigate(`student/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
                       }
                     }}
                     className={`hover:bg-slate-500 active:bg-slate-700 align-top border-2 border-black aspect-square ${day[1]}`}
                     role="gridcell"
-                    tabIndex={day[1] !== "invisible" ? 0 : -1}
-                    aria-label={day[0] ? `${day[0]} ${t(month[date.getMonth()])}` : ""}
+                    aria-label={`Day ${day[0]} ${t(month[date.getMonth()])}`}
                   >
                     {day[0]}
                   </td>

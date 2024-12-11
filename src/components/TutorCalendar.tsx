@@ -40,7 +40,7 @@ export default function TutorCalendar() {
   }, []);
 
   if (loading) {
-    return <p aria-live="polite" aria-busy="true">Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite" aria-busy="true" role="status">{t("Loading exams...")}</p>; // Display loading indicator while fetching
   }
 
   function getWeekday(d: Date): string {
@@ -107,40 +107,48 @@ export default function TutorCalendar() {
   }
 
   return (
-    <div className="w-full aspect-square select-none">
+    <div className="w-full aspect-square select-none" role="region" aria-label={t("Tutor Calendar")}>
       <div className="bg-slate-100 border-2 border-grey p-1 aspect-square">
         <div className="bg-slate-300 w-full flex justify-center content-stretch my-1 text-sm">
-          <button className="basis-1/5 text-left hover:underline" onClick={() => switchMonth(-1)}>
+          <button className="basis-1/5 text-left hover:underline" onClick={() => switchMonth(-1)} aria-label={t("Go to previous month")}>
             &lt; Prev
           </button>
           <div className="basis-3/5 text-center">
             {t(month[date.getMonth()])} {date.getFullYear()}
           </div>
-          <button onClick={() => switchMonth(1)} className="basis-1/5 text-right hover:underline">
+          <button onClick={() => switchMonth(1)} className="basis-1/5 text-right hover:underline" aria-label={t("Go to next month")}>
             Next &gt;
           </button>
         </div>
-        <table className="w-full text-sm text-left table-fixed">
+        <table className="w-full text-sm text-left table-fixed" aria-label={t("Calendar dates")}>
           <thead>
             <tr>
               {weekdays.map((weekday, index) => (
-                <th key={index}>{weekday.substring(0, 2)}</th>
+                <th key={index} scope="columnheader" aria-label={weekday}>{weekday.substring(0, 2)}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {getRows(date.getMonth(), date.getFullYear()).map((row, rowIndex) => (
-              <tr key={rowIndex}>
+              <tr key={rowIndex} role="row">
                 {row.map((day, dayIndex) => (
                   <td
                     key={dayIndex}
+                    tabIndex={day[1] === "bg-slate-400" ? 0 : undefined}
                     onClick={() => {
                       if (day[1] !== "invisible" && day[0]) {
                         // Use navigate to move to a new route for the specific date
                         navigate(`tutor/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
                       }
                     }}
+                    onKeyDown={(e) => {
+                      if ((e.key === "Enter" || e.key === " ") && day[1] !== "invisible" && day[0]) {
+                        navigate(`tutor/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
+                      }
+                    }}
                     className={`hover:bg-slate-500 active:bg-slate-700 align-top border-2 border-black aspect-square ${day[1]}`}
+                    role="gridcell"
+                    aria-label={`Day ${day[0]} ${t(month[date.getMonth()])}`}
                   >
                     {day[0]}
                   </td>
