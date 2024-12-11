@@ -625,27 +625,6 @@ export default function ExamEditor() {
           >
             {t("Back")}
           </button>
-        <button
-          onClick={() => {
-            setEditMode(!editMode);
-            if (editMode) handleUpdate();
-          }}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
-          aria-label={editMode ? t("Save changes") : t("Edit exam")}
-        >
-          {editMode ? t("Save") : t("Edit")}
-        </button>
-        {editMode && (
-          <button
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
-          onClick={() => {
-              setEditMode(!editMode);
-          }}
-          aria-label={t("Cancel editing")}
-          >
-            {t("Cancel")}
-          </button>
-         )}
       </div>
     </div>
     );

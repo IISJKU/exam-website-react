@@ -178,13 +178,14 @@ export default function RemoveTutor() {
           <dd>{exam.status}</dd>
         </div>
       </dl>
-
-      <button onClick={() => setShowConfirmDialog(true)}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
-        aria-haspopup="dialog"
-      >
-        {t("Remove")}
-      </button>
+      <div className="mt-4 flex space-x-2">
+        <button onClick={() => setShowConfirmDialog(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
+          aria-haspopup="dialog"
+        >
+          {t("Remove")}
+        </button>
+      </div>
 
       {/* Confirmation Dialog */}
       {showConfirmDialog && (
