@@ -19,6 +19,7 @@ export default function SearchBar(props: SearchProps) {
   }
 
   function filter(value: string) {
+    changeInput(value);
     if (value == "" || value == " " || value == undefined) return props.filter(props.items);
     matches = [];
     props.items.forEach((item) => {
@@ -45,7 +46,9 @@ export default function SearchBar(props: SearchProps) {
 
   return (
     <div className="relative w-full md:w-2/3 lg:max-w-md">
-      <label htmlFor="search-input" className="sr-only">Search</label>
+      <label htmlFor="search-input" className="sr-only">
+        Search
+      </label>
       <input
         id="search-input"
         type="search"
@@ -55,7 +58,9 @@ export default function SearchBar(props: SearchProps) {
         onChange={(e) => filter(e.target.value)}
         value={input}
       />
-      <div aria-hidden="true" className="absolute inset-y-0 right-3 flex items-center text-xl font-bold text-gray-500">🔎</div>
+      <div aria-hidden="true" className="absolute inset-y-0 right-3 flex items-center text-xl font-bold text-gray-500">
+        🔎
+      </div>
     </div>
   );
 }
