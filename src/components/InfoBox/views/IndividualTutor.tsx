@@ -103,7 +103,7 @@ export default function IndividualTutor() {
       <EditField title="Phone" editMode={editMode} text={phone} hideTitle={false} onChange={(e) => setPhone(e.target.value)} aria-label={t("Edit tutor's phone")}/>
       <EditField title="Matrikel Nr" editMode={editMode} text={matrikel_number} hideTitle={false} onChange={(e) => setMatrikelNum(e.target.value)} aria-label={t("Edit tutor's matrikel number")}/>
       <EditField title="Course" editMode={editMode} text={course} hideTitle={false} onChange={(e) => setCourse(e.target.value)} aria-label={t("Edit tutor's course")}/>
-      <div className="mt-4 flex gap-4">
+      <div className="mt-4 flex space-x-2">
         <button onClick={() => navigate(-1)}
           className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
           aria-label="Go back to the previous page">{t("Back")}</button>

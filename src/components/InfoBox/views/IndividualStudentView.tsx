@@ -148,7 +148,7 @@ export default function IndividualStudent() {
       <EditField title={t("Emergency Contact")} editMode={editMode} text={emergency_contact} hideTitle={false} onChange={(e) => setEmergencyContact(e.target.value)} aria-label={t("Edit student's emergency contact")}/>
       <EditField title={t("Overtime")} editMode={editMode} text={bonus_time ? bonus_time.toString() : ""} hideTitle={false} onChange={(e) => setOvertime(Number(e.target.value))} aria-label={t("Edit student's overtime allowance")}/>
       <EditField title={t("Misc")} editMode={editMode} text={misc} hideTitle={false} onChange={(e) => setMisc(e.target.value)} aria-label={t("Edit miscellaneous student details")} />
-      <div className="mt-4 flex gap-4">
+      <div className="mt-4 flex space-x-2">
         <button
           onClick={() => navigate(-1)}
           className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
