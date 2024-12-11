@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useInterval from "../hooks/UseInterval";
 import { useAuth } from "../hooks/AuthProvider";
 import Notification from "./classes/Notification";
 import { showToast } from "./InfoBox/components/ToastMessage";
+import fetchAll from "./InfoBox/views/FetchAll";
 
 interface NButtonProps {
   path: string;
@@ -23,12 +24,8 @@ export default function NotificationButton(props: NButtonProps) {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch(path, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      const data = await response.json();
+      const data = (await fetchAll(path, user.token)) as any[];
+
       let t: Notification[] = [];
 
       data.forEach((element: any) => {
@@ -38,6 +35,7 @@ export default function NotificationButton(props: NButtonProps) {
 
         e.seenBy = element.seenBy;
         e.type = element.type;
+        if (element.seenBy == null) console.log(element);
 
         if ((e.seenBy == undefined || !e.seenBy.includes(user.user) || !e.sentBy == user.user) && e.sentBy != user.user) {
           t.push(e);
@@ -61,7 +59,7 @@ export default function NotificationButton(props: NButtonProps) {
     }
     setUnreadNotifications(numNotifications);
   }
-  
+
   useEffect(() => {
     if (user.token && user.token.length > 1) fetchNotifications();
   }, []);
@@ -87,7 +85,9 @@ export default function NotificationButton(props: NButtonProps) {
     >
       {unreadNotifications > 0 && (
         <div className="h-5 w-5 inline-block align-center justify-center absolute right-1 top-2 text-sm select-none" aria-live="polite" aria-atomic="true">
-          <p className="bg-red-400 rounded-full text-center m-0" aria-label={`${unreadNotifications} unread notifications`}>{unreadNotifications}</p>
+          <p className="bg-red-400 rounded-full text-center m-0" aria-label={`${unreadNotifications} unread notifications`}>
+            {unreadNotifications}
+          </p>
         </div>
       )}
 

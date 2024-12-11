@@ -50,30 +50,38 @@ export default function NotificationCategory(props: NotificationCategoryProps) {
   if (props.notifications.length != 0)
     return (
       <div>
-        <h2 className="text-4xl p-3 pl-0" id="notification-category-title">{props.text}</h2>
+        <h2 className="text-4xl p-3 pl-0" id="notification-category-title" key={props.text}>
+          {props.text}
+        </h2>
         <ul className="w-full text-left border-2" aria-labelledby="notification-category-title">
           {props.notifications.map((elem, index) => (
             <>
               {index === 0 || moment(elem.createdAt).format("MMMM") !== moment(props.notifications[index - 1]?.createdAt).format("MMMM") ? (
-                <div className="p-1 text-xl" role="heading" aria-level={2}> {moment(elem.createdAt).format("MMMM YYYY")} </div>
+                <div className="p-1 text-xl" role="heading" aria-level={2}>
+                  {" "}
+                  {moment(elem.createdAt).format("MMMM YYYY")}{" "}
+                </div>
               ) : null}
               {index === 0 || moment(elem.createdAt).format("YYYY-MM-DD") !== moment(props.notifications[index - 1]?.createdAt).format("YYYY-MM-DD") ? (
-                <div className="p-0.5 text-xl font-bold" role="heading" aria-level={3}>{moment(elem.createdAt).format("DD.MM.YY")}</div>
+                <div className="p-0.5 text-xl font-bold" role="heading" aria-level={3}>
+                  {moment(elem.createdAt).format("DD.MM.YY")}
+                </div>
               ) : null}
               <li role="listitem">
-              <NotificationComponent
-                exam={getExam(elem.exam_id)}
-                options={props.options}
-                notification={elem.exam_id === 0 ? [elem] : getNotifications(elem.id)}
-                id={elem.id}
-                exam_id={elem.exam_id}
-                sentBy={elem.sentBy}
+                <NotificationComponent
+                  exam={getExam(elem.exam_id)}
+                  options={props.options}
+                  notification={elem.exam_id === 0 ? [elem] : getNotifications(elem.id)}
+                  id={elem.id}
+                  exam_id={elem.exam_id}
+                  sentBy={elem.sentBy}
                 />
-                </li>
+              </li>
             </>
           ))}
         </ul>
       </div>
     );
-  else return <div aria-live="polite" aria-busy="true">{props.text} - No notifications available.</div>;
+  //else return <div aria-live="polite" >{props.text} - No notifications available.</div>;
+  else return <></>;
 }
