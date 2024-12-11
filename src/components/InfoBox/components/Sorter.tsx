@@ -36,6 +36,7 @@ export default function Sorter(props: SorterProps) {
       id={String(props.id)}
       className={className}
       onClick={() => props.onClick(props.id)}
+      scope="col"
       tabIndex={0}
       role="button"
       aria-sort={

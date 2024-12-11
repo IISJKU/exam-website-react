@@ -107,6 +107,8 @@ export default function StudentBigCalender() {
         style={{ height: 700 }}
         onNavigate={(newDate) => setDate(newDate)}
         popup
+        aria-labelledby="calendar-title"
+        aria-label="Exam Calendar view"
         components={{
           event: ({ event }: { event: Event }) => (
             <div
@@ -116,7 +118,7 @@ export default function StudentBigCalender() {
                 "h:mm A"
               )} and ends at ${moment(event.end).format("h:mm A")}`}
               onClick={() => handleSelectEvent(event)}
-              onKeyPress={(e) => {
+              onKeyDown ={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   handleSelectEvent(event);
                 }
@@ -136,6 +138,9 @@ export default function StudentBigCalender() {
           next: "Next",
         }}
       />
+      <h2 id="calendar-title" className="sr-only">
+        {t("Student Exam Calendar")}
+      </h2>
     </div>
   );
 }
