@@ -87,6 +87,7 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
         endAccessor="end"
         onSelectEvent={handleSelectEvent}
         style={{ height: 700 }}
+        aria-labelledby="calendar-title"
         components={{
           event: ({ event }: { event: Event }) => (
             <div
@@ -96,7 +97,7 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
                 "h:mm A"
               )} and ends at ${moment(event.end).format("h:mm A")}`}
               onClick={() => handleSelectEvent(event)}
-              onKeyPress={(e) => {
+              onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   handleSelectEvent(event);
                 }
@@ -116,6 +117,9 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
           next: "Next",
         }}
       />
+        <h2 id="calendar-title" className="sr-only">
+        {t("Room management Calendar")}
+      </h2>
     </div>
   );
 }
