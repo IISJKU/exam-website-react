@@ -106,6 +106,35 @@ export default function TutorBigCalender() {
         onNavigate={(newDate) => setDate(newDate)}
         popup
         aria-labelledby="calendar-title"
+        aria-label="Exam Calendar view"
+        components={{
+          event: ({ event }: { event: Event }) => (
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label={`Exam: ${event.title}, starts at ${moment(event.start).format(
+                "h:mm A"
+              )} and ends at ${moment(event.end).format("h:mm A")}`}
+              onClick={() => handleSelectEvent(event)}
+              onKeyDown ={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  handleSelectEvent(event);
+                }
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              {event.title}
+            </div>
+          ),
+        }}
+        messages={{
+          week: "Week View",
+          day: "Day View",
+          month: "Month View",
+          today: "Today",
+          previous: "Previous",
+          next: "Next",
+        }}
       />
       <h2 id="calendar-title" className="sr-only">
         {t("Tutor Exam Calendar")}

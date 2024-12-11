@@ -6,6 +6,7 @@ import { showToast } from "../components/ToastMessage";
 import Exam from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
 import fetchAll from "./FetchAll";
+import { t } from "i18next";
 
 const localizer = momentLocalizer(moment);
 
@@ -82,7 +83,7 @@ export default function BigCalendar() {
   }
 
   return (
-    <div>
+    <div role="region" aria-label="Admin Exam Calendar" tabIndex={-1} className="admin-calendar">
       <Calendar
         defaultDate={defaultDate}
         defaultView={view}
@@ -96,16 +97,40 @@ export default function BigCalendar() {
         style={{ height: 700 }}
         onNavigate={(newDate) => setDate(newDate)}
         popup
+        aria-labelledby="calendar-title"
         aria-label="Exam Calendar view"
-        eventPropGetter={(event, start, end, isSelected) => {
-          return {
-            style: {
-              cursor: "pointer",
-            },
-            "aria-label": `${event.title} from ${moment(start).format("LLLL")} to ${moment(end).format("LLLL")}`,
-          };
+        components={{
+          event: ({ event }: { event: Event }) => (
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label={`Exam: ${event.title}, starts at ${moment(event.start).format(
+                "h:mm A"
+              )} and ends at ${moment(event.end).format("h:mm A")}`}
+              onClick={() => handleSelectEvent(event)}
+              onKeyDown ={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  handleSelectEvent(event);
+                }
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              {event.title}
+            </div>
+          ),
+        }}
+        messages={{
+          week: "Week View",
+          day: "Day View",
+          month: "Month View",
+          today: "Today",
+          previous: "Previous",
+          next: "Next",
         }}
       />
+      <h2 id="calendar-title" className="sr-only">
+        {t("Admin Exam Calendar")}
+      </h2>
     </div>
   );
 }

@@ -102,7 +102,7 @@ export default function Calendar() {
 
   return (
     <div className="w-full aspect-square select-none" role="region" aria-label="Calendar View">
-      <div className="bg-slate-100 border-2 border-black p-1 aspect-square">
+      <div className="bg-slate-100 border-2 border-grey p-1 aspect-square">
         <div className="bg-slate-300 w-full flex justify-center content-stretch my-1 text-sm" role="navigation" aria-label="Month Navigation">
           <button className="basis-1/5 text-left hover:underline" onClick={() => switchMonth(-1)} aria-label={`Switch to previous month, ${t(month[(date.getMonth() + 11) % 12])}`}>
             &lt; {t("Prev")}
@@ -128,7 +128,7 @@ export default function Calendar() {
                 {row.map((day, dayIndex) => (
                   <td
                     key={dayIndex}
-                    tabIndex={day[1] !== "invisible" ? 0 : undefined}
+                    tabIndex={day[1] === "bg-slate-400" ? 0 : undefined}
                     onClick={() => {
                       if (day[1] !== "invisible" && day[0]) {
                         // Use navigate to move to a new route for the specific date
