@@ -267,7 +267,7 @@ export default function IndividualNotification() {
   };
 
   const sendNotification = async (accept: boolean) => {
-    let notif = new Notification("", JSON.stringify(proposedExam), user.user, exam?.id ? exam.id : proposedExam.id);
+    let notif = new Notification("{}", JSON.stringify(proposedExam), user.user, exam?.id ? exam.id : proposedExam.id);
 
     notif.type = NotificationType.confirmChange;
     if (!accept) notif.type = NotificationType.discardChange;
