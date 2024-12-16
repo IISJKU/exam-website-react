@@ -19,7 +19,10 @@ export default function Calendar() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const data = (await fetchAll("http://localhost:1337/api/exams", user.token)) as Exam[];
+      let link = "http://localhost:1337/api/exams";
+      if (user.role == "Student" || user.role == "Tutor") link = "http://localhost:1337/api/exams/me";
+
+      const data = (await fetchAll(link, user.token)) as Exam[];
 
       setExams(data);
     } catch (error) {
@@ -34,7 +37,11 @@ export default function Calendar() {
   }, []);
 
   if (loading) {
-    return <p aria-live="polite" aria-busy="true" role="status">{t("Loading exams...")}</p>;
+    return (
+      <p aria-live="polite" aria-busy="true" role="status">
+        {t("Loading exams...")}
+      </p>
+    );
   }
 
   function getWeekday(d: Date): string {
@@ -45,7 +52,7 @@ export default function Calendar() {
   }
 
   function switchMonth(add: number): void {
-    const newDate = new Date(date.getFullYear(), date.getMonth() + add, 1); 
+    const newDate = new Date(date.getFullYear(), date.getMonth() + add, 1);
     setDate(newDate);
   }
 
@@ -101,24 +108,34 @@ export default function Calendar() {
   }
 
   return (
-    <div className="w-full aspect-square select-none" role="region" aria-label="Calendar View">
+    <div className="w-4/5 sm:w-2/4 md:bg-cyan-200 md:w-full aspect-square select-none" role="region" aria-label="Calendar View">
       <div className="bg-slate-100 border-2 border-grey p-1 aspect-square">
-        <div className="bg-slate-300 w-full flex justify-center content-stretch my-1 text-sm" role="navigation" aria-label="Month Navigation">
-          <button className="basis-1/5 text-left hover:underline" onClick={() => switchMonth(-1)} aria-label={`Switch to previous month, ${t(month[(date.getMonth() + 11) % 12])}`}>
+        <div className="bg-slate-300 w-full flex justify-center content-stretch my-1 text-xs md:text-sm " role="navigation" aria-label="Month Navigation">
+          <button
+            className="basis-2/5 md:basis-1/5 text-left hover:underline"
+            onClick={() => switchMonth(-1)}
+            aria-label={`Switch to previous month, ${t(month[(date.getMonth() + 11) % 12])}`}
+          >
             &lt; {t("Prev")}
           </button>
           <div className="basis-3/5 text-center" aria-live="polite" aria-atomic="true">
             {t(month[date.getMonth()])} {date.getFullYear()}
           </div>
-          <button onClick={() => switchMonth(1)} className="basis-1/5 text-right hover:underline" aria-label={`Switch to next month, ${t(month[(date.getMonth() + 1) % 12])}`}>
-          {t("Next")} &gt;
+          <button
+            onClick={() => switchMonth(1)}
+            className="basis-2/5 md:basis-1/5 text-right hover:underline"
+            aria-label={`Switch to next month, ${t(month[(date.getMonth() + 1) % 12])}`}
+          >
+            {t("Next")} &gt;
           </button>
         </div>
-        <table className="w-full text-sm text-left table-fixed" role="table" aria-label="Monthly Calendar">
+        <table className="w-full text-sm text-left table-fixed bg-white" role="table" aria-label="Monthly Calendar">
           <thead>
             <tr>
               {weekdays.map((weekday, index) => (
-                <th key={index} role="columnheader" aria-label={t(weekday)}>{weekday.substring(0, 2)}</th>
+                <th key={index} role="columnheader" aria-label={t(weekday)}>
+                  {weekday.substring(0, 2)}
+                </th>
               ))}
             </tr>
           </thead>
@@ -132,12 +149,13 @@ export default function Calendar() {
                     onClick={() => {
                       if (day[1] !== "invisible" && day[0]) {
                         // Use navigate to move to a new route for the specific date
-                        navigate(`admin/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
+
+                        navigate(`${user.role.toLowerCase()}/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
                       }
                     }}
                     onKeyDown={(e) => {
                       if ((e.key === "Enter" || e.key === " ") && day[1] !== "invisible" && day[0]) {
-                        navigate(`admin/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
+                        navigate(`${user.role.toLowerCase()}/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
                       }
                     }}
                     className={`hover:bg-slate-500 active:bg-slate-700 align-top border-2 border-black aspect-square ${day[1]}`}

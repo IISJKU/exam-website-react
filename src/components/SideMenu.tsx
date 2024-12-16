@@ -9,7 +9,7 @@ export default function SideMenu() {
   const location = useLocation();
 
   return (
-    <nav className="p-5 text-xl h-full w-full bg-slate-200" role="navigation" aria-label={t("Side Menu")}>
+    <nav className="p-5 text-xl h-full w-full bg-slate-200 grid grid-flow-col md:grid-flow-row " role="navigation" aria-label={t("Side Menu")}>
       <NotificationButton path="admin/notifications" />
       {/* Exams Overview Button */}
       <button
@@ -60,7 +60,7 @@ export default function SideMenu() {
       </button>
 
       {/* Calendar Component */}
-      <section role="region" aria-label={t("Calendar")}>
+      <section className="row-span-6 bg-slate-200 flex items-center justify-center" role="region" aria-label={t("Calendar")}>
         <Calendar />
       </section>
     </nav>

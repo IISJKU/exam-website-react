@@ -176,7 +176,8 @@ export default function NotificationView() {
         thread.forEach((notif) => {
           if (hasUnread && !hasThread([tempNew, tempOld, accReq], notif)) tempNew.push(notif);
           else if (!hasThread([tempNew, tempOld, accReq], notif) && !hasChange) tempOld.push(notif);
-          else if (!hasThread([tempNew, tempOld, accReq], notif) && !notif.seenBy.includes(user.user)) accReq.push(notif);
+          else if (!hasThread([tempNew, tempOld, accReq], notif) && thread[thread.length - 1].sentBy != user.user) accReq.push(notif);
+          else if (!hasThread([tempNew, tempOld, accReq], notif)) tempOld.push(notif);
         });
       });
 
@@ -295,10 +296,28 @@ export default function NotificationView() {
         {/*<SearchBar items={props.data} filter={setFilteredData} /> */}
       </div>
       <div className="h-5"></div>
-      <NotificationCategory notifications={proposals} text={t("Proposed Exams")} exams={exams} options={options} />
-      <NotificationCategory notifications={sortNotifs(actionsRequired)} text={t("Required Actions")} exams={exams} options={options} />
-      <NotificationCategory notifications={sortNotifs(newNotifications)} text={t("New Notifications")} exams={exams} options={options} />
-      <NotificationCategory notifications={sortNotifs(seenNotifications)} text={t("Old Notifications")} exams={exams} options={options} />
+      <NotificationCategory notifications={proposals} allNotifs={notifications} text={t("Proposed Exams")} exams={exams} options={options} />
+      <NotificationCategory
+        notifications={sortNotifs(actionsRequired)}
+        allNotifs={notifications}
+        text={t("Required Actions")}
+        exams={exams}
+        options={options}
+      />
+      <NotificationCategory
+        notifications={sortNotifs(newNotifications)}
+        allNotifs={notifications}
+        text={t("New Notifications")}
+        exams={exams}
+        options={options}
+      />
+      <NotificationCategory
+        notifications={sortNotifs(seenNotifications)}
+        allNotifs={notifications}
+        text={t("Old Notifications")}
+        exams={exams}
+        options={options}
+      />
     </div>
   );
 }

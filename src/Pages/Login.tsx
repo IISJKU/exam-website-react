@@ -18,7 +18,12 @@ export default function Login() {
 
   const auth = useAuth();
 
-  auth.redirectIfLoggedIn();
+  try {
+    auth.redirectIfLoggedIn();
+  } catch (error) {
+    setErrorText("Server can't be reached");
+    showToast({ message: `Server can't be reached: ${error}.`, type: "error" });
+  }
 
   // Handle login submission
   const handleSubmit = async (e: React.FormEvent) => {

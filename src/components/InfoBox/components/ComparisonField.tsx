@@ -39,34 +39,24 @@ export default function ComparisonField(props: ComparisonField) {
     >
       {/* Label for the dropdown */}
       {props.label && (
-        <label
-          id={`comparison-field-${props.label?.toLowerCase()}`}
-          className="font-bold"
-        >
-          {props.label}
+        <label id={`comparison-field-${props.label?.toLowerCase()}`} className="font-bold">
+          {props.label}:
         </label>
       )}
-      
+
       {/* Current and Proposed Values */}
-      <div className="mb-2 inline-block">
+      <div className="mb-2 ">
         {props.proposedVal ? (
           <>
             <div className="line-through" aria-label={`Current value: ${selectedOptionLabel}`}>
               {selectedOptionLabel}
             </div>
-            <div
-              className="text-red-400"
-              aria-label={`Proposed value: ${props.proposedVal}`}
-            >
+            <div className="text-red-500" aria-label={`Proposed value: ${props.proposedVal}`}>
               {props.proposedVal}
             </div>
           </>
         ) : (
-          <div
-            aria-label={`Current value: ${selectedOptionLabel}`}
-          >
-            {selectedOptionLabel}
-          </div>
+          <div aria-label={`Current value: ${selectedOptionLabel}`}>{selectedOptionLabel}</div>
         )}
       </div>
     </div>

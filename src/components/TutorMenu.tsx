@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router-dom"; // For navigation
 import TutorCalendar from "./TutorCalendar";
+import Calendar from "./Calendar";
 import NotificationButton from "./NotificationButton";
 
 export default function TutorMenu() {
@@ -37,7 +38,7 @@ export default function TutorMenu() {
         {t("Request Exam Monitoring")}
       </button>
       <section role="region" aria-label={t("Calendar")}>
-        <TutorCalendar />
+        <Calendar />
       </section>
     </nav>
   );

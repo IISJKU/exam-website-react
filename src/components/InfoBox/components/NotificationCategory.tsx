@@ -6,6 +6,7 @@ import moment from "moment";
 
 interface NotificationCategoryProps {
   notifications: Notification[];
+  allNotifs: Notification[];
   exams: Exam[] | undefined;
   text: string;
   options: {};
@@ -19,17 +20,18 @@ export default function NotificationCategory(props: NotificationCategoryProps) {
     let notifs: Notification[] = [];
     let n = new Notification();
 
-    props.notifications.forEach((element) => {
+    props.allNotifs.forEach((element) => {
       if (Number(element.id) == Number(id)) {
         n = element;
       }
     });
 
-    for (let i = 0; i < props.notifications.length; i++) {
-      if (Number(props.notifications[props.notifications.length - 1 - i].exam_id) == Number(n.exam_id)) {
-        notifs.push(props.notifications[props.notifications.length - 1 - i]);
+    for (let i = 0; i < props.allNotifs.length; i++) {
+      if (Number(props.allNotifs[props.allNotifs.length - 1 - i].exam_id) == Number(n.exam_id)) {
+        notifs.push(props.allNotifs[props.allNotifs.length - 1 - i]);
       }
     }
+
     return notifs;
   };
 

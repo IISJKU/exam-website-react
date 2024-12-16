@@ -170,29 +170,29 @@ export default function NotificationComponent(props: NotificationComponentProps)
       }}
     >
       <div className="relative" tabIndex={0}>
-        <p className="inline-block w-60 font-bold" >{moment(notifications[0].createdAt).format("DD.MM.YYYY HH:mm") + ""}</p>
+        <p className="inline-block w-60 font-bold">{moment(notifications[0].createdAt).format("DD.MM.YYYY HH:mm") + ""}</p>
         {props.notification[0].type == NotificationType.createExam ? (
           <div className="inline-block " id={"notification" + props.id.toString() + "_div"}>
             {getName()} proposed a new Exam
             {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) ||
             auth.role == "Tutor" ||
             auth.role == "Student" ? null : (
-                <a
-                  className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent parent toggle
+              <a
+                className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent parent toggle
+                  handleClick(props.id);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.stopPropagation();
                     handleClick(props.id);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.stopPropagation();
-                      handleClick(props.id);
-                    }
-                  }}
-                  role="button" 
-                  tabIndex={0}
-                  aria-label="Edit notification details"
-                >
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label="Edit notification details"
+              >
                 {t("Edit")}
               </a>
             )}
@@ -209,22 +209,22 @@ export default function NotificationComponent(props: NotificationComponentProps)
             {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) ||
             auth.role == "Tutor" ||
             auth.role == "Student" ? null : (
-                  <a
-                    className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent parent toggle
-                      handleClick(props.id);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.stopPropagation();
-                        handleClick(props.id);
-                      }
-                    }}
-                    role="button"
-                    tabIndex={0}
-                    aria-label="Edit notification details"
-                  >
+              <a
+                className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent parent toggle
+                  handleClick(props.id);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.stopPropagation();
+                    handleClick(props.id);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label="Edit notification details"
+              >
                 Edit
               </a>
             )}
@@ -240,7 +240,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                   notification.type == NotificationType.createExamOld ||
                   notification.type == NotificationType.createExam ? (
                     <div className={`pl-${tabs[index]}`}>
-                      At{" "}{moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm")}{" "}{notification.sentBy}{" "}
+                      At {moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm")} {notification.sentBy}{" "}
                       {notification.type == NotificationType.adminChange
                         ? "changed"
                         : notification.type == NotificationType.createExamOld
@@ -264,7 +264,8 @@ export default function NotificationComponent(props: NotificationComponentProps)
                         "font-bold"
                       ).toString()}
                     >
-                        Tutor {notification.sentBy}{" "}{notification.type === NotificationType.tutorConfirm ? "registered to monitor the exam." : "canceled to monitor the exam."}
+                      Tutor {notification.sentBy}{" "}
+                      {notification.type === NotificationType.tutorConfirm ? "registered to monitor the exam." : "canceled to monitor the exam."}
                     </div>
                   ) : (
                     <div
@@ -275,7 +276,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                         "font-bold"
                       ).toString()}
                     >
-                      {notification.sentBy}{" "}{notification.type === NotificationType.confirmChange ? "approved the changes.": "declined the changes."}
+                      {notification.sentBy} {notification.type === NotificationType.confirmChange ? "approved the changes." : "declined the changes."}
                       {notification.oldInformation != "" &&
                         Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) => (
                           <li

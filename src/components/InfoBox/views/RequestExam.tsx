@@ -76,8 +76,7 @@ export default function RequestExam() {
           fetch("http://localhost:1337/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/institutes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } })
-            .then((res) => res.json())
+          fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
         ]);
 
         setOptions({
@@ -262,16 +261,56 @@ export default function RequestExam() {
       label: lastNameField ? `${item[firstNameField]} ${item[lastNameField]}` : item[firstNameField],
     }));
 
-  if (loading) return <p aria-live="polite" aria-busy="true">{t("Loading exam data...")}</p>;
+  if (loading)
+    return (
+      <p aria-live="polite" aria-busy="true">
+        {t("Loading exam data...")}
+      </p>
+    );
 
   return (
-    <form onSubmit={handleSubmit} className="m-5" aria-labelledby="request-exam-heading" role="form">
-      <h1 id="request-exam-heading" className="text-2xl font-bold mb-4">{t("Request an Exam")}</h1>
-      <EditField title={t("Exam Title")} editMode={editMode} text={title} onChange={(e) => setTitle(e.target.value)} aria-label={t("Add Exam Title")} required={true} aria-required="true"/>
-      <EditField title={t("LVA Num")} editMode={editMode} text={lva_num?.toString() ?? ""} onChange={(e) => setLvaNum(Number(e.target.value))} aria-label={t("Add Exam LVA Num")} required={true} aria-required="true" />
-      <DateField title={t("Date/Time")} editMode={editMode} dateValue={date} onDateChange={handleDateChange} onTimeChange={handleTimeChange} aria-label={t("Add Exam Date and Time")} required={true} aria-required="true" />
+    <div className="m-5" aria-labelledby="request-exam-heading" role="form">
+      <h1 id="request-exam-heading" className="text-2xl font-bold mb-4">
+        {t("Request an Exam")}
+      </h1>
+      <EditField
+        title={t("Exam Title")}
+        editMode={editMode}
+        text={title}
+        onChange={(e) => setTitle(e.target.value)}
+        aria-label={t("Add Exam Title")}
+        required={true}
+        aria-required="true"
+      />
+      <EditField
+        title={t("LVA Num")}
+        editMode={editMode}
+        text={lva_num?.toString() ?? ""}
+        onChange={(e) => setLvaNum(Number(e.target.value))}
+        aria-label={t("Add Exam LVA Num")}
+        required={true}
+        aria-required="true"
+      />
+      <DateField
+        title={t("Date/Time")}
+        editMode={editMode}
+        dateValue={date}
+        onDateChange={handleDateChange}
+        onTimeChange={handleTimeChange}
+        aria-label={t("Add Exam Date and Time")}
+        required={true}
+        aria-required="true"
+      />
       <div className="m-2"></div>
-      <EditField title={t("Duration")} editMode={editMode} text={duration?.toString() ?? ""} onChange={(e) => setDuration(Number(e.target.value))} aria-label={t("Add Exam Duration in minutes")} required={true} aria-required="true" />
+      <EditField
+        title={t("Duration")}
+        editMode={editMode}
+        text={duration?.toString() ?? ""}
+        onChange={(e) => setDuration(Number(e.target.value))}
+        aria-label={t("Add Exam Duration in minutes")}
+        required={true}
+        aria-required="true"
+      />
 
       <DropdownWithSearch
         tableName="examiners"
@@ -315,16 +354,32 @@ export default function RequestExam() {
         aria-required="true"
       />
 
-      <EditField title={t("Status")} editMode={editMode} text={status} hideTitle={false} onChange={(e) => setStatus("Pending")} aria-label={t("Add Exam Status")} aria-required="true"/>
+      <EditField
+        title={t("Status")}
+        editMode={editMode}
+        text={status}
+        hideTitle={false}
+        onChange={(e) => setStatus("Pending")}
+        aria-label={t("Add Exam Status")}
+        aria-required="true"
+      />
 
       <div className="mt-4 flex space-x-2">
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700" aria-label={t("Submit Request")}>
-        {t("Submit")}
-      </button>
-      <button onClick={handleCancel} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700" aria-label={t("Cancel Request")}>
-        {t("Cancel")}
-      </button>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
+          aria-label={t("Submit Request")}
+          onClick={() => handleSubmit()}
+        >
+          {t("Submit")}
+        </button>
+        <button
+          onClick={handleCancel}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
+          aria-label={t("Cancel Request")}
+        >
+          {t("Cancel")}
+        </button>
       </div>
-    </form>
+    </div>
   );
 }

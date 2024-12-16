@@ -229,8 +229,9 @@ export default function IndividualNotification() {
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
-          }).then((res) => res.json())
-          .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)), 
+          })
+            .then((res) => res.json())
+            .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)),
         ]);
 
         setOptions({
@@ -381,7 +382,9 @@ export default function IndividualNotification() {
       }
     } else {
       //set notif to passive, discard changes
+      console.log(notification);
       if (notification && (exam == null || exam.id == undefined || exam.id == 0)) {
+        console.log("here?");
         const notif = await fetch(`http://localhost:1337/api/notifications/${notification.id}`, {
           method: "DELETE",
           headers: {
@@ -391,6 +394,8 @@ export default function IndividualNotification() {
         });
 
         sendNotification(false);
+      } else {
+        sendNotification(false);
       }
     }
 
@@ -398,7 +403,11 @@ export default function IndividualNotification() {
   };
 
   if (loading || !exam) {
-    return <p aria-live="polite" aria-busy="true">Loading exam data...</p>;
+    return (
+      <p aria-live="polite" aria-busy="true">
+        Loading exam data...
+      </p>
+    );
   }
 
   const dropdownOptions = (list: any[], firstNameField: string, lastNameField?: string) =>
@@ -455,9 +464,13 @@ export default function IndividualNotification() {
           aria-label={t("Date comparison")}
         />
 
-        <ComparisonField label={t("Duration")} options={[]} value={duration?.toString() || ""}
+        <ComparisonField
+          label={t("Duration")}
+          options={[]}
+          value={duration?.toString() || ""}
           proposedVal={proposedExam.duration?.toString() || ""}
-          aria-label={t("Duration comparison")} />
+          aria-label={t("Duration comparison")}
+        />
 
         <ComparisonField
           label={"Student"}
@@ -515,7 +528,7 @@ export default function IndividualNotification() {
           aria-label={t("Room comparison")}
         />
 
-        <ComparisonField label={t("Status")} options={[]} value={status || ""} proposedVal={proposedExam.status} aria-label={t("Status comparison")}/>
+        <ComparisonField label={t("Status")} options={[]} value={status || ""} proposedVal={proposedExam.status} aria-label={t("Status comparison")} />
       </section>
       <div className="mt-4 flex gap-4">
         <button

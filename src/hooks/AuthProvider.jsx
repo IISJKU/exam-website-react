@@ -55,7 +55,6 @@ const AuthProvider = ({ children }) => {
    */
   const setUserData = async (token) => {
     const userRes = await userData(token);
-    console.log(userRes);
     if (userRes.role && userRes.role.name) {
       setUser(userRes.username);
       localStorage.setItem("userName", userRes.username);
@@ -95,6 +94,14 @@ const AuthProvider = ({ children }) => {
    * Reset all variables, User Tokens and so on
    */
   const logOut = () => {
+    resetStates();
+    navigate("/");
+  };
+
+  /**
+   * Reset all of the States & Delete Everything from local storage
+   */
+  const resetStates = () => {
     setUser(null);
     setUserId(null);
     setToken("");
@@ -103,30 +110,26 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem("site");
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
-
-    navigate("/");
   };
 
   const redirectIfLoggedIn = async () => {
     if (token != "") {
-      const response = await fetch(url + "/api/users/me?populate=*", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      //console.log(token);
+      try {
+        const response = await fetch(url + "/api/users/me?populate=*", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      if (response.ok) {
-        redirectRole(role);
-      } else {
-        setUser(null);
-        setUserId(null);
-        setToken("");
-        setRole("");
+        if (!response.ok) {
+          resetStates();
 
-        localStorage.removeItem("site");
-        localStorage.removeItem("userName");
-        localStorage.removeItem("userRole");
-      }
+          throw new Error(response.message);
+        } else {
+          redirectRole(role);
+        }
+      } catch (error) {}
     }
   };
 

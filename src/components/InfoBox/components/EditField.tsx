@@ -31,54 +31,50 @@ export default function EditField(props: EditFieldProps) {
 
   if (props.hideTitle !== undefined) hide = props.hideTitle;
 
-  if (
-    (props.title === "First Name" ||
-      props.title === "Last Name" ||
-      props.title === "Exam Title") &&
-    !props.editMode
-  ) {
+  if ((props.title === "First Name" || props.title === "Last Name" || props.title === "Exam Title") && !props.editMode) {
     classList = "relative w-96 pr-2 text-3xl";
   }
-   
+
   if (props.title === "Duration") additionalText = " min";
 
   return (
     <div className={classList} tabIndex={0}>
       {props.title && (props.editMode || !hide) && (
-        <label htmlFor={`edit-field-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{t(props.title) + " "}
-          {props.required && <span className="text-red-500">{" "}*</span>}
+        <label htmlFor={`edit-field-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">
+          {t(props.title) + " "}
+          {props.required && <span className="text-red-500"> *</span>}
         </label>
       )}
       <div className="relative mt-1">
-      {props.editMode ? (
-        props.title === "Status" ? (
-          <textarea 
-            id={`edit-field-${props.title?.replace(/\s+/g, "-").toLowerCase()}`}
-            onChange={handleChange}
-            className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
-            rows={4}
-            cols={40} 
-            value={value}
-            aria-label={props.title}
-            required={props.required} 
-          />
-        ) : (
-          <input
-            id={`edit-field-${props.title?.replace(/\s+/g, "-").toLowerCase()}`}
-            onChange={handleChange}
-            className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
-            type="text"
-            value={value}
-            aria-label={props.title}
-            required={props.required} 
+        {props.editMode ? (
+          props.title === "Status" ? (
+            <textarea
+              id={`edit-field-${props.title?.replace(/\s+/g, "-").toLowerCase()}`}
+              onChange={handleChange}
+              className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
+              rows={4}
+              cols={40}
+              value={value}
+              aria-label={props.title}
+              required={props.required}
             />
-        )
-      ) : (
-        <div className="mb-2 inline-block" role="textbox" aria-readonly="true">
-          {value}
-          {additionalText}
-        </div>
-      )}
+          ) : (
+            <input
+              id={`edit-field-${props.title?.replace(/\s+/g, "-").toLowerCase()}`}
+              onChange={handleChange}
+              className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
+              type="text"
+              value={value}
+              aria-label={props.title}
+              required={props.required}
+            />
+          )
+        ) : (
+          <div className="mb-2 inline-block" role="textbox" aria-readonly="true">
+            {value}
+            {additionalText}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ interface DropdownOption {
 
 interface DropdownWithSearchProps {
   tableName: string;
-  label: string;
+  label?: string;
   options: DropdownOption[];
   value: string | number;
   onChange: (value: string | number) => void;
@@ -151,9 +151,12 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
       aria-labelledby={`dropdown-label-${props.label}`}
       tabIndex={0}
     >
-      {props.label && <label id={`dropdown-label-${props.label}`} className="font-bold" htmlFor="dropdown-input">{props.label}
-        {props.required && <span className="text-red-500">{" "}*</span>}
-      </label>}
+      {props.label && (
+        <label id={`dropdown-label-${props.label}`} className="font-bold" htmlFor="dropdown-input">
+          {props.label}
+          {props.required && <span className="text-red-500"> *</span>}
+        </label>
+      )}
       {props.disabled ? (
         <div className="mb-2">{selectedOptionLabel}</div>
       ) : (
@@ -174,7 +177,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
             aria-controls="dropdown-list"
             aria-activedescendant={isDropdownOpen && filteredOptions.length > 0 ? `option-${filteredOptions[0].value}` : undefined}
             aria-disabled={props.disabled || false}
-            required={props.required} 
+            required={props.required}
           />
           {isDropdownOpen && (
             <ul id="dropdown-list" role="listbox" className="absolute bg-white shadow-lg z-50 w-80 max-h-40 overflow-auto" tabIndex={-1}>
