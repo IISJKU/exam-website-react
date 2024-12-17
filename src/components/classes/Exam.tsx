@@ -14,6 +14,7 @@ export default class Exam {
   duration!: number;
   student!: Student | number; // Student name or ID
   tutor!: Tutor | number; // List of tutor names or ID
+  registeredTutors!: Tutor[];
   examiner!: Examiner | number; // List of examiners or ID
   major!: Major | number; // Major name or ID
   institute!: Institute | number; // Institute name or ID

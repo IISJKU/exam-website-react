@@ -39,6 +39,7 @@ export default function ExamEditor() {
   const [institute, setInstitute] = useState<number | undefined>();
   const [mode, setMode] = useState<number | undefined>();
   const [room, setRoom] = useState<number | null>();
+  const [registeredTutors, setRegisteredTutors] = useState<Tutor[]>([]);
   const [status, setStatus] = useState<string>("");
 
   const [originalExam, setOriginalExam] = useState<Exam>(new Exam());
@@ -82,7 +83,6 @@ export default function ExamEditor() {
         });
 
         const rawData = await examResponse.json();
-
         if (!examResponse.ok) {
           showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${rawData.error.message || "Unknown error"}.`, type: "error" });
         }
@@ -110,6 +110,7 @@ export default function ExamEditor() {
           setRoom(examData.room_id);
           setStatus(examData.status);
           setTutor(examData.tutor_id);
+          setRegisteredTutors(examData.registeredTutors);
           setStudent(examData.student_id);
           setExaminer(examData.examiner_id);
           setMajor(examData.major_id);
@@ -467,7 +468,10 @@ export default function ExamEditor() {
           label={"Tutors"}
           options={dropdownOptions(options.tutors, "first_name", "last_name")}
           value={tutor ?? ""}
-          onChange={(newValue) => setTutor(Number(newValue))}
+          values={registeredTutors}
+          onChange={(newValue) => {
+            setTutor(Number(newValue));
+          }}
           placeholder={t("Search tutors...")}
           disabled={!editMode}
           aria-label={t("Exam Tutor")}

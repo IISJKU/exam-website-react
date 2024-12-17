@@ -56,8 +56,6 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
     if (typeof optionValue == "string") optionValue = JSON.parse(optionValue).searchTerm;
     setIsDropdownOpen(false); // Close dropdown after selection
     if (typeof optionValue == "number") setSearchTerm(""); // Clear search term after selection
-
-    console.log(optionValue);
   };
 
   function newRecord() {
@@ -120,7 +118,6 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
       if (isDropdownOpen) {
         if (filteredOptions.length > 0) {
           //handleSelectOption(filteredOptions[0].value); // Select the first filtered option}
-          console.log(filteredOptions);
         } else handleAddNewRecord(); // Add a new record if no option is selected
       } else setIsDropdownOpen(true);
     } else if (e.key === "Tab") {
