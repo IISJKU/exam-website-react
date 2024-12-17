@@ -11,7 +11,7 @@ export default function TutorExamRequest() {
   const { id } = useParams();
   const { t } = useTranslation();
   const user = useAuth();
-  const userId = user.userId;
+  const userId = user.id;
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(true);
   const [exam, setExam] = useState<any | null>(null); // Use any type for flexibility
@@ -54,7 +54,7 @@ export default function TutorExamRequest() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user.token}`,
         },
-        body: JSON.stringify({ examId: id, tutorId: userId }),
+        body: JSON.stringify({ examId: id }),
       });
       const data = await response.json();
 
@@ -96,56 +96,92 @@ export default function TutorExamRequest() {
     }
   };
 
-  if (loading) return <p aria-live="polite" aria-busy="true">{t("Loading exam data...")}</p>;
+  if (loading)
+    return (
+      <p aria-live="polite" aria-busy="true">
+        {t("Loading exam data...")}
+      </p>
+    );
 
-  if (!exam) return <p aria-live="polite" aria-busy="true">{t("No exam details found.")}</p>;
+  if (!exam)
+    return (
+      <p aria-live="polite" aria-busy="true">
+        {t("No exam details found.")}
+      </p>
+    );
 
   return (
     <div className="m-5" aria-labelledby="tutor-request-heading" role="form">
-      <h2 id="tutor-request-heading" className="text-2xl font-bold mb-4">{t("Exam Details")}</h2>
+      <h2 id="tutor-request-heading" className="text-2xl font-bold mb-4">
+        {t("Exam Details")}
+      </h2>
       <dl>
         <div>
-          <dt><strong>{t("Exam Title")}:</strong></dt>
+          <dt>
+            <strong>{t("Exam Title")}:</strong>
+          </dt>
           <dd>{exam.title}</dd>
         </div>
         <div>
-          <dt><strong>{t("LVA Num")}:</strong></dt>
+          <dt>
+            <strong>{t("LVA Num")}:</strong>
+          </dt>
           <dd>{exam.lva_num}</dd>
         </div>
         <div>
-          <dt><strong>{t("Date")}:</strong></dt>
+          <dt>
+            <strong>{t("Date")}:</strong>
+          </dt>
           <dd>{moment(exam.date).format("DD.MM.YYYY HH:mm")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Duration")}:</strong></dt>
-          <dd>{exam.duration} {t("minutes")}</dd>
+          <dt>
+            <strong>{t("Duration")}:</strong>
+          </dt>
+          <dd>
+            {exam.duration} {t("minutes")}
+          </dd>
         </div>
         <div>
-          <dt><strong>{t("Student")}:</strong></dt>
+          <dt>
+            <strong>{t("Student")}:</strong>
+          </dt>
           <dd>{exam.student && typeof exam.student === "object" ? `${exam.student.first_name} ${exam.student.last_name}` : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Examiner")}:</strong></dt>
+          <dt>
+            <strong>{t("Examiner")}:</strong>
+          </dt>
           <dd>{exam.examiner && typeof exam.examiner === "object" ? `${exam.examiner.first_name} ${exam.examiner.last_name}` : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Major")}:</strong></dt>
+          <dt>
+            <strong>{t("Major")}:</strong>
+          </dt>
           <dd>{exam.major && typeof exam.major === "object" ? exam.major.name : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Institute")}:</strong></dt>
+          <dt>
+            <strong>{t("Institute")}:</strong>
+          </dt>
           <dd>{exam.institute && typeof exam.institute === "object" ? exam.institute.name : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Room")}:</strong></dt>
+          <dt>
+            <strong>{t("Room")}:</strong>
+          </dt>
           <dd>{exam.room && typeof exam.room === "object" ? exam.room.name : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Mode")}:</strong></dt>
+          <dt>
+            <strong>{t("Mode")}:</strong>
+          </dt>
           <dd>{exam.exam_mode && typeof exam.exam_mode === "object" ? exam.exam_mode.name : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Status")}:</strong></dt>
+          <dt>
+            <strong>{t("Status")}:</strong>
+          </dt>
           <dd>{exam.status}</dd>
         </div>
       </dl>

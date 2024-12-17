@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams , useNavigate} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import moment from "moment";
 import { showToast } from "../components/ToastMessage";
 import { useAuth } from "../../../hooks/AuthProvider";
@@ -75,7 +75,7 @@ export default function RemoveTutor() {
   // Handle tutor request to monitor the exam
   const handleRemove = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/exams/remove-tutor", {
+      const response = await fetch("http://localhost:1337/api/exams/deregister-tutor", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,60 +126,92 @@ export default function RemoveTutor() {
     }
   };
 
-  if (loading) return <p aria-live="polite" aria-busy="true">{t("Loading exam data...")}</p>;
+  if (loading)
+    return (
+      <p aria-live="polite" aria-busy="true">
+        {t("Loading exam data...")}
+      </p>
+    );
   if (!exam) return <p>{t("No exam details found.")}</p>;
 
   return (
     <div className="m-5" role="main" aria-labelledby="exam-details-heading">
-      <h2 id="exam-details-heading" className="text-2xl font-bold mb-4">{t("Exam Details")}</h2>
+      <h2 id="exam-details-heading" className="text-2xl font-bold mb-4">
+        {t("Exam Details")}
+      </h2>
       <dl>
         <div>
-          <dt><strong>{t("Exam Title")}:</strong></dt>
+          <dt>
+            <strong>{t("Exam Title")}:</strong>
+          </dt>
           <dd>{exam.title}</dd>
         </div>
         <div>
-          <dt><strong>{t("LVA Num")}:</strong></dt>
+          <dt>
+            <strong>{t("LVA Num")}:</strong>
+          </dt>
           <dd>{exam.lva_num}</dd>
         </div>
         <div>
-          <dt><strong>{t("Date")}:</strong></dt>
+          <dt>
+            <strong>{t("Date")}:</strong>
+          </dt>
           <dd>{moment(exam.date).format("DD.MM.YYYY HH:mm")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Duration")}:</strong></dt>
-          <dd>{exam.duration} {t("minutes")}</dd>
+          <dt>
+            <strong>{t("Duration")}:</strong>
+          </dt>
+          <dd>
+            {exam.duration} {t("minutes")}
+          </dd>
         </div>
         <div>
-          <dt><strong>{t("Student")}:</strong></dt>
+          <dt>
+            <strong>{t("Student")}:</strong>
+          </dt>
           <dd>{exam.student && typeof exam.student === "object" ? `${exam.student.first_name} ${exam.student.last_name}` : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Examiner")}:</strong></dt>
+          <dt>
+            <strong>{t("Examiner")}:</strong>
+          </dt>
           <dd>{exam.examiner && typeof exam.examiner === "object" ? `${exam.examiner.first_name} ${exam.examiner.last_name}` : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Major")}:</strong></dt>
+          <dt>
+            <strong>{t("Major")}:</strong>
+          </dt>
           <dd>{exam.major && typeof exam.major === "object" ? exam.major.name : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Institute")}:</strong></dt>
+          <dt>
+            <strong>{t("Institute")}:</strong>
+          </dt>
           <dd>{exam.institute && typeof exam.institute === "object" ? exam.institute.name : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Room")}:</strong></dt>
+          <dt>
+            <strong>{t("Room")}:</strong>
+          </dt>
           <dd>{exam.room && typeof exam.room === "object" ? exam.room.name : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Mode")}:</strong></dt>
+          <dt>
+            <strong>{t("Mode")}:</strong>
+          </dt>
           <dd>{exam.exam_mode && typeof exam.exam_mode === "object" ? exam.exam_mode.name : t("Not Assigned")}</dd>
         </div>
         <div>
-          <dt><strong>{t("Status")}:</strong></dt>
+          <dt>
+            <strong>{t("Status")}:</strong>
+          </dt>
           <dd>{exam.status}</dd>
         </div>
       </dl>
       <div className="mt-4 flex space-x-2">
-        <button onClick={() => setShowConfirmDialog(true)}
+        <button
+          onClick={() => setShowConfirmDialog(true)}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
           aria-haspopup="dialog"
         >

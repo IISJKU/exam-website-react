@@ -29,6 +29,7 @@ import TutorExamRequest from "./components/InfoBox/views/TutorExamRequest";
 import RemoveTutor from "./components/InfoBox/views/RemoveTutor";
 import ExamRoomView from "./components/InfoBox/views/ExamRoomView";
 import { useEffect } from "react";
+import TutorRegisteredExams from "./components/InfoBox/views/TutorRegisteredExams";
 
 export default function App() {
   return (
@@ -71,6 +72,7 @@ export default function App() {
               <Route path="/tutor/exams" element={<ExamView />} />
               <Route path="/tutor/exams/:id" element={<ExamEditor />} />
               <Route path="/tutor/upcoming-exams" element={<TutorExamView />} />
+              <Route path="/tutor/registered-exams" element={<TutorRegisteredExams />} />
               <Route path="/tutor/remove-tutor/:id" element={<RemoveTutor />} />
               <Route path="/tutor/exams/without-tutor" element={<ExamWithoutTutor />} />
               <Route path="/tutor/exams/monitor-request/:id" element={<TutorExamRequest />} />
@@ -81,7 +83,7 @@ export default function App() {
           </Routes>
 
           {/* ToastContainer for notifications */}
-          <ToastContainer role="alert" aria-live="assertive" aria-relevant="all"/>
+          <ToastContainer role="alert" aria-live="assertive" aria-relevant="all" />
         </AuthProvider>
       </div>
     </Router>
