@@ -5,6 +5,7 @@ import { useAuth } from "../../../hooks/AuthProvider";
 
 import fetchAll from "./FetchAll";
 import {formatDateTime } from "./ContentView";
+import { t } from "i18next";
 
 interface DataAdministrationProps {
   tableName: string;
@@ -32,6 +33,8 @@ export default function DataAdministration(props: DataAdministrationProps) {
   const [editingRecord, setEditingRecord] = useState<DataRecord | null>(null);
   const [relationalData, setRelationalData] = useState<{ [key: string]: any[] }>({}); // Relational data for dropdowns
   const [booleanFields, setBooleanFields] = useState<string[]>([]); // Boolean fields
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<number | null>(null);
 
   const fetchData = async () => {
     setData([]);
@@ -206,6 +209,23 @@ export default function DataAdministration(props: DataAdministrationProps) {
     }
   };
 
+  const openConfirmDialog = (id: number) => {
+    setRecordToDelete(id);
+    setShowConfirmDialog(true);
+  };
+  
+  const closeConfirmDialog = () => {
+    setRecordToDelete(null);
+    setShowConfirmDialog(false);
+  };
+  
+  const handleConfirmDeletion = async () => {
+    if (recordToDelete !== null) {
+      await deleteRecord(recordToDelete);
+      closeConfirmDialog();
+    }
+  };
+
   useEffect(() => {
     fetchData();
     if (props.populateFields?.length) {
@@ -278,14 +298,16 @@ export default function DataAdministration(props: DataAdministrationProps) {
                     <button
                       className="text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       aria-label={`Edit record ${record.id}`}
-                      onClick={() => handleEditClick(record)}>
-                      Edit
+                      onClick={() => handleEditClick(record)}
+                    >
+                      {t("Edit")}
                     </button>
                     <button
                       className="text-red-500 hover:text-red-700 ml-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                       aria-label={`Delete record ${record.id}`}
-                      onClick={() => deleteRecord(record.id!)}>
-                      Delete
+                      onClick={() => openConfirmDialog(record.id!)}
+                    >
+                      {t("Delete")}
                     </button>
                   </td>
                 </tr>
@@ -294,7 +316,40 @@ export default function DataAdministration(props: DataAdministrationProps) {
           </table>
         </div>
       )}
-
+      {showConfirmDialog && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-dialog-title"
+          aria-describedby="confirm-dialog-description"
+        >
+          <div className="bg-white p-4 rounded shadow-lg max-w-sm">
+            <h2 id="confirm-dialog-title" className="text-lg font-bold mb-4">
+              {t("Confirm Deletion")}
+            </h2>
+            <p id="confirm-dialog-description" className="mb-4">
+              {t("Are you sure you want to delete this record? This action cannot be undone.")}
+            </p>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={closeConfirmDialog}
+                className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 focus:ring-2 focus:ring-gray-400"
+                aria-label={t("Cancel deletion")}
+              >
+                {t("Cancel")}
+              </button>
+              <button
+                onClick={handleConfirmDeletion}
+                className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 focus:ring-2 focus:ring-red-500"
+                aria-label={t("Confirm deletion")}
+              >
+                {t("Delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <h2 id="record-form-title" className="text-xl font-bold mt-4" tabIndex={0} role="heading">{editingRecord ? "Edit Record" : "Add Record"}</h2>
       <div className="h-96 overflow-y-auto">
         <RecordForm
