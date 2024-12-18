@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
 import ComparisonField from "../components/ComparisonField";
 import fetchAll from "./FetchAll";
+import { sendEmail } from "../../../services/EmailService";
 
 export default function IndividualNotification() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -65,6 +66,8 @@ export default function IndividualNotification() {
     if (partial.institute_id != undefined) ex.institute_id = partial.institute_id;
     if (partial.lva_num != undefined) ex.lva_num = partial.lva_num;
     if (partial.status != undefined) ex.status = partial.status;
+    if (partial.student_email != undefined) ex.student_email = partial.student_email;
+    if (partial.tutor_email != undefined) ex.tutor_email = partial.tutor_email;
     if (partial.major_id != undefined) ex.major_id = partial.major_id;
 
     if (partial.exam_mode != undefined) ex.exam_mode = partial.exam_mode;
@@ -291,6 +294,46 @@ export default function IndividualNotification() {
     }
   };
 
+  function generateChangesHtml( currentExam: any, newExam: any, options: any, accept: boolean, emailContent: string ): string {
+    const isUpdate = (currentExam == null) ? false : true;
+    const current = (newExam.title == undefined) ? currentExam : newExam;
+    return `
+    <h3>Exam Changes</h3>
+    ${emailContent}
+    <table border="1" style="border-collapse: collapse; width: 70%;">
+      <thead>
+        <tr>
+          <th style="padding: 8px; text-align: left;">Field</th>
+           ${
+            isUpdate ?
+            `<th style="padding: 8px; text-align: left;">Old</th>
+            <th style="padding: 8px; text-align: left;">New</th>`
+            : `<th style="padding: 8px; text-align: left;">Details</th>`
+            }
+        </tr>
+      </thead>
+      <tbody>
+        ${generateRow("Title", current?.title, newExam.title, isUpdate)}
+        ${generateRow("LVA Number", current?.lva_num, newExam.lva_num, isUpdate)}
+        ${generateRow(
+          "Date",
+          current?.date ? moment(current.date).format("DD.MM.YYYY HH:mm") : "N/A",
+          newExam.date ? moment(newExam.date).format("DD.MM.YYYY HH:mm") : moment(current.date).format("DD.MM.YYYY HH:mm"), isUpdate
+        )}
+        ${generateRow("Duration", current?.duration, newExam.duration, isUpdate)}
+        ${generateRow("Tutor", match(options.tutors, current?.tutor_id || current?.tutor), match(options.tutors, newExam.tutor_id), isUpdate)}
+        ${generateRow("Student", match(options.students, current?.student_id || current?.student), match(options.students, newExam.student_id), isUpdate)}
+        ${generateRow("Examiner", match(options.examiners, current?.examiner_id || current?.examiner), match(options.examiners, newExam.examiner_id), isUpdate)}
+        ${generateRow("Major", match(options.majors, current?.major_id || current?.major), match(options.majors, newExam.major_id), isUpdate)}
+        ${generateRow("Institute", match(options.institutes, current?.institute_id || current?.institute), match(options.institutes, newExam.institute_id), isUpdate)}
+        ${generateRow("Mode", match(options.modes, current?.mode_id || current?.exam_mode), match(options.modes, newExam.mode_id), isUpdate)}
+        ${generateRow("Room", match(options.rooms, current?.room_id ||  current?.room), match(options.rooms, newExam.room_id), isUpdate)}
+        ${generateRow("Status", current?.status, newExam.status, isUpdate)}
+      </tbody>
+    </table>
+    `;
+  }
+
   const handleUpdate = async (accept: boolean) => {
     if (accept) {
       //reset notif, set to passive & apply changes
@@ -318,6 +361,27 @@ export default function IndividualNotification() {
           showToast({ message: "Exam updated successfully", type: "success" });
 
           sendNotification(accept);
+          // Generate changesHtml using the helper function
+          const changesHtml = generateChangesHtml(exam, proposedExam, options, accept, "<p>The following changes have been made to the exam:</p>");
+
+          // Send emails to both tutor and student
+          const emailPromises = [
+            sendEmail({
+              to: exam.tutor_email || "",
+              subject: "Exam Update Notification",
+              text: "The exam has been updated successfully.",
+              html: changesHtml,
+              token: user.token,
+            }),
+            sendEmail({
+              to: exam.student_email || "",
+              subject: "Exam Update Notification",
+              text: "The exam has been updated successfully.",
+              html: changesHtml,
+              token: user.token,
+            }),
+          ];
+          await Promise.all(emailPromises);
         } else {
           fixProposedExam();
 
@@ -374,17 +438,34 @@ export default function IndividualNotification() {
           } else {
             showToast({ message: "New Exam Not Found", type: "error" });
           }
-
+          const changesHtml = generateChangesHtml(null, proposedExam, options, accept, "<p>The new exam has been accepted:</p>");
+          // Send emails to both tutor and student
+          const emailPromises = [
+            sendEmail({
+              to: proposedExam?.tutor_email || "",
+              subject: "Exam Accepted Notification",
+              text: "The exam has been accepted.",
+              html: changesHtml,
+              token: user.token,
+            }),
+            sendEmail({
+              to: proposedExam?.student_email || "",
+              subject: "Exam Accepted Notification",
+              text: "The exam has been accepted.",
+              html: changesHtml,
+              token: user.token,
+            }),
+          ];
+          await Promise.all(emailPromises);
           sendNotification(accept);
         }
       } catch (error) {
         showToast({ message: "Error updating exam", type: "error" });
       }
     } else {
+      const availableExam = (proposedExam.title == undefined) ? exam : proposedExam;
       //set notif to passive, discard changes
-      console.log(notification);
       if (notification && (exam == null || exam.id == undefined || exam.id == 0)) {
-        console.log("here?");
         const notif = await fetch(`http://localhost:1337/api/notifications/${notification.id}`, {
           method: "DELETE",
           headers: {
@@ -394,8 +475,46 @@ export default function IndividualNotification() {
         });
 
         sendNotification(false);
+        const changesHtml = generateChangesHtml(null, availableExam, options, accept, "<p>We regret to inform you that the proposed exam has been <strong>declined</strong>. Below are the details of the declined exam:</p>");
+        // Send emails to both tutor and student
+        const emailPromises = [
+          sendEmail({
+            to: availableExam?.tutor_email || "",
+            subject: "Exam Decline Notification",
+            text: "The exam has been declined.",
+            html: changesHtml,
+            token: user.token,
+          }),
+          sendEmail({
+            to: availableExam?.student_email || "",
+            subject: "Exam Decline Notification",
+            text: "The exam has been declined.",
+            html: changesHtml,
+            token: user.token,
+          }),
+        ];
+        await Promise.all(emailPromises);
       } else {
         sendNotification(false);
+        const changesHtml = generateChangesHtml(null, availableExam, options, accept, "<p>We regret to inform you that the proposed exam changes has been <strong>declined</strong>. Below are the current details of the exam:</p>");
+        // Send emails to both tutor and student
+        const emailPromises = [
+          sendEmail({
+            to: availableExam?.tutor_email || "",
+            subject: "Exam Change Decline Notification",
+            text: "The exam changes has been declined.",
+            html: changesHtml,
+            token: user.token,
+          }),
+          sendEmail({
+            to: availableExam?.student_email || "",
+            subject: "Exam Change Decline Notification",
+            text: "The exam changes has been declined.",
+            html: changesHtml,
+            token: user.token,
+          }),
+        ];
+        await Promise.all(emailPromises);
       }
     }
 
@@ -418,22 +537,7 @@ export default function IndividualNotification() {
         : item[firstNameField], // For fields with just one field (like 'name' for institutes or majors)
     }));
 
-  const match = (arr: any[], val: any): string => {
-    let t;
 
-    arr.forEach((entr) => {
-      if (entr.id == val) {
-        t = entr;
-      }
-    });
-
-    if (t == undefined || t == null) return "";
-
-    if (t["name"] != undefined) return t["name"];
-    if (t["first_name"] && t["last_name"]) return t["first_name"] + " " + t["last_name"];
-
-    return "";
-  };
 
   return (
     <div className="m-5" role="main" aria-labelledby="notification-heading">
@@ -560,4 +664,42 @@ export default function IndividualNotification() {
       </div>
     </div>
   );
+}
+
+export const match = (arr: any[], val: any): string => {
+  let t;
+
+  arr.forEach((entr) => {
+    if (entr.id == val) {
+      t = entr;
+    }
+  });
+
+  if (t == undefined || t == null) return "";
+
+  if (t["name"] != undefined) return t["name"];
+  if (t["first_name"] && t["last_name"]) return t["first_name"] + " " + t["last_name"];
+
+  return "";
+};
+
+export function generateRow(fieldName: string, previousValue: any, newValue: any = "", includeNewValue: boolean = false): string {
+  // "N/A" if values are undefined or null
+  const prev = previousValue || "N/A";
+  const next = newValue || prev;
+
+  // Bold and highlight in red if there's a change
+  const nextText = prev !== next ? `<span style="color: red; font-weight: bold;">${next}</span>` : next;
+
+  return `
+    <tr>
+      <td style="padding: 8px;">${fieldName}</td>
+      <td style="padding: 8px;">${prev}</td>
+      ${
+        includeNewValue
+          ? `<td style="padding: 8px;">${nextText}</td>`
+          : ""
+      }
+    </tr>
+  `;
 }

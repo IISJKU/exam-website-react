@@ -31,4 +31,6 @@ export default class Exam {
   mode_id!: number;
   room_id!: number;
   confirmed!: boolean;
+  student_email!: string;
+  tutor_email!: string;
 }

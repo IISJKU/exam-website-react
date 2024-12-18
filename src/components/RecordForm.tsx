@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import DateField from "./InfoBox/components/DateField";
 import { t } from "i18next";
+import { sendEmail } from "../services/EmailService";
+import { useAuth } from "../hooks/AuthProvider";
+import { match } from "./InfoBox/views/IndividualNotification";
+import moment from "moment";
 
 interface RecordFormProps {
   record: DataRecord | null;
@@ -14,6 +18,8 @@ interface RecordFormProps {
 
 interface DataRecord {
   [key: string]: any;
+  student_email?: string | null;
+  tutor_email?: string | null;
 }
 
 const defaultRecord: DataRecord = {};
@@ -21,6 +27,7 @@ const defaultRecord: DataRecord = {};
 export default function RecordForm(props: RecordFormProps) {
   const [formData, setFormData] = useState<DataRecord>(defaultRecord);
   const [role, setRole] = useState(formData.role || "");
+  const user = useAuth();
 
   useEffect(() => {
     if (props.record) {
@@ -74,25 +81,167 @@ export default function RecordForm(props: RecordFormProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  function matchValue(options: any[], value: any): string {
+    if (!value || !options) return "N/A";
+    const item = options.find((option) => option.id === Number(value));
+    return item ? item.displayValue : "N/A";
+  }
+
+  function getEmail(options: any[], selectedId: number): string | null {
+    if (!options || !selectedId) return null;
+  
+    const selectedItem = options.find((option) => option.id === Number(selectedId));
+    if (!selectedItem) return null;
+  
+    // Check for 'student_email' directly
+    if (selectedItem.email) {
+      return selectedItem.email;
+    }
+  
+    // Check for nested 'user' email
+    if (selectedItem.user?.data?.attributes?.email) {
+      return selectedItem.user.data.attributes.email;
+    }
+  
+    return null;
+  }
+  
+
+  function generateChangesHtml(oldData: any, newData: any, options: any): string {
+    console.log('old'+ JSON.stringify(oldData))
+    console.log('new'+ JSON.stringify(newData))
+    const generateRow = (fieldName: string, oldValue: any, newValue: any) => {
+      const prev = oldValue || "N/A";
+      const next = newValue || prev;
+      const nextStyle = prev !== next ? `<span style="color: red; font-weight: bold;">${next}</span>` : next;
+  
+      return `
+        <tr>
+          <td style="padding: 8px;">${fieldName}</td>
+          <td style="padding: 8px;">${prev}</td>
+          <td style="padding: 8px;">${nextStyle}</td>
+        </tr>
+      `;
+    };
+  
+    return `
+      <h3>Exam Changes</h3>
+      <p>The following changes have been made:</p>
+      <table border="1" style="border-collapse: collapse; width: 70%;">
+        <thead>
+          <tr>
+            <th style="padding: 8px; text-align: left;">Field</th>
+            <th style="padding: 8px; text-align: left;">Old</th>
+            <th style="padding: 8px; text-align: left;">New</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${generateRow("Title", oldData?.title, newData?.title)}
+          ${generateRow("LVA Number", oldData?.lva_num, newData?.lva_num)}
+          ${generateRow(
+                    "Date",
+                    oldData?.date ? moment(oldData.date).format("DD.MM.YYYY HH:mm") : "N/A",
+                    newData.date ? moment(newData.date).format("DD.MM.YYYY HH:mm") : moment(oldData.date).format("DD.MM.YYYY HH:mm")
+                  )}
+          ${generateRow("Duration", oldData?.duration, newData?.duration)}
+          ${generateRow("Student", matchValue(options.student, oldData?.student_id), matchValue(options.student, newData?.student))}
+          ${generateRow("Tutor", matchValue(options.tutor, oldData?.tutor_id), matchValue(options.tutor, newData?.tutor))}
+          ${generateRow("Examiner", matchValue(options.examiner, oldData?.examiner_id), matchValue(options.examiner, newData?.examiner))}
+          ${generateRow("Major", matchValue(options.major, oldData?.major_id), matchValue(options.major, newData?.major))}
+          ${generateRow("Institute", matchValue(options.institute, oldData?.institute_id), matchValue(options.institute, newData?.institute))}
+          ${generateRow("Mode", matchValue(options.exam_mode, oldData?.exam_mode_id), matchValue(options.exam_mode, newData?.exam_mode))}
+          ${generateRow("Room", matchValue(options.room, oldData?.room_id), matchValue(options.room, newData?.room))}
+          ${generateRow("Status", oldData?.status, newData?.status)}
+        </tbody>
+      </table>
+    `;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    console.log(formData);
     e.preventDefault();
 
-    // Prepare formData to avoid empty strings for relational fields
-    const sanitizedData = {
+    const sanitizedData: DataRecord = {
       ...formData,
       student: formData.student || null,
       tutor: formData.tutor || null,
     };
+  
+    const options = props.relationalFields?.reduce((acc, field) => {
+      acc[field.name] = field.options ?? [];
+      return acc;
+    }, {} as Record<string, any[]>);
+
+    // retrieve the student and tutor emails
+    const studentEmail = getEmail(options?.student ?? [], sanitizedData.student);
+    const tutorEmail = getEmail(options?.tutor ?? [], sanitizedData.tutor);
+
+    // Assign the emails to sanitizedData
+    sanitizedData.student_email = studentEmail || null;
+    sanitizedData.tutor_email = tutorEmail || null;
+
+    const changesHtml = generateChangesHtml(props.record, sanitizedData, options);
 
     props.onSubmit(sanitizedData);
-    setFormData(defaultRecord); 
+  
+    if (props.record) {
+      try {
+        const emailPromises = [];
+        if (tutorEmail) {
+          emailPromises.push(
+            sendEmail({
+              to: tutorEmail,
+              subject: "Exam Update Notification",
+              text: "The exam details have been updated.",
+              html: changesHtml,
+              token: user.token,
+            })
+          );
+        }
+        if (studentEmail) {
+          emailPromises.push(
+            sendEmail({
+              to: studentEmail,
+              subject: "Exam Update Notification",
+              text: "The exam details have been updated.",
+              html: changesHtml,
+              token: user.token,
+            })
+          );
+        }
+        await Promise.all(emailPromises);
+        console.log("Emails sent successfully!");
+      } catch (error) {
+        console.error("Error sending emails:", error);
+      }
+    }
+  
+    setFormData(defaultRecord);
     setRole("");
-  };
+  };  
 
   const handleCancel = () => {
     setFormData(defaultRecord);
     setRole("");
     props.onCancel();
+  };
+
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedDate = event.target.value;
+    const currentTime = moment.utc(formData.date).format("HH:mm:ss"); // Preserve time, use UTC
+  
+    // Combine date and time in ISO format
+    const updatedDate = moment(`${selectedDate}T${currentTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString();
+    setFormData((prev) => ({ ...prev, date: updatedDate }));
+  };
+  
+  const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedTime = event.target.value;
+    const currentDate = moment.utc(formData.date).format("YYYY-MM-DD"); // Preserve date, use UTC
+  
+    // Combine date and time in ISO format
+    const updatedDate = moment(`${currentDate}T${selectedTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString();
+    setFormData((prev) => ({ ...prev, date: updatedDate }));
   };
 
   return (
@@ -132,7 +281,7 @@ export default function RecordForm(props: RecordFormProps) {
               {field.replace("_", " ")}:
             </label>
             {field === "date" ? (
-            <DateField editMode={true} dateValue={formData[field]} />
+            <DateField editMode={true} dateValue={formData[field]} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
             ) : (
               <input
                 type="text"
