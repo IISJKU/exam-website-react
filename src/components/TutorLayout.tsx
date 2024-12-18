@@ -13,7 +13,7 @@ export default function TutorLayout() {
 
       <div className="md:flex flex-column h-full w-full">
         {/* Side Menu Section */}
-        <nav role="navigation" aria-label="Side Menu" className="basis-1/6 h-max" >
+        <nav role="navigation" aria-label="Side Menu" className="w-full basis-1/6 md:min-w-64 h-max">
           <TutorMenu />
           <div className="h-max flex justify-center">
             <LogoutButton aria-label="Logout from the application" />
@@ -21,7 +21,7 @@ export default function TutorLayout() {
         </nav>
 
         {/* Main Content Section */}
-        <main role="main" aria-label="Main Content Area" className="basis-5/6 h-full w-full" >
+        <main role="main" aria-label="Main Content Area" className="basis-5/6 h-full w-full">
           <Outlet />
         </main>
       </div>

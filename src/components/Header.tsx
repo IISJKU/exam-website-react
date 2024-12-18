@@ -15,7 +15,7 @@ export default function Header() {
           <LanguageSwitch />
         </div>
       </header>
-      <hr className="h-px mx-2 bg-gray-500 border-0 max-w-full w-full" aria-hidden="true"></hr>
+      <hr className="h-px mx-2 bg-gray-500 border-0" aria-hidden="true"></hr>
     </>
   );
 }

@@ -62,9 +62,10 @@ export default function TutorExamRequest() {
         showToast({ message: "Request to monitor exam submitted successfully", type: "success" });
 
         if (exam) {
+          /* 
           let notif = new Notification("", JSON.stringify(originalExam), user.user, originalExam.id);
           notif.type = NotificationType.tutorConfirm;
-
+        
           const notify = await fetch(`http://localhost:1337/api/notifications`, {
             method: "POST",
             headers: {
@@ -81,7 +82,7 @@ export default function TutorExamRequest() {
               type: "error",
             });
             return;
-          }
+          } */
         }
       } else {
         showToast({
