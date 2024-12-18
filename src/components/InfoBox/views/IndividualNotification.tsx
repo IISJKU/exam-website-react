@@ -296,7 +296,7 @@ export default function IndividualNotification() {
 
   function generateChangesHtml( currentExam: any, newExam: any, options: any, accept: boolean, emailContent: string ): string {
     const isUpdate = (currentExam == null) ? false : true;
-    const current = (newExam.title == undefined) ? currentExam : newExam;
+    const current = (currentExam != null && newExam.title == undefined) ? currentExam : newExam;
     return `
     <h3>Exam Changes</h3>
     ${emailContent}
