@@ -18,6 +18,12 @@ interface DataRecord {
   [key: string]: any;
 }
 
+interface RelationalRecord {
+  id: any;
+  displayValue: string;
+  email?: string | null; // Optional property for email
+}
+
 export default function DataAdministration(props: DataAdministrationProps) {
   const user = useAuth();
   const [data, setData] = useState<DataRecord[]>([]); // Data for the selected table
@@ -98,17 +104,28 @@ export default function DataAdministration(props: DataAdministrationProps) {
 
 
       if (Array.isArray(records)) {
-        return {
-          fieldName: field.name,
-          data: records.map((item: any) => ({
-            id: item.id,
-            // Concatenate display fields for dropdown options
-            displayValue: field.displayField
-              .map((df) => item[df])
-              .filter(Boolean)
-              .join(" "),
-          })),
-        };
+          return {
+            fieldName: field.name,
+            data: records.map((item: any): RelationalRecord => {
+              // Build the base object with ID and display value
+              const baseObject: RelationalRecord = {
+                id: item.id,
+                displayValue: field.displayField
+                  .map((df) => item[df])
+                  .filter(Boolean)
+                  .join(" "),
+              };
+
+              // Conditionally add student_email or tutor_email
+              if (field.populateTable === "students") {
+                baseObject["email"] = item.student_email || item.user?.data?.attributes?.email || null;
+              } else if (field.populateTable === "tutors") {
+                baseObject["email"] = item.tutor_email || item.user?.data?.attributes?.email || null;
+              }
+
+              return baseObject;
+            }),
+          };
       } else {
         throw new Error(`Invalid response format for ${field.populateTable}`);
       }

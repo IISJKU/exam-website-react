@@ -17,6 +17,8 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
 import DropdownWithSearchMultiple from "../components/DropdownWithSearchMultiple";
+import { sendEmail } from "../../../services/EmailService";
+import { generateRow, match } from "./IndividualNotification";
 
 export default function ExamEditor() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -270,7 +272,7 @@ export default function ExamEditor() {
     }
     return t;
   }
-
+  
   const handleUpdate = async () => {
     const data: Partial<Exam> = {
       title,
@@ -286,8 +288,6 @@ export default function ExamEditor() {
       lva_num,
       status,
     };
-    // Track the original room ID
-    const originalRoomId = exam?.room_id; // The room before any change
 
     try {
       if (user.role == "Admin") {
@@ -306,6 +306,57 @@ export default function ExamEditor() {
             type: "error",
           });
           return;
+        } else {
+          // Prepare HTML email content
+          const changesHtml = `
+          <h3>Exam Changes</h3>
+          <p>The following changes have been made to the exam:</p>
+          <table border="1" style="border-collapse: collapse; width: 70%;">
+            <thead>
+              <tr>
+                <th style="padding: 8px; text-align: left;">Field</th>
+                <th style="padding: 8px; text-align: left;">Old</th>
+                <th style="padding: 8px; text-align: left;">New</th>
+              </tr>
+            </thead>
+            <tbody>
+               ${generateRow("Title", exam?.title, title, true)}
+               ${generateRow("LVA Number", exam?.lva_num, lva_num, true)}
+               ${generateRow(
+                 "Date",
+                 exam?.date ? moment(exam.date).format("DD.MM.YYYY HH:mm") : "N/A",
+                 date ? moment(date).format("DD.MM.YYYY HH:mm") : moment(exam?.date).format("DD.MM.YYYY HH:mm")
+                 , true)}
+              ${generateRow("Duration", exam?.duration, duration, true)}
+              ${generateRow("Tutor", match(options.tutors, exam?.tutor_id), match(options.tutors, tutor), true)}
+              ${generateRow("Student", match(options.students, exam?.student_id), match(options.students, student), true)}
+              ${generateRow("Examiner", match(options.examiners, exam?.examiner_id), match(options.examiners, examiner), true)}
+              ${generateRow("Major", match(options.majors, exam?.major_id), match(options.majors, major), true)}
+              ${generateRow("Institute", match(options.institutes, exam?.institute_id), match(options.institutes, institute), true)}
+              ${generateRow("Mode", match(options.modes, exam?.mode_id), match(options.modes, mode), true)}
+              ${generateRow("Room", match(options.rooms, exam?.room_id), match(options.rooms, room), true)}
+              ${generateRow("Status", exam?.status, status, true)}
+            </tbody>
+          </table>
+        `;
+        // Send emails to both tutor and student
+        const emailPromises = [
+          sendEmail({
+            to: exam?.tutor_email || "",
+            subject: "Exam Update Notification",
+            text: "The exam has been updated successfully.",
+            html: changesHtml,
+            token: user.token,
+          }),
+          sendEmail({
+            to: exam?.student_email || "",
+            subject: "Exam Update Notification",
+            text: "The exam has been updated successfully.",
+            html: changesHtml,
+            token: user.token,
+          }),
+        ];
+        await Promise.all(emailPromises);
         }
       }
 

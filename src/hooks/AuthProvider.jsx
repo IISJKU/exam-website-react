@@ -8,6 +8,7 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(localStorage.getItem("userName") || null);
   const [token, setToken] = useState(localStorage.getItem("site") || "");
   const [role, setRole] = useState(localStorage.getItem("userRole") || "");
+  const [userEmail, setUserEmail] = useState(localStorage.getItem("userEmail") || "");
   const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
@@ -60,6 +61,8 @@ const AuthProvider = ({ children }) => {
       localStorage.setItem("userName", userRes.username);
       setRole(userRes.role.name);
       localStorage.setItem("userRole", userRes.role.name);
+      setUserEmail(userRes.email);
+      localStorage.setItem("userEmail", userRes.email);
 
       if (userRes.role.name == "Admin") {
         setUserId(userRes.id);
@@ -106,10 +109,12 @@ const AuthProvider = ({ children }) => {
     setUserId(null);
     setToken("");
     setRole("");
+    setUserEmail("");
 
     localStorage.removeItem("site");
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("userEmail");
   };
 
   const redirectIfLoggedIn = async () => {
@@ -137,7 +142,7 @@ const AuthProvider = ({ children }) => {
   if (token != "" && user == null) {
     setUserData(token);
   }
-  return <AuthContext.Provider value={{ token, user, role, userId, loginAction, logOut, redirectIfLoggedIn }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ token, user, role, userId, userEmail, loginAction, logOut, redirectIfLoggedIn }}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;

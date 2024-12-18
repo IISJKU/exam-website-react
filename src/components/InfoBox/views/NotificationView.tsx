@@ -1,5 +1,6 @@
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useEffect, useState } from "react";
+import { useLocation as useReactLocation } from "react-router-dom"; 
 import Pagination from "../components/Pagination";
 import SearchBar from "../components/SearchBar";
 import { useTranslation } from "react-i18next";
@@ -30,6 +31,7 @@ export default function NotificationView() {
   const [seenNotifications, setSeenNotifications] = useState<Notification[]>([]);
   const [newNotifications, setNewNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // State for loading
+  const reactLocation = useReactLocation(); 
 
   const studentId = user.userId;
 
@@ -194,6 +196,19 @@ export default function NotificationView() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (reactLocation.pathname === "/"+ user.role.toLowerCase() +"/notifications") {
+      fetchNotifications(); // Fetch immediately when user lands on the page
+      interval = setInterval(fetchNotifications, 3000); // Poll every 3 seconds
+    }
+
+    return () => {
+      if (interval) clearInterval(interval); // Clear interval when user leaves
+    };
+  }, [reactLocation.pathname]); // Trigger useEffect when route changes
 
   const fetchDropdownOptions = async () => {
     try {

@@ -27,6 +27,7 @@ interface InitialState {
   institute?: number | string;
   mode?: number;
   status: string;
+  studentEmail: string;
 }
 
 export default function RequestExam() {
@@ -47,6 +48,7 @@ export default function RequestExam() {
   const [institute, setInstitute] = useState<number | string | undefined>();
   const [mode, setMode] = useState<number | undefined>();
   const [status, setStatus] = useState<string>("Pending");
+  const [studentEmail, setStudentEmail] = useState<string>(user.userEmail || "");
 
   // Define initial state with the correct type
   const [initialState, setInitialState] = useState<InitialState>({
@@ -60,6 +62,7 @@ export default function RequestExam() {
     institute: undefined,
     mode: undefined,
     status: "Pending",
+    studentEmail: user.userEmail,
   });
 
   const [options, setOptions] = useState({
@@ -98,6 +101,7 @@ export default function RequestExam() {
           institute,
           mode,
           status,
+          studentEmail,
         });
       } catch (error) {
         showToast({ message: t("Error fetching dropdown options"), type: "error" });
@@ -136,6 +140,7 @@ export default function RequestExam() {
     t = t + ' "examiner_id" : "' + examiner + '",';
     t = t + ' "institute_id" : "' + institute + '",';
     t = t + ' "exam_mode" : "' + mode + '",';
+    t = t + ' "student_email" : "' + studentEmail + '",';
 
     if (t != "") {
       t = t.substring(0, t.length - 1);
@@ -149,6 +154,7 @@ export default function RequestExam() {
     // Mapping of fields to their labels
     const fieldMapping = {
       title: t("Exam Title"),
+      studentEmail: t("Student Email"),
       lva_num: t("LVA Number"),
       date: t("Date/Time"),
       duration: t("Duration"),
@@ -181,6 +187,7 @@ export default function RequestExam() {
       exam_mode: mode,
       lva_num,
       status,
+      student_email: studentEmail,
     };
 
     if (typeof examiner == "number") {
@@ -202,7 +209,6 @@ export default function RequestExam() {
     }
 
     setExam(data as Exam);
-
     try {
       let addedEx = addedExam();
 
