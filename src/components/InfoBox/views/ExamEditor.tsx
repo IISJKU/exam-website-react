@@ -474,6 +474,7 @@ export default function ExamEditor() {
           hideTitle={true}
           onChange={(e) => setTitle(e.target.value)}
           aria-label={t("Exam Title")}
+          required={true}
         />
 
         <EditField
@@ -483,6 +484,7 @@ export default function ExamEditor() {
           hideTitle={false}
           onChange={(e) => setLvaNum(Number(e.target.value))}
           aria-label={t("LVA course Number")}
+          required={true}
         />
 
         <DateField
@@ -492,6 +494,7 @@ export default function ExamEditor() {
           onDateChange={handleDateChange}
           onTimeChange={handleTimeChange}
           aria-label={t("Exam Date and Time")}
+          required={true}
         />
 
         <EditField
@@ -501,6 +504,7 @@ export default function ExamEditor() {
           hideTitle={false}
           onChange={(e) => setDuration(Number(e.target.value))}
           aria-label={t("Exam Duration")}
+          required={true}
         />
 
         <DropdownWithSearch
@@ -512,6 +516,7 @@ export default function ExamEditor() {
           placeholder={t("Search student...")}
           disabled={!editMode}
           aria-label={t("Exam Student")}
+          required={true}
         />
 
         <DropdownWithSearchMultiple
@@ -537,6 +542,7 @@ export default function ExamEditor() {
           placeholder={t("Search examiner...")}
           disabled={!editMode}
           aria-label={t("Course Examiner")}
+          required={true}
         />
 
         <DropdownWithSearch
@@ -570,6 +576,7 @@ export default function ExamEditor() {
           placeholder={t("Search modes...")}
           disabled={!editMode}
           aria-label={t("Exam Mode")}
+          required={true}
         />
 
         <DropdownWithSearch
@@ -663,7 +670,15 @@ export default function ExamEditor() {
         <h1 id="exam-editor-title" className="text-2xl font-bold mb-4 sr-only" tabIndex={0}>
           {t("Exam Editor")}
         </h1>
-        <EditField title={t("Exam Title")} editMode={editMode} text={title} onChange={(e) => setTitle(e.target.value)} aria-label={t("Exam Title")} />
+        <EditField
+          title={t("Exam Title")}
+          editMode={editMode} text={title}
+          onChange={(e) => setTitle(e.target.value)}
+          aria-label={t("Exam Title")}
+          required={true}
+          aria-required="true"
+        />
+        
         <EditField
           title={t("LVA Num")}
           editMode={editMode}
@@ -671,6 +686,8 @@ export default function ExamEditor() {
           hideTitle={false}
           onChange={(e) => setLvaNum(Number(e.target.value))}
           aria-label={t("LVA course Number")}
+          required={true}
+          aria-required="true"
         />
         <DateField
           title={t("Date/Time")}
@@ -679,6 +696,8 @@ export default function ExamEditor() {
           onDateChange={handleDateChange}
           onTimeChange={handleTimeChange}
           aria-label={t("Exam Date and Time")}
+          required={true}
+          aria-required="true"
         />
         <EditField
           title={t("Duration")}
@@ -687,6 +706,8 @@ export default function ExamEditor() {
           hideTitle={false}
           onChange={(e) => setDuration(Number(e.target.value))}
           aria-label={t("Exam Duration")}
+          required={true}
+          aria-required="true"
         />
 
         <DropdownWithSearch
@@ -698,7 +719,10 @@ export default function ExamEditor() {
           placeholder={t("Search examiner...")}
           disabled={!editMode}
           aria-label={t("Course Examiner")}
+          required={true}
+          aria-required="true"
         />
+
         <DropdownWithSearch
           tableName="institutes"
           label={t("Institute")}
@@ -709,6 +733,7 @@ export default function ExamEditor() {
           disabled={!editMode}
           aria-label={t("Course Institute")}
         />
+
         <DropdownWithSearch
           tableName="exam-modes"
           label={t("Mode")}
@@ -718,6 +743,8 @@ export default function ExamEditor() {
           placeholder={t("Search modes...")}
           disabled={!editMode}
           aria-label={t("Exam Mode")}
+          required={true}
+          aria-required="true"
         />
 
         <EditField

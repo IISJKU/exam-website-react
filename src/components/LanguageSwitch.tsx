@@ -1,5 +1,6 @@
 import { useState } from "react";
 import i18n from "../i18n";
+import { t } from "i18next";
 
 enum Language {
   EN,
@@ -29,9 +30,9 @@ export default function LanguageSwitch() {
         aria-live="polite"
       >
         <div className="basis-1/2 bg-black text-white p-1" aria-current="true" aria-label="Current language: English">
-          EN
+        {t("EN")}
         </div>
-        <div className="basis-1/2 p-1">DE</div>
+        <div className="basis-1/2 p-1">{t("DE")}</div>
       </button>
     );
   else
@@ -45,9 +46,9 @@ export default function LanguageSwitch() {
         aria-label="Switch to English language"
         aria-live="polite"
       >
-        <div className="basis-1/2 p-1">EN</div>
+        <div className="basis-1/2 p-1">{t("EN")}</div>
         <div className="basis-1/2 bg-black text-white p-1" aria-current="true" aria-label="Current language: German">
-          DE
+        {t("DE")}
         </div>
       </button>
     );

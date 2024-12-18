@@ -131,10 +131,46 @@ export default function IndividualStudent() {
       <h1 id="student-details-heading" className="text-2xl font-bold mb-4 sr-only">
         Student Details
       </h1>
-      <EditField title={t("First Name")} editMode={editMode} text={first_name} onChange={(e) => setFirstName(e.target.value)} aria-label={t("Edit student's first name")}/>
-      <EditField title={t("Last Name")} editMode={editMode} text={last_name} onChange={(e) => setLastName(e.target.value)} aria-label={t("Edit student's last name")}/>
-      <EditField title={t("Phone")} editMode={editMode} text={phone} hideTitle={false} onChange={(e) => setPhone(e.target.value)} aria-label={t("Edit student's phone")}/>
-      <EditField title={t("Matrikel Number")} editMode={editMode} hideTitle={false} text={matrikel_number} onChange={(e) => setMatrikelNum(e.target.value)} aria-label={t("Edit student's matrikel number")}/>
+      <EditField
+        title={t("First Name")}
+        editMode={editMode}
+        text={first_name}
+        onChange={(e) => setFirstName(e.target.value)}
+        aria-label={t("Edit student's first name")}
+        required={true}
+        aria-required="true"
+      />
+
+      <EditField
+        title={t("Last Name")}
+        editMode={editMode} text={last_name}
+        onChange={(e) => setLastName(e.target.value)}
+        aria-label={t("Edit student's last name")}
+        required={true}
+        aria-required="true"
+      />
+
+      <EditField
+        title={t("Phone")}
+        editMode={editMode}
+        text={phone}
+        hideTitle={false}
+        onChange={(e) => setPhone(e.target.value)}
+        aria-label={t("Edit student's phone")}
+        required={true}
+        aria-required="true"
+      />
+
+      <EditField
+        title={t("Matrikel Number")}
+        editMode={editMode}
+        hideTitle={false}
+        text={matrikel_number} onChange={(e) => setMatrikelNum(e.target.value)}
+        aria-label={t("Edit student's matrikel number")}
+        required={true}
+        aria-required="true"
+      />
+
       <DropdownWithSearch
         tableName = {t("majors")}
         label="Major"
@@ -145,9 +181,37 @@ export default function IndividualStudent() {
         disabled={!editMode}
         aria-label={t("Select student's major")}
       />
-      <EditField title={t("Emergency Contact")} editMode={editMode} text={emergency_contact} hideTitle={false} onChange={(e) => setEmergencyContact(e.target.value)} aria-label={t("Edit student's emergency contact")}/>
-      <EditField title={t("Overtime")} editMode={editMode} text={bonus_time ? bonus_time.toString() : ""} hideTitle={false} onChange={(e) => setOvertime(Number(e.target.value))} aria-label={t("Edit student's overtime allowance")}/>
-      <EditField title={t("Misc")} editMode={editMode} text={misc} hideTitle={false} onChange={(e) => setMisc(e.target.value)} aria-label={t("Edit miscellaneous student details")} />
+
+      <EditField
+        title={t("Emergency Contact")}
+        editMode={editMode}
+        text={emergency_contact}
+        hideTitle={false} onChange={(e) => setEmergencyContact(e.target.value)}
+        aria-label={t("Edit student's emergency contact")}
+        required={true}
+        aria-required="true"
+      />
+
+      <EditField
+        title={t("Overtime")}
+        editMode={editMode}
+        text={bonus_time ? bonus_time.toString() : ""}
+        hideTitle={false}
+        onChange={(e) => setOvertime(Number(e.target.value))}
+        aria-label={t("Edit student's overtime allowance")}
+        required={true}
+        aria-required="true" />
+      
+      <EditField
+        title={t("Misc")}
+        editMode={editMode}
+        text={misc}
+        hideTitle={false}
+        onChange={(e) => setMisc(e.target.value)}
+        aria-label={t("Edit miscellaneous student details")}
+        required={true}
+        aria-required="true"
+      />
       <div className="mt-4 flex space-x-2">
         <button
           onClick={() => navigate(-1)}

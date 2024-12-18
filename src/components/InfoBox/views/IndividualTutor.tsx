@@ -98,11 +98,54 @@ export default function IndividualTutor() {
         <h1 id="tutor-details-heading" className="text-2xl font-bold mb-4 sr-only">
         Tutor Details
         </h1>
-      <EditField title="First Name" editMode={editMode} text={first_name} onChange={(e) => setFirstName(e.target.value)} aria-label={t("Edit tutor's first name")}/>
-      <EditField title="Last Name" editMode={editMode} text={last_name} onChange={(e) => setLastName(e.target.value)} aria-label={t("Edit tutor's last name")}/>
-      <EditField title="Phone" editMode={editMode} text={phone} hideTitle={false} onChange={(e) => setPhone(e.target.value)} aria-label={t("Edit tutor's phone")}/>
-      <EditField title="Matrikel Nr" editMode={editMode} text={matrikel_number} hideTitle={false} onChange={(e) => setMatrikelNum(e.target.value)} aria-label={t("Edit tutor's matrikel number")}/>
-      <EditField title="Course" editMode={editMode} text={course} hideTitle={false} onChange={(e) => setCourse(e.target.value)} aria-label={t("Edit tutor's course")}/>
+      <EditField
+        title="First Name"
+        editMode={editMode}
+        text={first_name}
+        onChange={(e) => setFirstName(e.target.value)}
+        aria-label={t("Edit tutor's first name")}
+        required={true}
+        aria-required="true"
+      />
+
+      <EditField
+        title="Last Name"
+        editMode={editMode}
+        text={last_name}
+        onChange={(e) => setLastName(e.target.value)}
+        aria-label={t("Edit tutor's last name")}
+        required={true}
+        aria-required="true"
+      />
+
+      <EditField
+        title="Phone"
+        editMode={editMode}
+        text={phone}
+        hideTitle={false}
+        onChange={(e) => setPhone(e.target.value)}
+        aria-label={t("Edit tutor's phone")}
+        required={true}
+        aria-required="true"
+      />
+
+      <EditField
+        title="Matrikel Nr"
+        editMode={editMode}
+        text={matrikel_number}
+        hideTitle={false}
+        onChange={(e) => setMatrikelNum(e.target.value)}
+        aria-label={t("Edit tutor's matrikel number")}
+      />
+
+      <EditField
+        title="Course"
+        editMode={editMode}
+        text={course}
+        hideTitle={false}
+        onChange={(e) => setCourse(e.target.value)}
+        aria-label={t("Edit tutor's course")}
+      />
       <div className="mt-4 flex space-x-2">
         <button onClick={() => navigate(-1)}
           className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
