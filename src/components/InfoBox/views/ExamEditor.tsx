@@ -120,6 +120,7 @@ export default function ExamEditor() {
           setMajor(examData.major_id);
           setInstitute(examData.institute_id);
           setMode(examData.mode_id);
+          setStatus(examData.status);
         } else {
           showToast({ message: "No exam data found", type: "error" });
         }
@@ -545,8 +546,10 @@ export default function ExamEditor() {
         />
           
         <StatusSelector
-        value={status}
-        onChange={(newValue) => setStatus((newValue))}
+          title="Status"
+          value={status}
+          disabled={!editMode}
+          onChange={(newValue) => setStatus((newValue))}
         />
       </div>
       <div

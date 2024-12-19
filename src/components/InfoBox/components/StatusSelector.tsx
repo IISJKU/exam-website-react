@@ -2,10 +2,11 @@ import React from "react";
 import { ExamStatus } from "../../classes/Exam";
 
 interface StatusSelectorProps {
-    value: ExamStatus;
-    title?: string;
-    onChange: (newValue: ExamStatus) => void;
-    description?: string;  // Optional description for the dropdown
+  title?: string;
+  value: ExamStatus;
+  disabled?: boolean;
+  onChange: (newValue: ExamStatus) => void;
+  description?: string;  // Optional description for the dropdown
 }
 
 export default function StatusSelector(props: StatusSelectorProps) {
@@ -27,20 +28,24 @@ export default function StatusSelector(props: StatusSelectorProps) {
           {props.description}
         </p>
       )}
-      <select
-        id="status"
-        value={props.value}
-        onChange={(e) => props.onChange(e.target.value as ExamStatus)}
-        className={`mt-1 mb-2 border border-gray-300 p-2 w-80 rounded-md px-1 w-full rounded-md`}
-        aria-labelledby="status-label"
-        aria-describedby={props.description ? "status-description" : undefined}
-      >
-        {options.map((status) => (
-          <option key={status} value={status}>
-            {status.charAt(0).toUpperCase() + status.slice(1)} {/* Capitalized */}
-          </option>
-        ))}
-      </select>
+       {props.disabled ? (
+        <div className="mb-2">{props.value}</div>
+      ) : (
+        <select
+          id="status"
+          value={props.value}
+          onChange={(e) => props.onChange(e.target.value as ExamStatus)}
+          className={`mt-1 mb-2 border border-gray-300 p-2 w-80 rounded-md px-1 w-full rounded-md`}
+          aria-labelledby="status-label"
+          aria-describedby={props.description ? "status-description" : undefined}
+        >
+          {options.map((status) => (
+            <option key={status} value={status}>
+              {status.charAt(0).toUpperCase() + status.slice(1)} {/* Capitalized */}
+            </option>
+          ))}
+          </select>
+      )}
     </div>
   );
 };
