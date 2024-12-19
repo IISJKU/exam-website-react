@@ -22,7 +22,7 @@ export default class Exam {
   room!: Room | number | null; // ExamMode object or ID (number)
   lva_num!: number;
   student_misc!: string;
-  status!: string;
+  notes!: string;
   tutor_id!: number;
   student_id!: number;
   examiner_id!: number;

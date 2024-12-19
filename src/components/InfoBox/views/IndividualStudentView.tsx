@@ -143,7 +143,8 @@ export default function IndividualStudent() {
 
       <EditField
         title={t("Last Name")}
-        editMode={editMode} text={last_name}
+        editMode={editMode}
+        text={last_name}
         onChange={(e) => setLastName(e.target.value)}
         aria-label={t("Edit student's last name")}
         required={true}

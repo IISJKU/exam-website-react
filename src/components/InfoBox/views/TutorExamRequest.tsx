@@ -181,9 +181,9 @@ export default function TutorExamRequest() {
         </div>
         <div>
           <dt>
-            <strong>{t("Status")}:</strong>
+            <strong>{t("Notes")}:</strong>
           </dt>
-          <dd>{exam.status}</dd>
+          <dd>{exam.notes}</dd>
         </div>
       </dl>
       {/* Request to Monitor Button */}

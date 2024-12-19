@@ -42,7 +42,7 @@ export default function ExamEditor() {
   const [mode, setMode] = useState<number | undefined>();
   const [room, setRoom] = useState<number | null>();
   const [registeredTutors, setRegisteredTutors] = useState<Tutor[]>([]);
-  const [status, setStatus] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
 
   const [originalExam, setOriginalExam] = useState<Exam>(new Exam());
   const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
@@ -110,7 +110,7 @@ export default function ExamEditor() {
           setDate(examData.date);
           setDuration(examData.duration);
           setRoom(examData.room_id);
-          setStatus(examData.status);
+          setNotes(examData.notes);
           setTutor(examData.tutor_id);
           setRegisteredTutors(examData.registeredTutors);
           setStudent(examData.student_id);
@@ -246,7 +246,7 @@ export default function ExamEditor() {
       if (lva_num != exam.lva_num) t = t + ' "lva_num" : "' + lva_num + '",';
       if (date != exam.date) t = t + ' "date" : "' + date + '",';
       if (duration != exam.duration) t = t + ' "duration" : "' + duration + '",';
-      if (status != exam.status) t = t + ' "status" : "' + status + '",';
+      if (notes != exam.notes) t = t + ' "notes" : "' + notes + '",';
       if (user.role == "Admin") {
         if (!compareField("student", student)) t = t + ' "student_id" : "' + student + '",';
         if (!compareField("tutor", tutor)) t = t + ' "tutor_id" : "' + tutor + '",';
@@ -286,7 +286,7 @@ export default function ExamEditor() {
       exam_mode: mode,
       room,
       lva_num,
-      status,
+      notes,
     };
 
     try {
@@ -332,7 +332,7 @@ export default function ExamEditor() {
               ${generateRow("Institute", match(options.institutes, exam?.institute_id), match(options.institutes, institute), true)}
               ${generateRow("Mode", match(options.modes, exam?.mode_id), match(options.modes, mode), true)}
               ${generateRow("Room", match(options.rooms, exam?.room_id), match(options.rooms, room), true)}
-              ${generateRow("Status", exam?.status, status, true)}
+              ${generateRow("Notes", exam?.notes, notes, true)}
             </tbody>
           </table>
         `;
@@ -605,12 +605,12 @@ export default function ExamEditor() {
         />
 
         <EditField
-          title={"Status"}
+          title={"Notes"}
           editMode={editMode}
-          text={status}
+          text={notes}
           hideTitle={false}
-          onChange={(e) => setStatus(e.target.value)}
-          aria-label={t("Exam Status")}
+          onChange={(e) => setNotes(e.target.value)}
+          aria-label={t("Exam Notes")}
         />
       </div>
     </div>
@@ -764,12 +764,12 @@ export default function ExamEditor() {
         />
 
         <EditField
-          title={t("Status")}
+          title={t("Notes")}
           editMode={editMode}
-          text={status}
+          text={notes}
           hideTitle={false}
-          onChange={(e) => setStatus("Pending")}
-          aria-label={t("Exam Status")}
+          onChange={(e) => setNotes("Pending")}
+          aria-label={t("Exam Notes")}
         />
 
         <div className="mt-4 flex space-x-2">

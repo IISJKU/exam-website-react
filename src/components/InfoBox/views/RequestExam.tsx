@@ -26,7 +26,7 @@ interface InitialState {
   examiner?: number | string;
   institute?: number | string;
   mode?: number;
-  status: string;
+  notes: string;
   studentEmail: string;
 }
 
@@ -47,7 +47,7 @@ export default function RequestExam() {
   const [examiner, setExaminer] = useState<number | string | undefined>();
   const [institute, setInstitute] = useState<number | string | undefined>();
   const [mode, setMode] = useState<number | undefined>();
-  const [status, setStatus] = useState<string>("Pending");
+  const [notes, setNotes] = useState<string>("Pending");
   const [studentEmail, setStudentEmail] = useState<string>(user.userEmail || "");
 
   // Define initial state with the correct type
@@ -61,7 +61,7 @@ export default function RequestExam() {
     examiner: undefined,
     institute: undefined,
     mode: undefined,
-    status: "Pending",
+    notes: "Pending",
     studentEmail: user.userEmail,
   });
 
@@ -100,7 +100,7 @@ export default function RequestExam() {
           examiner,
           institute,
           mode,
-          status,
+          notes,
           studentEmail,
         });
       } catch (error) {
@@ -134,7 +134,7 @@ export default function RequestExam() {
     t = t + ' "lva_num" : "' + lva_num + '",';
     t = t + ' "date" : "' + date + '",';
     t = t + ' "duration" : "' + duration + '",';
-    t = t + ' "status" : "' + status + '",';
+    t = t + ' "notes" : "' + notes + '",';
 
     t = t + ' "student_id" : "' + student + '",';
     t = t + ' "examiner_id" : "' + examiner + '",';
@@ -186,7 +186,7 @@ export default function RequestExam() {
       institute_id: 0,
       exam_mode: mode,
       lva_num,
-      status,
+      notes,
       student_email: studentEmail,
     };
 
@@ -256,7 +256,7 @@ export default function RequestExam() {
     setExaminer(initialState.examiner);
     setInstitute(initialState.institute);
     setMode(initialState.mode);
-    setStatus(initialState.status);
+    setNotes(initialState.notes);
 
     navigate("/student/all-exams");
   };
@@ -361,12 +361,12 @@ export default function RequestExam() {
       />
 
       <EditField
-        title={t("Status")}
+        title={t("Notes")}
         editMode={editMode}
-        text={status}
+        text={notes}
         hideTitle={false}
-        onChange={(e) => setStatus("Pending")}
-        aria-label={t("Add Exam Status")}
+        onChange={(e) => setNotes("Pending")}
+        aria-label={t("Add Exam Notes")}
         aria-required="true"
       />
 

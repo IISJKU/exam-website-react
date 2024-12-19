@@ -54,7 +54,7 @@ export default function RemoveTutor() {
       t = t + ' "lva_num" : "' + exam.lva_num + '",';
       t = t + ' "date" : "' + exam.date + '",';
       t = t + ' "duration" : "' + exam.duration + '",';
-      t = t + ' "status" : "' + exam.status + '",';
+      t = t + ' "notes" : "' + exam.notes + '",';
 
       t = t + ' "student_id" : "' + exam.student.id + '",';
       t = t + ' "tutor_id" : "' + exam.tutor.id + '",';
@@ -204,9 +204,9 @@ export default function RemoveTutor() {
         </div>
         <div>
           <dt>
-            <strong>{t("Status")}:</strong>
+            <strong>{t("Notes")}:</strong>
           </dt>
-          <dd>{exam.status}</dd>
+          <dd>{exam.notes}</dd>
         </div>
       </dl>
       <div className="mt-4 flex space-x-2">

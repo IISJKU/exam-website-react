@@ -46,7 +46,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
     else navigate(`/student/notification/${notifId}`);
   };
 
-  const staticTitles = ["title", "date", "lva_num", "duration", "status"];
+  const staticTitles = ["title", "date", "lva_num", "duration", "notes"];
 
   const hasStaticTitle = (title: string): boolean => {
     let isStatic = false;

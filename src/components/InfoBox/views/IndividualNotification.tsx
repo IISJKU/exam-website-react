@@ -39,7 +39,7 @@ export default function IndividualNotification() {
   const [institute, setInstitute] = useState<number | undefined>();
   const [mode, setMode] = useState<number | undefined>();
   const [room, setRoom] = useState<number | undefined>();
-  const [status, setStatus] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
 
   const user = useAuth();
 
@@ -65,7 +65,7 @@ export default function IndividualNotification() {
     if (partial.date != undefined) ex.date = partial.date;
     if (partial.institute_id != undefined) ex.institute_id = partial.institute_id;
     if (partial.lva_num != undefined) ex.lva_num = partial.lva_num;
-    if (partial.status != undefined) ex.status = partial.status;
+    if (partial.notes != undefined) ex.notes = partial.notes;
     if (partial.student_email != undefined) ex.student_email = partial.student_email;
     if (partial.tutor_email != undefined) ex.tutor_email = partial.tutor_email;
     if (partial.major_id != undefined) ex.major_id = partial.major_id;
@@ -176,7 +176,7 @@ export default function IndividualNotification() {
             setInstitute(ex.institute_id);
             setMode(ex.mode_id);
             setRoom(ex.room_id);
-            setStatus(ex.status);
+            setNotes(ex.notes);
           }
         } else {
           showToast({ message: "No exam data found", type: "error" });
@@ -328,7 +328,7 @@ export default function IndividualNotification() {
         ${generateRow("Institute", match(options.institutes, current?.institute_id || current?.institute), match(options.institutes, newExam.institute_id), isUpdate)}
         ${generateRow("Mode", match(options.modes, current?.mode_id || current?.exam_mode), match(options.modes, newExam.mode_id), isUpdate)}
         ${generateRow("Room", match(options.rooms, current?.room_id ||  current?.room), match(options.rooms, newExam.room_id), isUpdate)}
-        ${generateRow("Status", current?.status, newExam.status, isUpdate)}
+        ${generateRow("Notes", current?.notes, newExam.notes, isUpdate)}
       </tbody>
     </table>
     `;
@@ -632,7 +632,7 @@ export default function IndividualNotification() {
           aria-label={t("Room comparison")}
         />
 
-        <ComparisonField label={t("Status")} options={[]} value={status || ""} proposedVal={proposedExam.status} aria-label={t("Status comparison")} />
+        <ComparisonField label={t("Notes")} options={[]} value={notes || ""} proposedVal={proposedExam.notes} aria-label={t("Notes comparison")} />
       </section>
       <div className="mt-4 flex gap-4">
         <button

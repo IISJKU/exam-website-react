@@ -151,7 +151,7 @@ export default function RecordForm(props: RecordFormProps) {
           ${generateRow("Institute", matchValue(options.institute, oldData?.institute_id), matchValue(options.institute, newData?.institute))}
           ${generateRow("Mode", matchValue(options.exam_mode, oldData?.exam_mode_id), matchValue(options.exam_mode, newData?.exam_mode))}
           ${generateRow("Room", matchValue(options.room, oldData?.room_id), matchValue(options.room, newData?.room))}
-          ${generateRow("Status", oldData?.status, newData?.status)}
+          ${generateRow("Notes", oldData?.notes, newData?.notes)}
         </tbody>
       </table>
     `;
