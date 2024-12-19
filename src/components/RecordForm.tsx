@@ -5,6 +5,7 @@ import { sendEmail } from "../services/EmailService";
 import { useAuth } from "../hooks/AuthProvider";
 import { match } from "./InfoBox/views/IndividualNotification";
 import moment from "moment";
+import StatusSelector from "./InfoBox/components/StatusSelector";
 
 interface RecordFormProps {
   record: DataRecord | null;
@@ -138,11 +139,8 @@ export default function RecordForm(props: RecordFormProps) {
         <tbody>
           ${generateRow("Title", oldData?.title, newData?.title)}
           ${generateRow("LVA Number", oldData?.lva_num, newData?.lva_num)}
-          ${generateRow(
-                    "Date",
-                    oldData?.date ? moment(oldData.date).format("DD.MM.YYYY HH:mm") : "N/A",
-                    newData.date ? moment(newData.date).format("DD.MM.YYYY HH:mm") : moment(oldData.date).format("DD.MM.YYYY HH:mm")
-                  )}
+          ${generateRow("Date", oldData?.date ? moment(oldData.date).format("DD.MM.YYYY HH:mm") : "N/A",
+            newData.date ? moment(newData.date).format("DD.MM.YYYY HH:mm") : moment(oldData.date).format("DD.MM.YYYY HH:mm"))}
           ${generateRow("Duration", oldData?.duration, newData?.duration)}
           ${generateRow("Student", matchValue(options.student, oldData?.student_id), matchValue(options.student, newData?.student))}
           ${generateRow("Tutor", matchValue(options.tutor, oldData?.tutor_id), matchValue(options.tutor, newData?.tutor))}
@@ -152,6 +150,7 @@ export default function RecordForm(props: RecordFormProps) {
           ${generateRow("Mode", matchValue(options.exam_mode, oldData?.exam_mode_id), matchValue(options.exam_mode, newData?.exam_mode))}
           ${generateRow("Room", matchValue(options.room, oldData?.room_id), matchValue(options.room, newData?.room))}
           ${generateRow("Notes", oldData?.notes, newData?.notes)}
+          ${generateRow("Status", oldData?.status, newData?.status)}
         </tbody>
       </table>
     `;
@@ -282,6 +281,16 @@ export default function RecordForm(props: RecordFormProps) {
             </label>
             {field === "date" ? (
             <DateField editMode={true} dateValue={formData[field]} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
+            ) : field === "status" ? (
+              <StatusSelector
+                value={formData[field] || ""}
+                onChange={(newValue) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    [field]: newValue,
+                  }));
+                }}
+              />
             ) : (
               <input
                 type="text"

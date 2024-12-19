@@ -7,6 +7,14 @@ import Room from "./Room";
 import Student from "./Student";
 import Tutor from "./Tutor";
 
+export enum ExamStatus {
+  NoEmailExaminer = "Email Examiner Needed",
+  noMaterial = "Material Needed",
+  noTutor = "No Tutor Needed",
+  noAction = "No Action Required",
+  archived = "Archived",
+}
+
 export default class Exam {
   id!: number;
   title!: string;
@@ -23,6 +31,7 @@ export default class Exam {
   lva_num!: number;
   student_misc!: string;
   notes!: string;
+  status!: ExamStatus;
   tutor_id!: number;
   student_id!: number;
   examiner_id!: number;

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // Import useParams and useNavigate
 import EditField from "../components/EditField";
 import DateField from "../components/DateField";
-import Exam from "../../classes/Exam";
+import Exam, { ExamStatus } from "../../classes/Exam";
 import moment from "moment";
 import { showToast } from "../components/ToastMessage";
 import DropdownWithSearch from "../components/DropdownWithSearch";
@@ -19,6 +19,7 @@ import Notification, { NotificationType } from "../../classes/Notification";
 import DropdownWithSearchMultiple from "../components/DropdownWithSearchMultiple";
 import { sendEmail } from "../../../services/EmailService";
 import { generateRow, match } from "./IndividualNotification";
+import StatusSelector from "../components/StatusSelector";
 
 export default function ExamEditor() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -43,6 +44,7 @@ export default function ExamEditor() {
   const [room, setRoom] = useState<number | null>();
   const [registeredTutors, setRegisteredTutors] = useState<Tutor[]>([]);
   const [notes, setNotes] = useState<string>("");
+  const [status, setStatus] = useState<ExamStatus>(ExamStatus.NoEmailExaminer);
 
   const [originalExam, setOriginalExam] = useState<Exam>(new Exam());
   const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
@@ -333,6 +335,7 @@ export default function ExamEditor() {
               ${generateRow("Mode", match(options.modes, exam?.mode_id), match(options.modes, mode), true)}
               ${generateRow("Room", match(options.rooms, exam?.room_id), match(options.rooms, room), true)}
               ${generateRow("Notes", exam?.notes, notes, true)}
+              ${generateRow("Status", exam?.status, status, true)}
             </tbody>
           </table>
         `;
@@ -460,7 +463,7 @@ export default function ExamEditor() {
   if (user.role == "Admin")
     return (
       <>
-      <div className="flex flex-row md:flex-row justify-between items-center gap-4 p-4">
+      <div className="flex flex-row md:flex-row justify-between items-center px-4">
         <h1 id="exam-editor-title" className="text-2xl font-bold mb-4 sr-only" tabIndex={0}>
           {t("Exam Editor")}
           </h1>
@@ -476,7 +479,7 @@ export default function ExamEditor() {
         />
       </div>
       <div
-      className="flex flex-col md:flex-row justify-between gap-4 p-4"
+      className="flex flex-col md:flex-row justify-between gap-4 px-2"
       role="region"
       aria-labelledby="side-by-side-divs-heading"
       > 
@@ -505,7 +508,6 @@ export default function ExamEditor() {
           aria-label={t("Exam Date and Time")}
           required={true}
         />
-        <div className="m-2"></div>
         <EditField
           title={t("Duration")}
           editMode={editMode}
@@ -540,6 +542,11 @@ export default function ExamEditor() {
           placeholder={t("Search tutors...")}
           disabled={!editMode}
           aria-label={t("Exam Tutor")}
+        />
+          
+        <StatusSelector
+        value={status}
+        onChange={(newValue) => setStatus((newValue))}
         />
       </div>
       <div

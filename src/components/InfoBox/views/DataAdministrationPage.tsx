@@ -18,7 +18,7 @@ const tableConfigurations = {
     },
     exams: {
       tableName: "exams",
-      selectedFields: ["title", "date", "duration", "lva_num", "notes"],
+      selectedFields: ["title", "date", "duration", "lva_num", "notes", "status"],
       optionalFields: [],
       populateFields: [
         { name: "student", populateTable: "students", displayField: ["matrikel_number"] },

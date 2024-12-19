@@ -329,6 +329,7 @@ export default function IndividualNotification() {
         ${generateRow("Mode", match(options.modes, current?.mode_id || current?.exam_mode), match(options.modes, newExam.mode_id), isUpdate)}
         ${generateRow("Room", match(options.rooms, current?.room_id ||  current?.room), match(options.rooms, newExam.room_id), isUpdate)}
         ${generateRow("Notes", current?.notes, newExam.notes, isUpdate)}
+        ${generateRow("Status", current?.status, newExam.status, isUpdate)}
       </tbody>
     </table>
     `;
