@@ -322,11 +322,8 @@ export default function ExamEditor() {
             <tbody>
                ${generateRow("Title", exam?.title, title, true)}
                ${generateRow("LVA Number", exam?.lva_num, lva_num, true)}
-               ${generateRow(
-                 "Date",
-                 exam?.date ? moment(exam.date).format("DD.MM.YYYY HH:mm") : "N/A",
-                 date ? moment(date).format("DD.MM.YYYY HH:mm") : moment(exam?.date).format("DD.MM.YYYY HH:mm")
-                 , true)}
+               ${generateRow("Date", exam?.date ? moment(exam.date).format("DD.MM.YYYY HH:mm") : "N/A",
+                 date ? moment(date).format("DD.MM.YYYY HH:mm") : moment(exam?.date).format("DD.MM.YYYY HH:mm"), true)}
               ${generateRow("Duration", exam?.duration, duration, true)}
               ${generateRow("Tutor", match(options.tutors, exam?.tutor_id), match(options.tutors, tutor), true)}
               ${generateRow("Student", match(options.students, exam?.student_id), match(options.students, student), true)}
@@ -462,11 +459,12 @@ export default function ExamEditor() {
   //customise site layout depending on role of user
   if (user.role == "Admin")
     return (
-      <div className="m-5" role="region" aria-labelledby="exam-editor-title">
+      <>
+      <div className="flex flex-row md:flex-row justify-between items-center gap-4 p-4">
         <h1 id="exam-editor-title" className="text-2xl font-bold mb-4 sr-only" tabIndex={0}>
           {t("Exam Editor")}
-        </h1>
-
+          </h1>
+          
         <EditField
           title={t("Exam Title")}
           editMode={editMode}
@@ -476,7 +474,18 @@ export default function ExamEditor() {
           aria-label={t("Exam Title")}
           required={true}
         />
-
+      </div>
+      <div
+      className="flex flex-col md:flex-row justify-between gap-4 p-4"
+      role="region"
+      aria-labelledby="side-by-side-divs-heading"
+      > 
+      {/* First div */}
+      <div
+        className="w-1/2 p-4 rounded shadow-md"
+        role="region"
+        aria-labelledby="first-div-heading"
+      >
         <EditField
           title={t("LVA Num")}
           editMode={editMode}
@@ -496,7 +505,7 @@ export default function ExamEditor() {
           aria-label={t("Exam Date and Time")}
           required={true}
         />
-
+        <div className="m-2"></div>
         <EditField
           title={t("Duration")}
           editMode={editMode}
@@ -532,7 +541,12 @@ export default function ExamEditor() {
           disabled={!editMode}
           aria-label={t("Exam Tutor")}
         />
-
+      </div>
+      <div
+        className="w-1/2 p-4 rounded shadow-md"
+        role="region"
+        aria-labelledby="second-div-heading"
+      >
         <DropdownWithSearch
           tableName="examiners"
           label={t("Examiner")}
@@ -543,8 +557,8 @@ export default function ExamEditor() {
           disabled={!editMode}
           aria-label={t("Course Examiner")}
           required={true}
-        />
-
+            />
+            
         <DropdownWithSearch
           tableName="majors"
           label={t("Major")}
@@ -598,71 +612,73 @@ export default function ExamEditor() {
           onChange={(e) => setStatus(e.target.value)}
           aria-label={t("Exam Status")}
         />
-        <div className="mt-4 flex space-x-2">
+      </div>
+    </div>
+    <div className="m-5 mt-4 flex flex-row md:flex-row space-x-2">
+      <button
+        onClick={() => navigate(-1)}
+        className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
+        aria-label={t("Back to previous page")}
+      >
+        {"Back"}
+      </button>
+      <button
+        onClick={() => {
+          setEditMode(!editMode);
+          if (editMode) handleUpdate();
+        }}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
+        aria-label={editMode ? t("Save changes") : t("Edit exam")}
+      >
+        {editMode ? t("Save") : t("Edit")}
+        </button>
+        {editMode && (
           <button
-            onClick={() => navigate(-1)}
-            className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
-            aria-label={t("Back to previous page")}
-          >
-            {"Back"}
-          </button>
-          <button
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
             onClick={() => {
-              setEditMode(!editMode);
-              if (editMode) handleUpdate();
+              setEditMode(false);
             }}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
-            aria-label={editMode ? t("Save changes") : t("Edit exam")}
+            aria-label={t("Cancel editing")}
           >
-            {editMode ? t("Save") : t("Edit")}
+            {t("Cancel")}
           </button>
-          {editMode && (
+        )}
+    </div>
+    {showConfirmDialog && (
+      <div
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-description"
+      >
+        <div className="bg-white p-4 rounded shadow-lg max-w-sm">
+          <h2 id="confirm-dialog-title" className="text-lg font-bold mb-4">
+            {t("Confirm Room Selection")}
+          </h2>
+          <p id="confirm-dialog-description" className="mb-4">
+            {t("The selected room has a capacity of 0. Do you want to continue?")}
+          </p>
+          <div className="flex justify-end space-x-2">
             <button
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
-              onClick={() => {
-                setEditMode(false);
-              }}
-              aria-label={t("Cancel editing")}
+              onClick={handleCancelRoomSelection}
+              className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 focus:ring-2 focus:ring-gray-400"
+              aria-label={t("Cancel room selection")}
             >
               {t("Cancel")}
             </button>
-          )}
-        </div>
-        {showConfirmDialog && (
-          <div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="confirm-dialog-title"
-            aria-describedby="confirm-dialog-description"
-          >
-            <div className="bg-white p-4 rounded shadow-lg max-w-sm">
-              <h2 id="confirm-dialog-title" className="text-lg font-bold mb-4">
-                {t("Confirm Room Selection")}
-              </h2>
-              <p id="confirm-dialog-description" className="mb-4">
-                {t("The selected room has a capacity of 0. Do you want to continue?")}
-              </p>
-              <div className="flex justify-end space-x-2">
-                <button
-                  onClick={handleCancelRoomSelection}
-                  className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 focus:ring-2 focus:ring-gray-400"
-                  aria-label={t("Cancel room selection")}
-                >
-                  {t("Cancel")}
-                </button>
-                <button
-                  onClick={handleConfirmRoomSelection}
-                  className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 focus:ring-2 focus:ring-red-500"
-                  aria-label={t("Confirm room selection")}
-                >
-                  {t("Confirm")}
-                </button>
-              </div>
-            </div>
+            <button
+              onClick={handleConfirmRoomSelection}
+              className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 focus:ring-2 focus:ring-red-500"
+              aria-label={t("Confirm room selection")}
+            >
+              {t("Confirm")}
+            </button>
           </div>
-        )}
+        </div>
       </div>
+    )}
+    </>
     );
   else
     return (
