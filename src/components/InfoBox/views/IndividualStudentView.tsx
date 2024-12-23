@@ -127,7 +127,7 @@ export default function IndividualStudent() {
   }
 
   return (
-    <div className="m-10" role="main" aria-labelledby="student-details-heading">
+    <div className="m-5" role="main" aria-labelledby="student-details-heading">
       <h1 id="student-details-heading" className="text-2xl font-bold mb-4 sr-only">
         Student Details
       </h1>

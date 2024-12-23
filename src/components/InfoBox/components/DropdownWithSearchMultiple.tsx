@@ -111,7 +111,7 @@ export default function DropdownWithSearchMultiple(props: DropdownWithSearchMult
 
   return (
     <div
-      className={`relative w-96 ${!props.disabled ? "bg-slate-100 border border-gray-300 rounded-md p-2" : ""}`}
+      className={`relative w-96`}
       role="combobox"
       aria-haspopup="listbox"
       aria-owns="dropdown-list"
@@ -149,48 +149,51 @@ export default function DropdownWithSearchMultiple(props: DropdownWithSearchMult
           </div>
         </div>
       ) : (
-        <>
-          {values.map((elem: Tutor, index) => (
-            <div className="align-middle w-full hover:bg-slate-300 rounded-md group-focus:bg-slate-300">
+          <>
+          <div className={`${!props.disabled ? "mt-1 bg-slate-100 border border-gray-300 rounded-md p-2" : ""}`}>
+            {values.map((elem: Tutor, index) => (
+              
+              <div className="align-middle w-full hover:bg-slate-300 rounded-md group-focus:bg-slate-300">
+                <input
+                  className="align-middle inline-block w-5 h-5"
+                  type="checkbox"
+                  id={"tutorCheckbox" + index}
+                  name={"tutorCheckbox" + index}
+                  checked={isChecked(elem)}
+                  onClick={() => {
+                    click(index);
+                  }}
+                />
+                <label htmlFor={"tutorCheckbox" + index} className="align-middle inline-block pl-3">
+                  {elem["first_name"] + " " + elem["last_name"]}
+                </label>
+              </div>
+            ))}
+            <div className="inline-block w-full">
               <input
-                className="align-middle inline-block w-5 h-5"
+                className="align-middle inline-block w-5 h-5 mr-3"
                 type="checkbox"
-                id={"tutorCheckbox" + index}
-                name={"tutorCheckbox" + index}
-                checked={isChecked(elem)}
+                id={"nuTutorCheckbox"}
+                checked={checked[values.length]}
+                onChange={() => {}}
                 onClick={() => {
-                  click(index);
+                  click(values.length);
                 }}
+                disabled={!dropdownValue ? true : false}
               />
-              <label htmlFor={"tutorCheckbox" + index} className="align-middle inline-block pl-3">
-                {elem["first_name"] + " " + elem["last_name"]}
-              </label>
+              <div className="align-middle inline-block w-80">
+                <DropdownWithSearch
+                  tableName="tutors"
+                  options={filteredDropDownOptions()}
+                  value={dropdownValue || ""}
+                  onChange={(newValue) => dropdownValueChanged(Number(newValue))}
+                  placeholder={t("Add tutor")}
+                  disabled={props.disabled}
+                  aria-label={t("Exam Tutor")}
+                />
+              </div>
             </div>
-          ))}
-          <div className="inline-block w-full">
-            <input
-              className="align-middle inline-block w-5 h-5 mr-3"
-              type="checkbox"
-              id={"nuTutorCheckbox"}
-              checked={checked[values.length]}
-              onChange={() => {}}
-              onClick={() => {
-                click(values.length);
-              }}
-              disabled={!dropdownValue ? true : false}
-            />
-            <div className="align-middle inline-block w-80">
-              <DropdownWithSearch
-                tableName="tutors"
-                options={filteredDropDownOptions()}
-                value={dropdownValue || ""}
-                onChange={(newValue) => dropdownValueChanged(Number(newValue))}
-                placeholder={t("Add tutor")}
-                disabled={props.disabled}
-                aria-label={t("Exam Tutor")}
-              />
-            </div>
-          </div>
+          </div>   
         </>
       )}
     </div>

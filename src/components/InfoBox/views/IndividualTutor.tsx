@@ -94,7 +94,7 @@ export default function IndividualTutor() {
   }
 
   return (
-    <div className="m-10" role="main" aria-labelledby="tutor-details-heading">
+    <div className="m-5" role="main" aria-labelledby="tutor-details-heading">
         <h1 id="tutor-details-heading" className="text-2xl font-bold mb-4 sr-only">
         Tutor Details
         </h1>
