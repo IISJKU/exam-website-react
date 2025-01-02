@@ -201,7 +201,8 @@ export default function ExamEditor() {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
-      setAllExams(data);
+      const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
+    setAllExams(nonArchivedExams);
     };
 
     fetchExam();

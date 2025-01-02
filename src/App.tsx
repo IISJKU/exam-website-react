@@ -30,6 +30,7 @@ import RemoveTutor from "./components/InfoBox/views/RemoveTutor";
 import ExamRoomView from "./components/InfoBox/views/ExamRoomView";
 import { useEffect } from "react";
 import TutorRegisteredExams from "./components/InfoBox/views/TutorRegisteredExams";
+import ArchivedExamsView from "./components/InfoBox/views/ArchivedExamsView";
 
 export default function App() {
   return (
@@ -46,6 +47,7 @@ export default function App() {
               {/* Layout keeps the side menu persistent */}
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/exams" element={<ExamView />} />
+              <Route path="/admin/archived-exams" element={<ArchivedExamsView />} />
               <Route path="/admin/notifications" element={<NotificationView />} />
               <Route path="/admin/notifications/:id" element={<NotificationView />} /> {/* open a specific notification */}
               <Route path="/admin/students" element={<StudentView />} />

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { showToast } from "../components/ToastMessage";
 import DropdownWithSearch from "../components/DropdownWithSearch";
 import { useAuth } from "../../../hooks/AuthProvider";
-import Exam from "../../classes/Exam";
+import Exam, { ExamStatus } from "../../classes/Exam";
 import Room from "../../classes/Room";
 import { useTranslation } from "react-i18next";
 import RoomsCalender from "./RoomsCalender";
@@ -48,7 +48,8 @@ export default function RoomManagement() {
       headers: { Authorization: `Bearer ${user.token}` },
     });
     const data = await response.json();
-    setAllExams(data);
+    const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
+    setAllExams(nonArchivedExams);
   };
 
   const updateExamRoom = async (exam: Exam) => {

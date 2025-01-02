@@ -13,6 +13,7 @@ interface ContentViewInterface<T> {
   keys: (keyof T)[];
   data: T[];
   buttonName?: string; 
+  coloring?: boolean;
   onRowClick?: (id: number) => void;
 }
 
@@ -71,7 +72,7 @@ export default function ContentView<T extends { id?: number; status?: ExamStatus
         <SearchBar items={props.data} filter={setFilteredData} />
       </div>
        {/* Color Legend for Admin */}
-      {user.role === "Admin" && (
+      {user.role === "Admin" && props.coloring == true && (
         <div className="mb-4 p-4 bg-gray-100 rounded-md" role="region" aria-labelledby="legend-title">
           <h6 id="legend-title" className="text-lg font-semibold mb-2 sr-only">
             {t("Color Legend for Exam Statuses")}
@@ -149,7 +150,7 @@ export default function ContentView<T extends { id?: number; status?: ExamStatus
           {entries.map((element: T, index) => (
             <tr
               key={`${element.id}-${index}`}
-              className={`${user.role == "Admin" ? getBorderColor( element.status, element.room_id, element.registeredTutors, element.tutor_id) : className} `}
+              className={`${user.role == "Admin" && props.coloring == true ? getBorderColor( element.status, element.room_id, element.registeredTutors, element.tutor_id) : className} `}
               tabIndex={0}
               role="row"
               aria-label={`Row ${index + 1}`}

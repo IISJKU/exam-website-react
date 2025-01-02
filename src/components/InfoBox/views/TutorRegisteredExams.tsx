@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Tutor from "../../classes/Tutor";
 import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
-import Exam from "../../classes/Exam";
+import Exam, { ExamStatus } from "../../classes/Exam";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
 import { t } from "i18next";
@@ -49,13 +49,14 @@ export default function TutorRegisteredExams() {
         },
       });
       const data = await response.json();
-
+       // Filter out exams with the archived status
+      const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
       if (!response.ok) {
         showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
       }
 
       // Modify the data array before setting it to exams
-      const updatedData = data.map((exam: any) => {
+      const updatedData = nonArchivedExams.map((exam: any) => {
         let updatedExam = { ...exam };
 
         // Update student to matrikel_number if exists

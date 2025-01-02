@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Calendar, momentLocalizer, Views, Event } from "react-big-calendar";
 import moment from "moment";
 import { showToast } from "../components/ToastMessage";
-import Exam from "../../classes/Exam";
+import Exam, { ExamStatus } from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
 import fetchAll from "./FetchAll";
 import { t } from "i18next";
@@ -41,7 +41,9 @@ export default function BigCalendar() {
   const fetchExams = async () => {
     try {
       const data = (await fetchAll("http://localhost:1337/api/exams", user.token, "Http error!")) as Exam[];
-      setExams(data);
+      // Filter out exams with the status "archived"
+      const filteredExams = data.filter((exam) => exam.status !== ExamStatus.archived);
+      setExams(filteredExams);
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
     } finally {

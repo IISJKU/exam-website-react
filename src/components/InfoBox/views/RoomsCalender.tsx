@@ -3,7 +3,7 @@ import { Calendar as BigCalendar, momentLocalizer, Views, Event } from "react-bi
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "../components/ToastMessage";
-import Exam from "../../classes/Exam";
+import Exam, { ExamStatus } from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
 import fetchAll from "./FetchAll";
 import { t } from "i18next";
@@ -33,7 +33,9 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
   const fetchExams = async () => {
     try {
       const data = (await fetchAll("http://localhost:1337/api/exams", user.token, "Http error!")) as Exam[];
-      const filteredExams = selectedRoomId ? data.filter((exam) => exam.room_id === selectedRoomId) : [];
+       // Filter exams by selected room and exclude those with the archived status
+      const filteredExams = selectedRoomId ? data.filter((exam) => exam.room_id === selectedRoomId && exam.status !== ExamStatus.archived)
+        : data.filter((exam) => exam.status !== ExamStatus.archived);
       setExams(filteredExams);
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error"});

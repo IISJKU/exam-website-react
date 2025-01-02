@@ -1,4 +1,4 @@
-import Exam from "../../classes/Exam";
+import Exam, { ExamStatus } from "../../classes/Exam";
 import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
 import { useEffect, useState } from "react";
@@ -42,15 +42,16 @@ export default function ExamWithoutTutor() {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
-      });
+      });      
       const data = await response.json();
-      
       if (!response.ok) {
-       showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
-      }
-
+        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+       }
+ 
+      // Filter out exams with the archived status
+      const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
       // Modify the data array before setting it to exams
-      const updatedData = data.map((exam: any) => {
+      const updatedData = nonArchivedExams.map((exam: any) => {
         let updatedExam = { ...exam };
 
         // Update student to matrikel_number if exists
@@ -108,6 +109,7 @@ export default function ExamWithoutTutor() {
       fields={fields}
       keys={keys}
       buttonName={user.role === "Tutor" ? "Request" : "Edit"}
+      coloring={true}
       data={exams} // Pass the fetched and updated exam data here
     />
   );

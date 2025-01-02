@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"; // Import navigate from react-ro
 import fetchAll from "./FetchAll";
 import { useAuth } from "../../../hooks/AuthProvider";
 
-export default function ExamView() {
+export default function ArchivedExamsView() {
   const navigate = useNavigate(); // Initialize navigate
   const user = useAuth();
 
@@ -38,15 +38,11 @@ export default function ExamView() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      //let data = [];
 
       const data = (await fetchAll("http://localhost:1337/api/exams", user.token, "Http error!")) as Exam[];
 
-      // Filter out exams with the archived status
-      const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
-
       // Modify the data array before setting it to exams
-      const updatedData = nonArchivedExams.map((exam: any) => {
+      const updatedData = data.map((exam: any) => {
         let updatedExam = { ...exam };
 
         // Update student to matrikel_number if exists
@@ -90,8 +86,7 @@ export default function ExamView() {
   }, []);
 
   const handleExamClick = (examId: number) => {
-    const routePrefix = user.role === "Tutor" ? "tutor" : "admin";
-    navigate(`/${routePrefix}/exams/${examId}`);
+    navigate(`/admin/exams/${examId}`);
   };
 
   if (loading) {
@@ -104,9 +99,9 @@ export default function ExamView() {
       onRowClick={handleExamClick} 
       fields={fields}
       keys={keys}
-      buttonName={user.role === "Tutor" ? "View" : "Edit"}
+      buttonName={"Edit"}
       coloring={true}
-      data={exams}
+      data={exams.filter((exam) => exam.status === ExamStatus.archived)}
     />
   );
 }

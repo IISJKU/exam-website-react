@@ -23,8 +23,8 @@ export default function Calendar() {
       if (user.role == "Student" || user.role == "Tutor") link = "http://localhost:1337/api/exams/me";
 
       const data = (await fetchAll(link, user.token)) as Exam[];
-
-      setExams(data);
+      const filteredExams = data.filter((exam) => exam.status !== ExamStatus.archived);
+      setExams(filteredExams);
     } catch (error) {
       showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
     } finally {
