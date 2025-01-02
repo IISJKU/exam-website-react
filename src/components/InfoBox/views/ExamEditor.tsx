@@ -290,6 +290,7 @@ export default function ExamEditor() {
       room,
       lva_num,
       notes,
+      status,
     };
 
     try {

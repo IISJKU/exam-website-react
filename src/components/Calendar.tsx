@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { showToast } from "./InfoBox/components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import Exam from "./classes/Exam";
+import Exam, { ExamStatus } from "./classes/Exam";
 import fetchAll from "./InfoBox/views/FetchAll";
 import { useAuth } from "../hooks/AuthProvider";
 
@@ -56,6 +56,48 @@ export default function Calendar() {
     setDate(newDate);
   }
 
+  function getColorForExams(exams: Exam[]): string {
+    const colors = exams.map((exam) => {
+      const { status, room_id, registeredTutors, tutor_id } = exam;
+  
+      if (status === ExamStatus.NoEmailExaminer) {
+        return "rgba(255, 99, 132, 0.5)"; //  darker red
+      }
+      if (status === ExamStatus.noMaterial) {
+        return "rgba(255, 206, 86, 0.5)"; // darker yellow
+      }
+      if (!room_id) {
+        return "rgba(255, 159, 64, 0.5)"; // darker orange
+      }
+      if (status === ExamStatus.noTutor) {
+        return "rgba(75, 192, 192, 0.5)"; // darker green
+      }
+      if (registeredTutors && registeredTutors.length === 0 && !tutor_id) {
+        return "rgba(30, 100, 180, 0.7)"; // dark blue
+      }
+      if (!tutor_id) {
+        return "rgba(54, 162, 235, 0.5)"; // light blue
+      }
+      if (status === ExamStatus.noAction) {
+        return "rgba(148, 163, 184, 0.8)";   // darker gray
+      }
+      return "rgba(201, 203, 207, 0.3)"; // Default slightly darker white
+    });
+  
+    // Generate the gradient based on the colors
+    if (colors.length === 1) {
+      return colors[0]; // Single color
+    }
+  
+    const gradientStops = colors.map((color, index) => {
+      const percentage = (index / (colors.length - 1)) * 100;
+      return `${color} ${percentage}%`;
+    });
+  
+    return `linear-gradient(90deg, ${gradientStops.join(", ")})`;
+  }  
+
+
   function getRows(month: number, year: number): string[][][] {
     const currentDate = new Date(year, month, 1);
     const numDays = new Date(year, month + 1, 0).getDate();
@@ -66,9 +108,9 @@ export default function Calendar() {
       const row: string[][] = [];
       for (let i = 0; i < 7; i++) {
         if (currentDate.getDate() === 1 && getWeekday(currentDate) !== weekdays[i]) {
-          row.push(["", "invisible"]);
+          row.push(["", ""]);
         } else if (count <= numDays) {
-          let examString = exams.some((exam) => {
+          const matchingExams = exams.filter((exam) => {
             const examDate = new Date(exam.date);
             return (
               examDate.getDate() === currentDate.getDate() &&
@@ -76,30 +118,23 @@ export default function Calendar() {
               examDate.getFullYear() === currentDate.getFullYear()
             );
           })
-            ? "bg-slate-400"
-            : "";
 
-          if (examString != "") {
-            examString = exams.some((exam) => {
-              const examDate = new Date(exam.date);
-              if (
-                examDate.getDate() === currentDate.getDate() &&
-                examDate.getMonth() === currentDate.getMonth() &&
-                examDate.getFullYear() === currentDate.getFullYear()
-              )
-                if (exam.confirmed != undefined) {
-                  if (exam.confirmed === false) return true;
-                } else return false;
-            })
-              ? "bg-red-200"
-              : "bg-slate-400";
+          let backgroundStyle = "";
+          if (matchingExams.length > 0) {
+            if (user.role === "Admin") {
+              backgroundStyle = matchingExams.length === 1
+                ? getColorForExams(matchingExams) // Single color
+                : getColorForExams(matchingExams); // Gradient for multiple exams
+            } else {
+              backgroundStyle = "rgba(148, 163, 184, 0.8)"; // Default gray for non-admin
+            }
           }
 
-          row.push([String(currentDate.getDate()), examString]);
+          row.push([String(currentDate.getDate()), backgroundStyle]);
           currentDate.setDate(currentDate.getDate() + 1);
           count++;
         } else {
-          row.push(["", "invisible"]);
+          row.push(["", ""]);
         }
       }
       rows.push(row);
@@ -145,22 +180,25 @@ export default function Calendar() {
                 {row.map((day, dayIndex) => (
                   <td
                     key={dayIndex}
-                    tabIndex={day[1] === "bg-slate-400" ? 0 : undefined}
+                    tabIndex={day[1] ? 0 : undefined}
                     onClick={() => {
-                      if (day[1] !== "invisible" && day[0]) {
+                      if (day[0]) {
                         // Use navigate to move to a new route for the specific date
-
                         navigate(`${user.role.toLowerCase()}/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
                       }
                     }}
                     onKeyDown={(e) => {
-                      if ((e.key === "Enter" || e.key === " ") && day[1] !== "invisible" && day[0]) {
+                      if ((e.key === "Enter" || e.key === " ") && day[0]) {
                         navigate(`${user.role.toLowerCase()}/calendar/${date.getFullYear()}/${date.getMonth() + 1}/${day[0]}`);
                       }
                     }}
-                    className={`hover:bg-slate-500 active:bg-slate-700 align-top border-2 border-black aspect-square ${day[1]}`}
+                    className={`hover:bg-slate-500 active:bg-slate-700 align-top border-2 border-black aspect-square hover:cursor-pointer 
+                      ${day[0] ? "" : "bg-white"}`}
+                    style={{
+                      background: day[0] ? day[1] : "",  // Use the gradient or single color here
+                    }}
                     role="gridcell"
-                    aria-label={`Day ${day[0]} ${t(month[date.getMonth()])}`}
+                    aria-label={day[0] ? `Day ${day[0]} ${t(month[date.getMonth()])}` : "Empty cell"}
                   >
                     {day[0]}
                   </td>

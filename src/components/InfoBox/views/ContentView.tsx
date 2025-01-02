@@ -4,6 +4,8 @@ import SortableHeaders from "../components/SortableHeaders";
 import { useTranslation } from "react-i18next";
 import Pagination from "../components/Pagination";
 import { useAuth } from "../../../hooks/AuthProvider";
+import { ExamStatus } from "../../classes/Exam";
+import Tutor from "../../classes/Tutor";
 
 interface ContentViewInterface<T> {
   title: string;
@@ -14,7 +16,7 @@ interface ContentViewInterface<T> {
   onRowClick?: (id: number) => void;
 }
 
-export default function ContentView<T extends { id?: number; confirmed?: boolean }>(props: ContentViewInterface<T>) {
+export default function ContentView<T extends { id?: number; status?: ExamStatus; room_id?: number; registeredTutors?: Tutor[]; tutor_id?: number}>(props: ContentViewInterface<T>) {
   const { t } = useTranslation();
   const [filtered, setFiltered] = useState<T[]>(props.data);
   const entriesPerPage = 20;
@@ -29,14 +31,38 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
     return !isNaN(Date.parse(t)) && t.includes("T");
   }
 
+  const getBorderColor = (status?: ExamStatus, room_id?: number, registeredTutors?: Tutor[], tutor_id?: number): string => {
+    if (status === ExamStatus.NoEmailExaminer) {
+      return "hover:bg-red-100 border-dashed border-black border-2 bg-red-200 cursor-pointer focus:outline-none focus:ring-2"; // Light red
+    }
+    if (status === ExamStatus.noMaterial) {
+      return "hover:bg-yellow-100 border-dashed border-black border-2 bg-yellow-200 cursor-pointer focus:outline-none focus:ring-2"; // Yellow
+    }
+    if (!room_id) {
+      return "hover:bg-orange-100 border-dashed border-black border-2 bg-orange-200 cursor-pointer focus:outline-none focus:ring-2"; // Light orange
+    }
+    if (status === ExamStatus.noTutor) {
+      return "hover:bg-green-100 border-dashed border-black border-2 bg-green-200 cursor-pointer focus:outline-none focus:ring-2" // Green 
+    }
+    if (registeredTutors && registeredTutors.length === 0 && !tutor_id) {
+      return "hover:bg-blue-300 border-dashed border-black border-2 bg-blue-400 cursor-pointer focus:outline-none focus:ring-2"; // Dark blue
+    }
+    if (!tutor_id) {
+      return "hover:bg-blue-100 border-dashed border-black border-2 bg-blue-200 cursor-pointer focus:outline-none focus:ring-2"; // light blue
+    }
+    if (status === ExamStatus.noAction) {
+      return "hover:bg-slate-100 even:bg-slate-300 odd:bg-slate-200 cursor-pointer focus:outline-none focus:ring-2"; // No color
+    }
+    return "hover:bg-slate-100 even:bg-slate-300 odd:bg-slate-200 cursor-pointer focus:outline-none focus:ring-2"; // Default (no border color)
+  };
+  
   const start = (page - 1) * entriesPerPage;
   const numPages = Math.ceil(filtered.length / entriesPerPage);
   const entries: T[] = filtered.slice(start, start + entriesPerPage);
 
   const pages = Array.from({ length: numPages }, (_, i) => i + 1);
 
-  const className = "hover:bg-slate-300 even:bg-slate-200 odd:bg-slate-100 cursor-pointer focus:outline-none focus:ring-2";
-  const dashedBorder = "hover:bg-red-100 border-dashed border-black border-2 bg-red-200 cursor-pointer focus:outline-none focus:ring-2";
+  const className = "hover:bg-slate-100 even:bg-slate-300 odd:bg-slate-200 cursor-pointer focus:outline-none focus:ring-2";
 
   return (
     <div className="w-full h-full p-5 select-none" role="region" aria-labelledby="table-title">
@@ -44,7 +70,76 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
         <h2 id="table-title" className="text-4xl w-full md:w-1/3 my-2">{t(props.title)}</h2>
         <SearchBar items={props.data} filter={setFilteredData} />
       </div>
-       {/* Table Wrapper with Horizontal Scrolling */}
+       {/* Color Legend for Admin */}
+      {user.role === "Admin" && (
+        <div className="mb-4 p-4 bg-gray-100 rounded-md" role="region" aria-labelledby="legend-title">
+          <h6 id="legend-title" className="text-lg font-semibold mb-2 sr-only">
+            {t("Color Legend for Exam Statuses")}
+          </h6>
+          <ul className="flex flex-wrap gap-4" role="list" aria-label="Exam status color legend">
+            <li className="flex items-center" role="listitem" aria-label="Email Examiner Needed">
+              <span
+                className="w-6 h-6 bg-red-300 border-dashed border-black border-2 inline-block mr-2"
+                role="presentation"
+                aria-hidden="true"
+              ></span>
+              {t("Email Examiner Needed")}
+            </li>
+            <li className="flex items-center" role="listitem" aria-label="Material Needed">
+              <span
+                className="w-6 h-6 bg-yellow-300 border-dashed border-black border-2 inline-block mr-2"
+                role="presentation"
+                aria-hidden="true"
+              ></span>
+              {t("Material Needed")}
+            </li>
+            <li className="flex items-center" role="listitem" aria-label="No Room Assigned">
+              <span
+                className="w-6 h-6 bg-orange-300 border-dashed border-black border-2 inline-block mr-2"
+                role="presentation"
+                aria-hidden="true"
+              ></span>
+              {t("No Room Assigned")}
+            </li>
+            <li className="flex items-center" role="listitem" aria-label="Online Exam Mode">
+              <span
+                className="w-6 h-6 bg-green-300 border-dashed border-black border-2 inline-block mr-2"
+                role="presentation"
+                aria-hidden="true"
+              ></span>
+              {t("No Tutor Needed")}
+            </li>
+            <li className="flex items-center" role="listitem" aria-label="No Tutors Assigned">
+              <span
+                className="w-6 h-6 bg-blue-400 border-dashed border-black border-2 inline-block mr-2"
+                role="presentation"
+                aria-hidden="true"
+              ></span>
+              {t("No Tutors Assigned")}
+            </li>
+            <li className="flex items-center" role="listitem" aria-label="No Tutor Picked Yet">
+              <span
+                className="w-6 h-6 bg-blue-200 border-dashed border-black border-2 inline-block mr-2"
+                role="presentation"
+                aria-hidden="true"
+              ></span>
+              {t("No Tutor Picked Yet")}
+            </li>
+            <li className="flex items-center" role="listitem" aria-label="No Action Required">
+              <span
+                className="w-6 h-6 bg-slate-300 inline-block mr-2"
+                style={{
+                  background: "repeating-linear-gradient(0deg, #d1d5db 0, #d1d5db 10%, #9ca3af 10%, #9ca3af 20%)",
+                }}
+                role="presentation"
+                aria-hidden="true"
+              ></span>
+              {t("No Action Required")}
+            </li>
+          </ul>
+        </div>
+      )}
+    {/* Table Wrapper with Horizontal Scrolling */}
     <div className="overflow-x-auto" role="table" aria-label={`${props.title} Table`}>
       <table className="min-w-full table-auto text-left border-2">
         <thead>
@@ -54,13 +149,7 @@ export default function ContentView<T extends { id?: number; confirmed?: boolean
           {entries.map((element: T, index) => (
             <tr
               key={`${element.id}-${index}`}
-              className={
-                element["confirmed"] != undefined
-                  ? element["confirmed"] === false
-                    ? dashedBorder
-                    : className
-                  : className
-              }
+              className={`${user.role == "Admin" ? getBorderColor( element.status, element.room_id, element.registeredTutors, element.tutor_id) : className} `}
               tabIndex={0}
               role="row"
               aria-label={`Row ${index + 1}`}
