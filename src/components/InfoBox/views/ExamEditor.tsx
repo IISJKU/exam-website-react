@@ -88,7 +88,7 @@ export default function ExamEditor() {
 
         const rawData = await examResponse.json();
         if (!examResponse.ok) {
-          showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${rawData.error.message || "Unknown error"}.`, type: "error" });
+          showToast({ message: `${t("Error fetching exam data")}: ${examResponse.status}, Message: ${rawData.error.message || "Unknown error"}.`, type: "error" });
         }
 
         let examData: Exam | undefined;
@@ -122,10 +122,10 @@ export default function ExamEditor() {
           setMode(examData.mode_id);
           setStatus(examData.status);
         } else {
-          showToast({ message: "No exam data found", type: "error" });
+          showToast({ message: t("No exam data found"), type: "error" });
         }
       } catch (error) {
-        showToast({ message: "Error fetching exam data", type: "error" });
+        showToast({ message: t("Error fetching exam data"), type: "error" });
       } finally {
         setLoading(false);
       }
@@ -191,7 +191,7 @@ export default function ExamEditor() {
           rooms: roomsRes,
         });
       } catch (error) {
-        showToast({ message: "Error fetching dropdown options", type: "error" });
+        showToast({ message: t("Error fetching dropdown options"), type: "error" });
       }
     };
 
@@ -307,7 +307,7 @@ export default function ExamEditor() {
         if (!response.ok) {
           const errorData = await response.json();
           showToast({
-            message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+            message: `${t("Error updating exam")}: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
             type: "error",
           });
           return;
@@ -382,14 +382,14 @@ export default function ExamEditor() {
         if (!notify.ok) {
           const errorData = await notify.json();
           showToast({
-            message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+            message: `${t("Error submitting notification")}: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
             type: "error",
           });
           return;
         }
       }
     } catch (error) {
-      showToast({ message: "Error updating exam", type: "error" });
+      showToast({ message: t("Error updating exam"), type: "error" });
     }
   };
 
@@ -417,7 +417,7 @@ export default function ExamEditor() {
     // Check if the overlapping exams exceed room capacity
     if (overlappingExams.length + 1 > room.capacity) {
       showToast({
-        message: "Room capacity exceeded with overlapping exams.",
+        message: t("Room capacity exceeded with overlapping exams!"),
         type: "error",
       });
       return;
@@ -429,27 +429,27 @@ export default function ExamEditor() {
       setShowConfirmDialog(true);
     } else {
       setRoom(newRoomId);
-      showToast({ message: `Room capacity: ${room.capacity}`, type: "info" });
+      showToast({ message: `${t("Room capacity")}: ${room.capacity}`, type: "info" });
     }
   };
 
   const handleConfirmRoomSelection = () => {
     setRoom(selectedRoomId);
     setShowConfirmDialog(false);
-    showToast({ message: "Room with 0 capacity selected", type: "warning" });
+    showToast({ message: t("Room with 0 capacity selected"), type: "warning" });
   };
 
   const handleCancelRoomSelection = () => {
     setSelectedRoomId(null);
     setShowConfirmDialog(false);
     setRoom(null);
-    showToast({ message: "Room selection canceled", type: "info" });
+    showToast({ message: t("Room selection canceled"), type: "info" });
   };
 
   if (loading || !exam) {
     return (
       <p aria-live="polite" aria-busy="true">
-        Loading exam data...
+        {t("Loading exam data...")}
       </p>
     );
   }
@@ -481,17 +481,9 @@ export default function ExamEditor() {
           required={true}
         />
       </div>
-      <div
-      className="flex flex-col md:flex-row justify-between gap-4 px-2"
-      role="region"
-      aria-labelledby="side-by-side-divs-heading"
-      > 
+      <div className="flex flex-col md:flex-row justify-between gap-4 px-2" role="region" aria-labelledby="side-by-side-divs-heading" > 
       {/* First div */}
-      <div
-        className="w-1/2 p-4 rounded shadow-md"
-        role="region"
-        aria-labelledby="first-div-heading"
-      >
+      <div className="w-1/2 p-4 rounded shadow-md" role="region" aria-labelledby="first-div-heading">
         <EditField
           title={t("LVA Num")}
           editMode={editMode}
@@ -523,7 +515,7 @@ export default function ExamEditor() {
 
         <DropdownWithSearch
           tableName="students"
-          label={"Student"}
+          label={t("Student")}
           options={dropdownOptions(options.students, "first_name", "last_name")}
           value={student ?? ""}
           onChange={(newValue) => setStudent(Number(newValue))}
@@ -535,7 +527,7 @@ export default function ExamEditor() {
 
         <DropdownWithSearchMultiple
           tableName="tutors"
-          label={"Tutors"}
+          label={t("Tutors")}
           options={dropdownOptions(options.tutors, "first_name", "last_name")}
           value={tutor ?? ""}
           values={registeredTutors}
@@ -548,7 +540,7 @@ export default function ExamEditor() {
         />
           
         <StatusSelector
-          title="Status"
+          title={t("Status")}
           value={status}
           disabled={!editMode}
           onChange={(newValue) => setStatus((newValue))}
@@ -617,7 +609,7 @@ export default function ExamEditor() {
         />
 
         <EditField
-          title={"Notes"}
+          title={t("Notes")}
           editMode={editMode}
           text={notes}
           hideTitle={false}

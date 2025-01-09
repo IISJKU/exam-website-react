@@ -5,11 +5,12 @@ import moment from "moment";
 import { showToast } from "../components/ToastMessage";
 import Exam from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const localizer = momentLocalizer(moment);
 
 export default function TutorBigCalender() {
+  const { t } = useTranslation();
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState(Views.WEEK);
   const [exams, setExams] = useState<Exam[]>([]);
@@ -47,11 +48,11 @@ export default function TutorBigCalender() {
       });
       const data = await response.json();
       if (!response.ok) {
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
+        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
       }
       setExams(data);
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error" });
     } finally {
       setLoading(false);
     }
@@ -91,7 +92,7 @@ export default function TutorBigCalender() {
   }
 
   return (
-    <div role="region" aria-label="Tutor Exam Calendar" className="tutor-big-calendar">
+    <div role="region" aria-label={t("Tutor Exam Calendar")} className="tutor-big-calendar">
       <Calendar
         defaultDate={defaultDate}
         defaultView={view}
@@ -106,15 +107,13 @@ export default function TutorBigCalender() {
         onNavigate={(newDate) => setDate(newDate)}
         popup
         aria-labelledby="calendar-title"
-        aria-label="Exam Calendar view"
+        aria-label={t("Exam Calendar view")}
         components={{
           event: ({ event }: { event: Event }) => (
             <div
               role="button"
               tabIndex={0}
-              aria-label={`Exam: ${event.title}, starts at ${moment(event.start).format(
-                "h:mm A"
-              )} and ends at ${moment(event.end).format("h:mm A")}`}
+              aria-label={`${t("Exam")}: ${event.title}, ${t("starts at")} ${moment(event.start).format("h:mm A")} ${t("and ends at")} ${moment(event.end).format("h:mm A")}`}
               onClick={() => handleSelectEvent(event)}
               onKeyDown ={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -128,12 +127,12 @@ export default function TutorBigCalender() {
           ),
         }}
         messages={{
-          week: "Week View",
-          day: "Day View",
-          month: "Month View",
-          today: "Today",
-          previous: "Previous",
-          next: "Next",
+          week: t("Week View"),
+          day: t("Day View"),
+          month: t("Month View"),
+          today: t("Today"),
+          previous: t("Previous"),
+          next: t("Next"),
         }}
       />
       <h2 id="calendar-title" className="sr-only">

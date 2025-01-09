@@ -4,10 +4,12 @@ import "./index.css";
 import App from "./App";
 import "./i18n";
 import reportWebVitals from "./reportWebVitals";
+import { useTranslation } from "react-i18next";
 
+const { t } = useTranslation();
 // Add accessible label to the root element
 const rootElement = document.getElementById("root") as HTMLElement;
-rootElement.setAttribute("aria-label", "Application Root");
+rootElement.setAttribute("aria-label", t("Application Root"));
 
 const root = ReactDOM.createRoot(rootElement);
 root.render(

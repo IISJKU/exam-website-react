@@ -5,9 +5,10 @@ import { showToast } from "../components/ToastMessage";
 import Exam, { ExamStatus } from "../../classes/Exam";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export default function TutorRegisteredExams() {
+  const { t } = useTranslation();
   const navigate = useNavigate(); // Initialize navigate
   const user = useAuth();
   const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
@@ -20,8 +21,8 @@ export default function TutorRegisteredExams() {
 
   // Determine fields and keys dynamically based on screen size
   const fields = isMobileView
-    ? ["Exam Title", "Date/Time"] // Shortened fields for mobile
-    : ["Exam Title", "LVA Nr.", "Date/Time", "Duration", "Mode", "Student", "Examiner", "Institute", "Notes", "Student Misc"];
+    ? [t("Exam Title"), t("Date/Time")]
+    : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Institute"), t("Notes"), t("Student Misc")];
 
   const keys: (keyof Exam)[] = isMobileView
     ? ["title", "date"] // Shortened keys for mobile
@@ -52,7 +53,7 @@ export default function TutorRegisteredExams() {
        // Filter out exams with the archived status
       const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
       if (!response.ok) {
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
+        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
       }
 
       // Modify the data array before setting it to exams
@@ -89,7 +90,7 @@ export default function TutorRegisteredExams() {
 
       setExams(updatedData); // Set the updated data to exams
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error" });
     } finally {
       setLoading(false); // Set loading to false when the fetch is complete
     }
@@ -106,14 +107,11 @@ export default function TutorRegisteredExams() {
 
   if (loading) {
     return (
-      <p aria-live="polite" aria-busy="true">
-        Loading exams...
-      </p>
-    ); // Display loading indicator while fetching
+      <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>
+    );
   }
 
   const handleRemove = async () => {
-    console.log(id);
     const response = await fetch("http://localhost:1337/api/exams/deregister-tutor", {
       method: "POST",
       headers: {
@@ -123,20 +121,18 @@ export default function TutorRegisteredExams() {
       body: JSON.stringify({ examId: id }),
     });
     const data = await response.json();
-
     window.location.reload();
-
     setShowConfirmDialog(false);
   };
 
   return (
     <>
       <ContentView
-        title={"List of Registered Exams"}
+        title={t("List of Registered Exams")}
         onRowClick={(id) => handleExamClick(id)}
         fields={fields}
         keys={keys}
-        buttonName={user.role === "Tutor" ? "Deregister" : "Edit"}
+        buttonName={user.role === "Tutor" ? t("Deregister") : t("Edit")}
         data={exams} // Pass the fetched and updated exam data here
       />
       {/* Confirmation Dialog */}

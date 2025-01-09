@@ -1,4 +1,4 @@
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 import React, { useState } from "react";
 
 interface DropdownOption {
@@ -15,6 +15,7 @@ interface DropdownProps {
 }
 
 export default function Dropdown(props: DropdownProps) {
+  const { t } = useTranslation();
   const [value, setValue] = useState<string | number>(props.value);
 
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -29,9 +30,7 @@ export default function Dropdown(props: DropdownProps) {
     <div role="group" aria-labelledby={`dropdown-label-${props.label.toLowerCase()}`}>
       {props.label ? (
         <label id={`dropdown-label-${props.label.toLowerCase()}`} className="font-bold">{t(props.label) + " "}</label>
-      ) : (
-        <></>
-          )}
+      ) : null }
         <div className="mb-2 inline-block ">
             <select
                 value={value}
@@ -43,11 +42,11 @@ export default function Dropdown(props: DropdownProps) {
                 aria-disabled={props.disabled ? "true" : undefined} 
             >
                 <option value="" disabled>
-                {t(`Select a ${props.label.toLowerCase()}`)}
+                {t("Select a", { label: t(props.label.toLowerCase()) })}
                 </option>
                 {props.options.map((option) => (
                   <option key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.label)}
                   </option>
                 ))}
             </select>

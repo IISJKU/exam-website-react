@@ -7,6 +7,7 @@ import Exam, { ExamStatus } from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
 import fetchAll from "./FetchAll";
 import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const localizer = momentLocalizer(moment);
 
@@ -18,6 +19,7 @@ export default function BigCalendar() {
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const user = useAuth();
+  const { t } = useTranslation();
 
   const { defaultDate, scrollToTime } = useMemo(
     () => ({
@@ -41,11 +43,11 @@ export default function BigCalendar() {
   const fetchExams = async () => {
     try {
       const data = (await fetchAll("http://localhost:1337/api/exams", user.token, "Http error!")) as Exam[];
-      // Filter out exams with the status "archived"
+      // Filter out exams with the status not "archived"
       const filteredExams = data.filter((exam) => exam.status !== ExamStatus.archived);
       setExams(filteredExams);
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error" });
     } finally {
       setLoading(false); // Set loading to false when fetch is complete
     }
@@ -81,11 +83,11 @@ export default function BigCalendar() {
   );
 
   if (loading) {
-    return <p aria-live="polite" aria-busy="true">Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>; // Display loading indicator while fetching
   }
 
   return (
-    <div role="region" aria-label="Admin Exam Calendar" tabIndex={-1} className="admin-calendar">
+    <div role="region" aria-label={t("Admin Exam Calendar")} tabIndex={-1} className="admin-calendar">
       <Calendar
         defaultDate={defaultDate}
         defaultView={view}
@@ -100,15 +102,15 @@ export default function BigCalendar() {
         onNavigate={(newDate) => setDate(newDate)}
         popup
         aria-labelledby="calendar-title"
-        aria-label="Exam Calendar view"
+        aria-label={t("Exam Calendar view")}
         components={{
           event: ({ event }: { event: Event }) => (
             <div
               role="button"
               tabIndex={0}
-              aria-label={`Exam: ${event.title}, starts at ${moment(event.start).format(
+              aria-label={`${t("Exam")}: ${event.title}, ${t("starts at")} ${moment(event.start).format(
                 "h:mm A"
-              )} and ends at ${moment(event.end).format("h:mm A")}`}
+              )} ${t("and ends at")} ${moment(event.end).format("h:mm A")}`}
               onClick={() => handleSelectEvent(event)}
               onKeyDown ={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -122,12 +124,12 @@ export default function BigCalendar() {
           ),
         }}
         messages={{
-          week: "Week View",
-          day: "Day View",
-          month: "Month View",
-          today: "Today",
-          previous: "Previous",
-          next: "Next",
+          week: t("Week View"),
+          day: t("Day View"),
+          month: t("Month View"),
+          today: t("Today"),
+          previous: t("Previous"),
+          next: t("Next"),
         }}
       />
       <h2 id="calendar-title" className="sr-only">

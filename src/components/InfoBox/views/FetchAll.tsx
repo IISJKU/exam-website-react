@@ -2,9 +2,11 @@ import { ToastOptions } from "react-toastify";
 import { showToast } from "../components/ToastMessage";
 
 import { useAuth } from "../../../hooks/AuthProvider";
+import { useTranslation } from "react-i18next";
 
 export default async function fetchAll(link: string, token: string, errorMsg?: string): Promise<any[] | {}> {
-  let t = 0;
+  const { t } = useTranslation();
+  let count = 0;
   let start = true;
   let numEntries = 25;
   let allEntries: any[] = [];
@@ -29,12 +31,12 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
 
     if (!response.ok && errorMsg) {
       showToast({
-        message: `${errorMsg} Status: ${response.status}, Message: ${data.error?.message || "Unknown error"}.`,
+        message: `${t(errorMsg)} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error?.message || t("Unknown error")}.`,
         type: "error",
       });
     }
 
-    t = t + numEntries;
+    count = count + numEntries;
 
     if (data.length !== 0 && data != null) allEntries = allEntries.concat(data);
   }

@@ -4,12 +4,13 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import ContentView from "./ContentView";
 import Exam from "../../classes/Exam";
 import { showToast } from "../components/ToastMessage";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export default function StudentExamView() {
   const navigate = useNavigate(); 
   const user = useAuth();
   const studentId = user.userId;
+  const { t } = useTranslation(); 
 
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState<boolean>(true); 
@@ -17,8 +18,8 @@ export default function StudentExamView() {
 
   // Determine fields and keys dynamically based on screen size
   const fields = isMobileView
-    ? ["Exam Title", "Date/Time"] // Shortened fields for mobile
-    : ["Exam Title", "LVA Nr.", "Date/Time", "Duration", "Mode", "Examiner", "Institute", "Notes"];
+    ? [t("Exam Title"), t("Date/Time")]
+    : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Examiner"), t("Institute"), t("Notes")];
 
   const keys: (keyof Exam)[] = isMobileView
     ? ["title", "date"] // Shortened keys for mobile
@@ -47,10 +48,7 @@ export default function StudentExamView() {
       });
       const data = await response.json();
       if (!response.ok) {
-        showToast({
-          message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`,
-          type: "error",
-        });
+        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
       }
 
       // Modify the data array before setting it to exams
@@ -77,7 +75,7 @@ export default function StudentExamView() {
 
       setExams(updatedData); // Set the updated data to exams
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error" });
     } finally {
       setLoading(false);
     }
@@ -96,7 +94,7 @@ export default function StudentExamView() {
   }
 
   return (
-    <div role="region" aria-label="Upcoming Exams" className="student-exam-view">
+    <div role="region" aria-label={t("Upcoming Exams")} className="student-exam-view">
       <ContentView
         title={t("Upcoming Exams")}
         onRowClick={handleExamClick} 
@@ -106,7 +104,7 @@ export default function StudentExamView() {
           ...exam,
           tabIndex: 0,
           role: "button",
-          "aria-label": `${exam.title}, scheduled for ${new Date(exam.date).toLocaleString()}`,
+          "aria-label": `${exam.title}, ${t("scheduled for")} ${new Date(exam.date).toLocaleString()}`,
         }))} 
       />
     </div>

@@ -4,8 +4,10 @@ import { showToast } from "../components/ToastMessage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
+import { useTranslation } from "react-i18next";
 
 export default function ExamWithoutTutor() {
+  const { t } = useTranslation();
   const navigate = useNavigate(); // Initialize navigate
   const user = useAuth();
 
@@ -15,8 +17,9 @@ export default function ExamWithoutTutor() {
 
   // Determine fields and keys dynamically based on screen size
   const fields = isMobileView
-    ? ["Exam Title", "Date/Time"] // Shortened fields for mobile
-    : ["Exam Title", "LVA Nr.", "Date/Time", "Duration", "Mode", "Student", "Examiner", "Institute", "Notes", "Student Misc"];
+  ? [t("Exam Title"), t("Date/Time")]
+  : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Institute"), t("Notes"), t("Student Misc")];
+  
 
   const keys: (keyof Exam)[] = isMobileView
     ? ["title", "date"] // Shortened keys for mobile
@@ -45,8 +48,8 @@ export default function ExamWithoutTutor() {
       });      
       const data = await response.json();
       if (!response.ok) {
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
-       }
+        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
+      }
  
       // Filter out exams with the archived status
       const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
@@ -84,7 +87,7 @@ export default function ExamWithoutTutor() {
 
       setExams(updatedData); // Set the updated data to exams
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error" });
     } finally {
       setLoading(false); // Set loading to false when the fetch is complete
     }
@@ -99,16 +102,16 @@ export default function ExamWithoutTutor() {
   };
 
   if (loading) {
-    return <p aria-live="polite" aria-busy="true">Loading exams...</p>; // Display loading indicator while fetching
+    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>; // Display loading indicator while fetching
   }
 
   return (
     <ContentView
-      title={"Request Exam Monitoring"}
+      title={t("Request Exam Monitoring")}
       onRowClick={handleExamClick} 
       fields={fields}
       keys={keys}
-      buttonName={user.role === "Tutor" ? "Request" : "Edit"}
+      buttonName={user.role === "Tutor" ? t("Request") : t("Edit")}
       coloring={true}
       data={exams} // Pass the fetched and updated exam data here
     />

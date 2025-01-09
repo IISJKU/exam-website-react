@@ -38,7 +38,7 @@ export default function RoomManagement() {
         setData(data.filter((room: Room) => room.isAvailable));
       }
     } catch (error) {
-      showToast({ message: `Error fetching ${type}: ${error}`, type: "error" });
+      showToast({ message: `${t("Error fetching")} ${type}: ${error}`, type: "error" });
     }
   };
 
@@ -58,14 +58,14 @@ export default function RoomManagement() {
     setSelectedExam(examId);
 
     if (!roomId) {
-      showToast({ message: "Please select a room to save.", type: "warning" });
+      showToast({ message: t("Please select a room to save."), type: "warning" });
       return;
     }
 
     try {
       const room = rooms.find((r) => r.id === roomId);
       if (!room) {
-        return showToast({ message: "Room not found", type: "error" });
+        return showToast({ message: t("Room not found"), type: "error" });
       }
 
       // Ensure room capacity is greater than zero or show confirmation dialog if it is zero
@@ -96,11 +96,11 @@ export default function RoomManagement() {
         body: JSON.stringify({ data: { room: roomId } }),
       });
 
-      if (!examUpdateResponse.ok) throw new Error("Failed to update exam room");
+      if (!examUpdateResponse.ok) throw new Error(t("Failed to update exam room"));
 
       fetchData("exams", setExams); // Refresh exams to reflect changes
     } catch (error) {
-      showToast({ message: `Error updating exam room: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error updating exam room")}: ${error}.`, type: "error" });
     }
   };
 
@@ -131,7 +131,7 @@ export default function RoomManagement() {
     // Check if the overlapping exams exceed room capacity
     if (overlappingExams.length + 1 > room.capacity) {
       showToast({
-        message: "Room capacity exceeded with overlapping exams.",
+        message: t("Room capacity exceeded with overlapping exams!"),
         type: "error",
       });
       return;
@@ -143,7 +143,7 @@ export default function RoomManagement() {
       setShowConfirmDialog(true);
     } else {
       setExams((prevExams) => prevExams.map((exam) => (exam.id === examId ? { ...exam, room_id: newRoomId } : exam)));
-      showToast({ message: `Room capacity: ${room.capacity}`, type: "info" });
+      showToast({ message: `${t("Room capacity")}: ${room.capacity}`, type: "info" });
     }
   };
 
@@ -151,14 +151,14 @@ export default function RoomManagement() {
     setSelectedRoom(pendingRoomId); // Set the room from the pending state
     setExams((prevExams) => prevExams.map((exam) => (exam.id === selectedExam ? { ...exam, room_id: pendingRoomId ?? exam.room_id } : exam)));
     setShowConfirmDialog(false);
-    showToast({ message: "Room with 0 capacity selected", type: "warning" });
+    showToast({ message: t("Room with 0 capacity selected"), type: "warning" });
   };
 
   const handleCancelRoomSelection = () => {
     setShowConfirmDialog(false);
     setPendingRoomId(null);
     setSelectedRoom(null);
-    showToast({ message: "Room selection canceled", type: "info" });
+    showToast({ message: t("Room selection canceled"), type: "info" });
   };
 
   const handleRoomSelection = (roomId: number) => {
@@ -170,14 +170,14 @@ export default function RoomManagement() {
       <table className="w-full">
         <thead>
           <tr>
-            <th className="border px-4 py-2">Exam Title</th>
-            <th className="border px-4 py-2">LVA Nr.</th>
-            <th className="border px-4 py-2">Date/Time</th>
-            <th className="border px-4 py-2">Duration</th>
-            <th className="border px-4 py-2">Mode</th>
-            <th className="border px-4 py-2">Student</th>
-            <th className="border px-4 py-2">Room</th>
-            <th className="border px-4 py-2">Actions</th>
+            <th className="border px-4 py-2">{t("Exam Title")}</th>
+            <th className="border px-4 py-2">{t("LVA Nr.")}</th>
+            <th className="border px-4 py-2">{t("Date/Time")}</th>
+            <th className="border px-4 py-2">{t("Duration")}</th>
+            <th className="border px-4 py-2">{t("Mode")}</th>
+            <th className="border px-4 py-2">{t("Student")}</th>
+            <th className="border px-4 py-2">{t("Room")}</th>
+            <th className="border px-4 py-2">{t("Actions")}</th>
           </tr>
         </thead>
         <tbody>
@@ -193,10 +193,10 @@ export default function RoomManagement() {
                   hour12: false,
                 })}
               </td>
-              <td className="p-3 border border-gray-300">{exam.duration} mins</td>
-              <td className="p-3 border border-gray-300">{typeof exam.exam_mode === "object" && exam.exam_mode !== null ? exam.exam_mode.name : "Unknown"}</td>
+              <td className="p-3 border border-gray-300">{exam.duration} {t("mins")}</td>
+              <td className="p-3 border border-gray-300">{typeof exam.exam_mode === "object" && exam.exam_mode !== null ? exam.exam_mode.name : t("Unknown")}</td>
               <td className="p-3 border border-gray-300">
-                {typeof exam.student === "object" && exam.student !== null ? `${exam.student.first_name} ${exam.student.last_name}` : "N/A"}
+                {typeof exam.student === "object" && exam.student !== null ? `${exam.student.first_name} ${exam.student.last_name}` : t("N/A")}
               </td>
               <td className="p-3 border border-gray-300 text-justify">
                 <DropdownWithSearch
@@ -276,7 +276,7 @@ export default function RoomManagement() {
           </div>
         </div>
       )}
-      <h3 className="text-xl font-semibold mt-6 mb-4">Select a Room to View Calendar</h3>
+      <h3 className="text-xl font-semibold mt-6 mb-4">{t("Select a Room to View Calendar")}</h3>
       {renderRoomButtons()}
       <RoomsCalender selectedRoomId={selectedRoom} />
     </div>

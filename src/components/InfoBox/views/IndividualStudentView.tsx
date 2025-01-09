@@ -6,9 +6,10 @@ import Student from "../../classes/Student";
 import Major from "../../classes/Major";
 import DropdownWithSearch from "../components/DropdownWithSearch";
 import { useAuth } from "../../../hooks/AuthProvider";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export default function IndividualStudent() {
+  const { t } = useTranslation();
   const { id } = useParams(); // Get the student ID from the URL params
   const navigate = useNavigate();
 
@@ -50,7 +51,7 @@ export default function IndividualStudent() {
         setMisc(studentData.misc);
         setMajor(studentData.major_id);
       } catch (error) {
-        showToast({ message: "Error fetching student data", type: "error" });
+        showToast({ message: t("Error fetching student data"), type: "error" });
       } finally {
         setLoading(false);
       }
@@ -67,11 +68,11 @@ export default function IndividualStudent() {
         });
         const result = await response.json();
         if (!response.ok) {
-          showToast({ message: `HTTP error! Status: ${response.status}, Message: ${result.error.message || "Unknown error"}.`, type: "error", });
+          showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${result.error.message || t("Unknown error")}}.`, type: "error"});
         }
         setMajors(result);
       } catch (error) {
-        showToast({ message: "Error fetching majors.", type: "error" });
+        showToast({ message: t("Error fetching majors."), type: "error" });
       }
     };
 
@@ -104,16 +105,16 @@ export default function IndividualStudent() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error" });
+        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`, type: "error"});
         return;
       }
 
       const result = await response.json();
-      showToast({ message: `${result.first_name} ${result.last_name}'s student record has been updated successfully.`, type: "success" });
+      showToast({ message: `${result.first_name} ${result.last_name} ${t("student record has been updated successfully.")}`, type: "success" });
 
       //navigate("/admin/students"); // Navigate back to the students list after successful update
     } catch (error) {
-      showToast({ message: `Error updating the student record: ${(error as Error).message}.`, type: "error" });
+      showToast({ message: `${t("Error updating the student record")}: ${(error as Error).message}.`, type: "error" });
     }
   };
 
@@ -123,13 +124,13 @@ export default function IndividualStudent() {
   }));
 
   if (loading || !student) {
-    return <p aria-live="polite" aria-busy="true">Loading student data...</p>;
+    return <p aria-live="polite" aria-busy="true">{t("Loading student data...")}</p>;
   }
 
   return (
     <div className="m-5" role="main" aria-labelledby="student-details-heading">
       <h1 id="student-details-heading" className="text-2xl font-bold mb-4 sr-only">
-        Student Details
+        {t("Student Details")}
       </h1>
       <EditField
         title={t("First Name")}
@@ -173,12 +174,12 @@ export default function IndividualStudent() {
       />
 
       <DropdownWithSearch
-        tableName = {t("majors")}
-        label="Major"
+        tableName = "majors"
+        label={t("Major")}
         options={majorOptions}
         value={major ?? ""}
         onChange={(newValue) => setMajor(Number(newValue))}
-        placeholder="Search major..."
+        placeholder={t("Search major...")}
         disabled={!editMode}
         aria-label={t("Select student's major")}
       />
@@ -217,7 +218,7 @@ export default function IndividualStudent() {
         <button
           onClick={() => navigate(-1)}
           className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
-          aria-label="Go back to the previous page"
+          aria-label={t("Go back to the previous page")}
         >{t("Back")}</button>
       <button
         onClick={() => {
@@ -225,15 +226,15 @@ export default function IndividualStudent() {
           if (editMode) handleUpdate();
         }}
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
-        aria-label={editMode ? "Save changes" : "Enable edit mode"}
+        aria-label={editMode ? t("Save changes") : t("Enable edit mode")}
       >
-        {editMode ? "Save" : "Edit"}
+        {editMode ? t("Save") : t("Edit")}
       </button>
       {editMode && (
         <button
         className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
         onClick={() => setEditMode(false)}
-        aria-label="Cancel editing"
+        aria-label={t("Cancel editing")}
         >{t("Cancel")}</button>
       )}
       </div>

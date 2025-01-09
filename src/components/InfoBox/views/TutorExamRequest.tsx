@@ -29,14 +29,14 @@ export default function TutorExamRequest() {
         });
         const examData = await examResponse.json();
         if (!examResponse.ok) {
-          showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error" });
+          showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${examResponse.status}, ${t("Message")}: ${examData.error.message || t("Unknown error")}}.`, type: "error"});
           return;
         }
 
         setExam(examData);
         setOriginalExam(examData);
       } catch (error) {
-        showToast({ message: "Error fetching exam data", type: "error" });
+        showToast({ message: t("Error fetching exam data"), type: "error" });
       } finally {
         setLoading(false);
       }
@@ -59,7 +59,7 @@ export default function TutorExamRequest() {
       const data = await response.json();
 
       if (response.ok) {
-        showToast({ message: "Request to monitor exam submitted successfully", type: "success" });
+        showToast({ message: t("Request to monitor exam submitted successfully"), type: "success" });
 
         if (exam) {
           /* 
@@ -85,13 +85,10 @@ export default function TutorExamRequest() {
           } */
         }
       } else {
-        showToast({
-          message: `HTTP error! Status: ${response.status}, Message: ${data.error?.message || "Unknown error"}.`,
-          type: "error",
-        });
+        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
       }
     } catch (error) {
-      showToast({ message: "Error submitting request to monitor exam", type: "error" });
+      showToast({ message: t("Error submitting request to monitor exam"), type: "error" });
     } finally {
       navigate("/tutor/exams/without-tutor");
     }

@@ -20,26 +20,12 @@ interface NotificationComponentProps {
 export default function NotificationComponent(props: NotificationComponentProps) {
   const navigate = useNavigate(); // Initialize navigate
   const auth = useAuth();
-
-  const [notifications, setNotifications] = useState<Notification[]>(props.notification);
-
   const { t } = useTranslation();
-
-  const hasSeen = (): boolean => {
-    let t = true;
-
-    notifications.forEach((element) => {
-      if (element.seenBy.length == 0 || !element.seenBy.includes(auth.user)) t = false;
-    });
-
-    return t;
-  };
-
-  const [seen, setSeen] = useState<boolean>(hasSeen());
+  const [notifications, setNotifications] = useState<Notification[]>(props.notification);
+  const [seen, setSeen] = useState<boolean>(notifications.every((n) => n.seenBy.includes(auth.user)));
+  const [infoOpen, setInfoOpen] = useState<boolean>(false);
 
   let tabs: number[] = [];
-
-  const [infoOpen, setInfoOpen] = useState<boolean>(false);
 
   const handleClick = (notifId: number) => {
     if (auth.role == "Admin") navigate(`/admin/notification/${notifId}`); // Navigate to ExamEditor with the exam ID
@@ -48,20 +34,10 @@ export default function NotificationComponent(props: NotificationComponentProps)
 
   const staticTitles = ["title", "date", "lva_num", "duration", "notes"];
 
-  const hasStaticTitle = (title: string): boolean => {
-    let isStatic = false;
-
-    staticTitles.forEach((elem) => {
-      if (elem == title) isStatic = true;
-    });
-
-    return isStatic;
-  };
+  const hasStaticTitle = (title: string): boolean => staticTitles.includes(title);
 
   const getElem = (index: any, type: string): string => {
-    if (index != undefined && index.id != undefined) {
-      index = index.id;
-    }
+    if (index?.id) index = index.id;
 
     if (!type.includes("_id") && !type.includes("exam_mode") && hasStaticTitle(type)) {
       if (type == "date") return moment(index).tz("Europe/Vienna").format("YYYY-MM-DD HH:MM");
@@ -113,6 +89,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
         }
       });
     }
+    setSeen(true);
     setInfoOpen(!infoOpen);
   };
 
@@ -150,7 +127,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
   }, []);
 
   const getName = (): string => {
-    if (notifications[0].sentBy == auth.user) return "You";
+    if (notifications[0].sentBy == auth.user) return t("You");
     return notifications[0].sentBy;
   };
 
@@ -162,7 +139,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
       onClick={() => toggleInfoPannel()}
       role="button"
       aria-expanded={infoOpen}
-      aria-label={`Notification from ${getName()}, click to ${infoOpen ? "collapse" : "expand"} details`}
+      aria-label={`${t("Notification from")} ${getName()}, ${t("click to")} ${infoOpen ? "collapse" : "expand"} ${t("details")}`}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           toggleInfoPannel();
@@ -173,7 +150,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
         <p className="inline-block w-60 font-bold">{moment(notifications[0].createdAt).format("DD.MM.YYYY HH:mm") + ""}</p>
         {props.notification[0].type == NotificationType.createExam ? (
           <div className="inline-block " id={"notification" + props.id.toString() + "_div"}>
-            {getName()} proposed a new Exam
+            {getName()} ${t("proposed a new Exam")}
             {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) ||
             auth.role == "Tutor" ||
             auth.role == "Student" ? null : (
@@ -191,7 +168,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                 }}
                 role="button"
                 tabIndex={0}
-                aria-label="Edit notification details"
+                aria-label={t("Edit notification details")}
               >
                 {t("Edit")}
               </a>
@@ -201,11 +178,11 @@ export default function NotificationComponent(props: NotificationComponentProps)
           <div className="inline-block w-max">
             {props.exam.title != undefined
               ? notifications[0].type == NotificationType.tutorConfirm
-                ? `${getName()} will monitor ${props.exam.title}`
+                ? `${getName()} ${t("will monitor")} ${props.exam.title}`
                 : notifications[0].type == NotificationType.tutorDecline
-                ? `${getName()} will no longer monitor ${props.exam.title}`
-                : `${props.exam.title} was edited by ${getName()}`
-              : `Exam was declined by ${getName()}`}
+                ? `${getName()} ${t("will no longer monitor")} ${props.exam.title}`
+                : `${props.exam.title}  ${t("was edited by")} ${getName()}`
+              : ` ${t("Exam was declined by")} ${getName()}`}
             {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) ||
             auth.role == "Tutor" ||
             auth.role == "Student" ? null : (
@@ -223,9 +200,9 @@ export default function NotificationComponent(props: NotificationComponentProps)
                 }}
                 role="button"
                 tabIndex={0}
-                aria-label="Edit notification details"
+                aria-label={t("Edit notification details")}
               >
-                Edit
+                {t("Edit")}
               </a>
             )}
           </div>
@@ -240,12 +217,12 @@ export default function NotificationComponent(props: NotificationComponentProps)
                   notification.type == NotificationType.createExamOld ||
                   notification.type == NotificationType.createExam ? (
                     <div className={`pl-${tabs[index]}`}>
-                      At {moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm")} {notification.sentBy}{" "}
+                        {t("At")} {moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm")} {notification.sentBy}{" "}
                       {notification.type == NotificationType.adminChange
-                        ? "changed"
+                        ? t("changed")
                         : notification.type == NotificationType.createExamOld
-                        ? "proposed an Exam"
-                        : "proposed a change"}
+                        ? t("proposed an Exam")
+                        : t("proposed a change")}
                       :
                       {Object.keys(JSON.parse(notification.information)).map((elem: string) => (
                         <li className="bg-white border border-grey p-1" key={`entry2_${notification.id}`}>
@@ -264,8 +241,8 @@ export default function NotificationComponent(props: NotificationComponentProps)
                         "font-bold"
                       ).toString()}
                     >
-                      Tutor {notification.sentBy}{" "}
-                      {notification.type === NotificationType.tutorConfirm ? "registered to monitor the exam." : "canceled to monitor the exam."}
+                        {t("Tutor")} {notification.sentBy}{" "}
+                      {notification.type === NotificationType.tutorConfirm ? t("registered to monitor the exam.") : t("canceled to monitor the exam.")}
                     </div>
                   ) : (
                     <div
@@ -276,7 +253,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                         "font-bold"
                       ).toString()}
                     >
-                      {notification.sentBy} {notification.type === NotificationType.confirmChange ? "approved the changes." : "declined the changes."}
+                      {notification.sentBy} {notification.type === NotificationType.confirmChange ? t("approved the changes.") : t("declined the changes.")}
                       {notification.oldInformation != "" &&
                         Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) => (
                           <li

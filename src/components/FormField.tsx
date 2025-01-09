@@ -1,4 +1,5 @@
 import { ChangeEventHandler, HTMLInputTypeAttribute } from "react";
+import { useTranslation } from "react-i18next";
 
 interface FormFieldProps {
   label: String;
@@ -10,13 +11,14 @@ interface FormFieldProps {
 }
 
 export default function FormField(props: FormFieldProps) {
+  const { t } = useTranslation();
   const errorId = `${props.id}-error`; // Generate a unique ID for the error message
 
   return (
     <div className="p-5 w-full" role="group" aria-labelledby={`${props.id}-label`}>
       <div>
         <label id={`${props.id}-label`} htmlFor={props.id} className="block mb-2 text-xl font-medium text-gray-900">
-          {props.label}<span aria-hidden="true">*</span>
+        {t(props.label.toString())}<span aria-hidden="true">*</span>
         </label>
         <input
           type={props.type}
@@ -36,7 +38,7 @@ export default function FormField(props: FormFieldProps) {
       </div>
       {props.errorText && (
         <div id={errorId} className="text-red-800 text-xl" role="alert">
-          {props.errorText}
+          {t(props.errorText)}
         </div>
       )}
     </div>

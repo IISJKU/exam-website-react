@@ -55,7 +55,7 @@ export default function EditField(props: EditFieldProps) {
               rows={4}
               cols={40}
               value={value}
-              aria-label={props.title}
+              aria-label={t(props.title || "Field")}
               required={props.required}
             />
           ) : (
@@ -65,12 +65,12 @@ export default function EditField(props: EditFieldProps) {
               className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
               type="text"
               value={value}
-              aria-label={props.title}
+              aria-label={t(props.title || "Field")}
               required={props.required}
             />
           )
         ) : (
-          <div className="mb-2 inline-block" role="textbox" aria-readonly="true">
+          <div className="mb-2 inline-block" role="textbox" aria-readonly="true" aria-label={t(props.title || "Field")}>
             {value}
             {additionalText}
           </div>

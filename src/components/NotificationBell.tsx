@@ -6,8 +6,10 @@ import { showToast } from "./InfoBox/components/ToastMessage";
 import Notification, { NotificationType } from "./classes/Notification";
 import useInterval from "../hooks/UseInterval";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function NotificationBell() {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState<Notification[] | null>(null);
   const [exams, setExams] = useState<Exam[]>([]);
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
@@ -50,7 +52,7 @@ export default function NotificationBell() {
       calcNotifications(t);
       setNotifications(t);
     } catch (error) {
-      showToast({ message: `Error fetching notifications: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching notifications")}: ${error}.`, type: "error" });
     }
   };
 
@@ -96,7 +98,7 @@ export default function NotificationBell() {
       className="relative focus:border-double h-10 ml-5 hover:border hover:border-black transition"
       tabIndex={0}
       role="button"
-      aria-label="Notification bell"
+      aria-label={t("Notification bell")}
       aria-haspopup="true"
       aria-expanded={dropdownVisible}
       onClick={() => setDropdownVisible((prev) => !prev)}
@@ -107,7 +109,7 @@ export default function NotificationBell() {
       }}
       onBlur={handleBlur}
     >
-      <img className="h-10" src={bellImage} alt="Notification Bell"></img>
+      <img className="h-10" src={bellImage} alt={t("Notification bell")}></img>
       <div
         className="h-5 w-5 inline-flex items-center justify-center border absolute bottom-0 right-0 bg-red-400 rounded-full object-cover"
         aria-live="polite"
@@ -119,7 +121,7 @@ export default function NotificationBell() {
           <ul
           className="absolute -translate-x-32 mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black z-50 w-80"
           role="listbox"
-          aria-label="Notifications list"
+          aria-label={t("Notifications list")}
         >
           {notifications.length > 0 ? (
             notifications.map((notification, index) => (
@@ -128,17 +130,17 @@ export default function NotificationBell() {
                 className="cursor-pointer select-none relative py-2 hover:bg-indigo-500 hover:text-white"
                 role="option"
                 tabIndex={0}
-                aria-label={`Notification ${index + 1}: ${
+                aria-label={`${t("Notification")} ${index + 1}: ${
                   notification.type === NotificationType.adminChange
-                    ? `${notification.sentBy} changed ${getName(notification.exam_id)}`
+                    ? `${notification.sentBy} ${t("changed")} ${getName(notification.exam_id)}`
                     : notification.type === NotificationType.proposeChange
-                    ? `${notification.sentBy} proposed changes for ${getName(notification.exam_id)}`
+                    ? `${notification.sentBy} ${t("proposed changes for")} ${getName(notification.exam_id)}`
                     : notification.type === NotificationType.confirmChange
-                    ? `${notification.sentBy} approved changes in ${getName(notification.exam_id)}`
+                    ? `${notification.sentBy} ${t("approved changes in")} ${getName(notification.exam_id)}`
                     : notification.type === NotificationType.discardChange
-                    ? `${notification.sentBy} rejected changes in ${getName(notification.exam_id)}`
+                    ? `${notification.sentBy} ${t("rejected changes in")} ${getName(notification.exam_id)}`
                     : notification.type === NotificationType.createExam
-                    ? `${notification.sentBy} added a new Exam`
+                    ? `${notification.sentBy} ${t("added a new Exam")}`
                     : ""
                 }`}
                 onClick={() => handleClick(notification.id)}
@@ -149,19 +151,19 @@ export default function NotificationBell() {
                 }}
               >
                 {notification.type === NotificationType.adminChange || notification.type == NotificationType.proposeChange
-                  ? `${notification.sentBy} changed ${getName(notification.exam_id)}`
+                  ? `${notification.sentBy} ${t("changed")} ${getName(notification.exam_id)}`
                   : notification.type === NotificationType.confirmChange
-                  ? `${notification.sentBy} approved changes in ${getName(notification.exam_id)}`
+                  ? `${notification.sentBy} ${t("approved changes in")} ${getName(notification.exam_id)}`
                   : notification.type === NotificationType.discardChange
-                  ? `${notification.sentBy} rejected changes in ${getName(notification.exam_id)}`
+                  ? `${notification.sentBy} ${t("rejected changes in")} ${getName(notification.exam_id)}`
                   : notification.type === NotificationType.createExam
-                  ? `${notification.sentBy} added a new Exam`
+                  ? `${notification.sentBy} ${t("added a new Exam")}`
                   : ""}
                 </li>
             ))
           ) : (
             <div className="absolute p-2 -translate-x-32 mb-2 bg-slate-100 inline-block focus:ring-2 border-2 border-black z-50 w-80" aria-live="polite">
-              No new notifications :)
+              {t("No new notifications")} :)
             </div>
           )}
         </ul>

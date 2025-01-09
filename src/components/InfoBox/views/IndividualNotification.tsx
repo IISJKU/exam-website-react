@@ -150,10 +150,6 @@ export default function IndividualNotification() {
 
         const examData = (await fetchAll("http://localhost:1337/api/exams", user.token)) as Exam[];
 
-        if (!response.ok) {
-          showToast({ message: `HTTP error! Status: ${response.status}, Message: ${"Unknown error"}.`, type: "error" });
-        }
-
         if (examData) {
           let ex = new Exam();
 
@@ -179,10 +175,10 @@ export default function IndividualNotification() {
             setNotes(ex.notes);
           }
         } else {
-          showToast({ message: "No exam data found", type: "error" });
+          showToast({ message: t("No exam data found"), type: "error" });
         }
       } catch (error) {
-        showToast({ message: "Error fetching Notification", type: "error" });
+        showToast({ message: t("Error fetching Notification"), type: "error" });
       } finally {
         setLoading(false);
       }
@@ -247,7 +243,7 @@ export default function IndividualNotification() {
           rooms: roomsRes,
         });
       } catch (error) {
-        showToast({ message: "Error fetching dropdown options", type: "error" });
+        showToast({ message: t("Error fetching dropdown options"), type: "error" });
       }
     };
 
@@ -287,7 +283,7 @@ export default function IndividualNotification() {
     if (!notify.ok) {
       const errorData = await notify.json();
       showToast({
-        message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+        message: `${t("HTTP error!")} ${t("Status")}: ${notify.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`,
         type: "error",
       });
       return;
@@ -298,7 +294,7 @@ export default function IndividualNotification() {
     const isUpdate = (currentExam == null) ? false : true;
     const current = (currentExam != null && newExam.title == undefined) ? currentExam : newExam;
     return `
-    <h3>Exam Changes</h3>
+    <h3>${t("Exam Changes")}</h3>
     ${emailContent}
     <table border="1" style="border-collapse: collapse; width: 70%;">
       <thead>
@@ -306,30 +302,30 @@ export default function IndividualNotification() {
           <th style="padding: 8px; text-align: left;">Field</th>
            ${
             isUpdate ?
-            `<th style="padding: 8px; text-align: left;">Old</th>
-            <th style="padding: 8px; text-align: left;">New</th>`
-            : `<th style="padding: 8px; text-align: left;">Details</th>`
+            `<th style="padding: 8px; text-align: left;">${t("Old")}</th>
+            <th style="padding: 8px; text-align: left;">${t("New")}</th>`
+            : `<th style="padding: 8px; text-align: left;">${t("Details")}</th>`
             }
         </tr>
       </thead>
       <tbody>
-        ${generateRow("Title", current?.title, newExam.title, isUpdate)}
-        ${generateRow("LVA Number", current?.lva_num, newExam.lva_num, isUpdate)}
+        ${generateRow(t("Title"), current?.title, newExam.title, isUpdate)}
+        ${generateRow(t("LVA Number"), current?.lva_num, newExam.lva_num, isUpdate)}
         ${generateRow(
-          "Date",
-          current?.date ? moment(current.date).format("DD.MM.YYYY HH:mm") : "N/A",
+          t("Date"),
+          current?.date ? moment(current.date).format("DD.MM.YYYY HH:mm") : t("N/A"),
           newExam.date ? moment(newExam.date).format("DD.MM.YYYY HH:mm") : moment(current.date).format("DD.MM.YYYY HH:mm"), isUpdate
         )}
-        ${generateRow("Duration", current?.duration, newExam.duration, isUpdate)}
-        ${generateRow("Tutor", match(options.tutors, current?.tutor_id || current?.tutor), match(options.tutors, newExam.tutor_id), isUpdate)}
-        ${generateRow("Student", match(options.students, current?.student_id || current?.student), match(options.students, newExam.student_id), isUpdate)}
-        ${generateRow("Examiner", match(options.examiners, current?.examiner_id || current?.examiner), match(options.examiners, newExam.examiner_id), isUpdate)}
-        ${generateRow("Major", match(options.majors, current?.major_id || current?.major), match(options.majors, newExam.major_id), isUpdate)}
-        ${generateRow("Institute", match(options.institutes, current?.institute_id || current?.institute), match(options.institutes, newExam.institute_id), isUpdate)}
-        ${generateRow("Mode", match(options.modes, current?.mode_id || current?.exam_mode), match(options.modes, newExam.mode_id), isUpdate)}
-        ${generateRow("Room", match(options.rooms, current?.room_id ||  current?.room), match(options.rooms, newExam.room_id), isUpdate)}
-        ${generateRow("Notes", current?.notes, newExam.notes, isUpdate)}
-        ${generateRow("Status", current?.status, newExam.status, isUpdate)}
+        ${generateRow(t("Duration"), current?.duration, newExam.duration, isUpdate)}
+        ${generateRow(t("Tutor"), match(options.tutors, current?.tutor_id || current?.tutor), match(options.tutors, newExam.tutor_id), isUpdate)}
+        ${generateRow(t("Student"), match(options.students, current?.student_id || current?.student), match(options.students, newExam.student_id), isUpdate)}
+        ${generateRow(t("Examiner"), match(options.examiners, current?.examiner_id || current?.examiner), match(options.examiners, newExam.examiner_id), isUpdate)}
+        ${generateRow(t("Major"), match(options.majors, current?.major_id || current?.major), match(options.majors, newExam.major_id), isUpdate)}
+        ${generateRow(t("Institute"), match(options.institutes, current?.institute_id || current?.institute), match(options.institutes, newExam.institute_id), isUpdate)}
+        ${generateRow(t("Mode"), match(options.modes, current?.mode_id || current?.exam_mode), match(options.modes, newExam.mode_id), isUpdate)}
+        ${generateRow(t("Room"), match(options.rooms, current?.room_id ||  current?.room), match(options.rooms, newExam.room_id), isUpdate)}
+        ${generateRow(t("Notes"), current?.notes, newExam.notes, isUpdate)}
+        ${generateRow(t("Status"), current?.status, newExam.status, isUpdate)}
       </tbody>
     </table>
     `;
@@ -353,31 +349,31 @@ export default function IndividualNotification() {
           if (!response.ok) {
             const errorData = await response.json();
             showToast({
-              message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`,
+              message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`,
               type: "error",
             });
             return;
           }
 
-          showToast({ message: "Exam updated successfully", type: "success" });
+          showToast({ message: t("Exam updated successfully"), type: "success" });
 
           sendNotification(accept);
           // Generate changesHtml using the helper function
-          const changesHtml = generateChangesHtml(exam, proposedExam, options, accept, "<p>The following changes have been made to the exam:</p>");
+          const changesHtml = generateChangesHtml(exam, proposedExam, options, accept, `<p>${t("The following changes have been made to the exam")}:</p>`);
 
           // Send emails to both tutor and student
           const emailPromises = [
             sendEmail({
               to: exam.tutor_email || "",
-              subject: "Exam Update Notification",
-              text: "The exam has been updated successfully.",
+              subject: t("Exam Update Notification"),
+              text: t("The exam has been updated successfully."),
               html: changesHtml,
               token: user.token,
             }),
             sendEmail({
               to: exam.student_email || "",
-              subject: "Exam Update Notification",
-              text: "The exam has been updated successfully.",
+              subject: t("Exam Update Notification"),
+              text: t("The exam has been updated successfully."),
               html: changesHtml,
               token: user.token,
             }),
@@ -437,22 +433,22 @@ export default function IndividualNotification() {
               });
             }
           } else {
-            showToast({ message: "New Exam Not Found", type: "error" });
+            showToast({ message: t("New Exam Not Found"), type: "error" });
           }
-          const changesHtml = generateChangesHtml(null, proposedExam, options, accept, "<p>The new exam has been accepted:</p>");
+          const changesHtml = generateChangesHtml(null, proposedExam, options, accept, `<p>${t("The new exam has been accepted")}:</p>`);
           // Send emails to both tutor and student
           const emailPromises = [
             sendEmail({
               to: proposedExam?.tutor_email || "",
-              subject: "Exam Accepted Notification",
-              text: "The exam has been accepted.",
+              subject: t("Exam Accepted Notification"),
+              text: t("The exam has been accepted."),
               html: changesHtml,
               token: user.token,
             }),
             sendEmail({
               to: proposedExam?.student_email || "",
-              subject: "Exam Accepted Notification",
-              text: "The exam has been accepted.",
+              subject: t("Exam Accepted Notification"),
+              text: t("The exam has been accepted."),
               html: changesHtml,
               token: user.token,
             }),
@@ -461,7 +457,7 @@ export default function IndividualNotification() {
           sendNotification(accept);
         }
       } catch (error) {
-        showToast({ message: "Error updating exam", type: "error" });
+        showToast({ message: t("Error updating exam"), type: "error" });
       }
     } else {
       const availableExam = (proposedExam.title == undefined) ? exam : proposedExam;
@@ -476,20 +472,20 @@ export default function IndividualNotification() {
         });
 
         sendNotification(false);
-        const changesHtml = generateChangesHtml(null, availableExam, options, accept, "<p>We regret to inform you that the proposed exam has been <strong>declined</strong>. Below are the details of the declined exam:</p>");
+        const changesHtml = generateChangesHtml(null, availableExam, options, accept, `<p>${t("We regret to inform you that the proposed exam has been <strong>declined</strong>. Below are the details of the declined exam:")}:</p>`);
         // Send emails to both tutor and student
         const emailPromises = [
           sendEmail({
             to: availableExam?.tutor_email || "",
-            subject: "Exam Decline Notification",
-            text: "The exam has been declined.",
+            subject: t("Exam Decline Notification"),
+            text: t("The exam has been declined."),
             html: changesHtml,
             token: user.token,
           }),
           sendEmail({
             to: availableExam?.student_email || "",
-            subject: "Exam Decline Notification",
-            text: "The exam has been declined.",
+            subject: t("Exam Decline Notification"),
+            text: t("The exam has been declined."),
             html: changesHtml,
             token: user.token,
           }),
@@ -497,20 +493,20 @@ export default function IndividualNotification() {
         await Promise.all(emailPromises);
       } else {
         sendNotification(false);
-        const changesHtml = generateChangesHtml(null, availableExam, options, accept, "<p>We regret to inform you that the proposed exam changes has been <strong>declined</strong>. Below are the current details of the exam:</p>");
+        const changesHtml = generateChangesHtml(null, availableExam, options, accept, `<p>${t("We regret to inform you that the proposed exam changes has been <strong>declined</strong>. Below are the current details of the exam:")}:</p>`);
         // Send emails to both tutor and student
         const emailPromises = [
           sendEmail({
             to: availableExam?.tutor_email || "",
-            subject: "Exam Change Decline Notification",
-            text: "The exam changes has been declined.",
+            subject: t("Exam Change Decline Notification"),
+            text: t("The exam changes has been declined."),
             html: changesHtml,
             token: user.token,
           }),
           sendEmail({
             to: availableExam?.student_email || "",
-            subject: "Exam Change Decline Notification",
-            text: "The exam changes has been declined.",
+            subject: t("Exam Change Decline Notification"),
+            text: t("The exam changes has been declined."),
             html: changesHtml,
             token: user.token,
           }),
@@ -524,9 +520,7 @@ export default function IndividualNotification() {
 
   if (loading || !exam) {
     return (
-      <p aria-live="polite" aria-busy="true">
-        Loading exam data...
-      </p>
+      <p aria-live="polite" aria-busy="true">{t("Loading exam data...")}</p>
     );
   }
 
@@ -537,8 +531,6 @@ export default function IndividualNotification() {
         ? `${item[firstNameField]} ${item[lastNameField]}` // Concatenate first and last name
         : item[firstNameField], // For fields with just one field (like 'name' for institutes or majors)
     }));
-
-
 
   return (
     <div className="m-5" role="main" aria-labelledby="notification-heading">
@@ -578,7 +570,7 @@ export default function IndividualNotification() {
         />
 
         <ComparisonField
-          label={"Student"}
+          label={t("Student")}
           options={dropdownOptions(options.students, "first_name", "last_name")}
           value={student || ""}
           proposedVal={match(options.students, proposedExam.student_id)}
@@ -586,7 +578,7 @@ export default function IndividualNotification() {
         />
 
         <ComparisonField
-          label={"Tutor"}
+          label={t("Tutor")}
           options={dropdownOptions(options.tutors, "first_name", "last_name")}
           value={tutor || ""}
           proposedVal={match(options.tutors, proposedExam.tutor_id)}
@@ -685,8 +677,9 @@ export const match = (arr: any[], val: any): string => {
 };
 
 export function generateRow(fieldName: string, previousValue: any, newValue: any = "", includeNewValue: boolean = false): string {
+  const { t } = useTranslation();
   // "N/A" if values are undefined or null
-  const prev = previousValue || "N/A";
+  const prev = previousValue || t("N/A");
   const next = newValue || prev;
 
   // Bold and highlight in red if there's a change

@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout"; // Import the layout
 import Login from "./Pages/Login";
@@ -28,14 +27,15 @@ import ExamWithoutTutor from "./components/InfoBox/views/ExamWithoutTutor";
 import TutorExamRequest from "./components/InfoBox/views/TutorExamRequest";
 import RemoveTutor from "./components/InfoBox/views/RemoveTutor";
 import ExamRoomView from "./components/InfoBox/views/ExamRoomView";
-import { useEffect } from "react";
 import TutorRegisteredExams from "./components/InfoBox/views/TutorRegisteredExams";
 import ArchivedExamsView from "./components/InfoBox/views/ArchivedExamsView";
+import { useTranslation } from "react-i18next";
 
 export default function App() {
+  const { t } = useTranslation();
   return (
     <Router>
-      <div className="App" role="application" aria-label="Exam Management Application">
+      <div className="App" role="application" aria-label={t("Exam Management Application")}>
         {/* AuthProvider handles login*/}
         <AuthProvider>
           <Routes>

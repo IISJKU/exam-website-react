@@ -47,7 +47,7 @@ export default function RequestExam() {
   const [examiner, setExaminer] = useState<number | string | undefined>();
   const [institute, setInstitute] = useState<number | string | undefined>();
   const [mode, setMode] = useState<number | undefined>();
-  const [notes, setNotes] = useState<string>("Pending");
+  const [notes, setNotes] = useState<string>(t("Pending"));
   const [studentEmail, setStudentEmail] = useState<string>(user.userEmail || "");
 
   // Define initial state with the correct type
@@ -61,7 +61,7 @@ export default function RequestExam() {
     examiner: undefined,
     institute: undefined,
     mode: undefined,
-    notes: "Pending",
+    notes: t("Pending"),
     studentEmail: user.userEmail,
   });
 
@@ -228,19 +228,16 @@ export default function RequestExam() {
 
         if (!notify.ok) {
           const errorData = await notify.json();
-          showToast({
-            message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
-            type: "error",
-          });
+          showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${notify.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`, type: "error"});
           return;
         }
 
-        showToast({ message: "Exam notification created successfully", type: "success" });
+        showToast({ message: t("Exam notification created successfully"), type: "success" });
       }
 
       navigate("/student/all-exams");
     } catch (error) {
-      showToast({ message: "Error creating exam notification", type: "error" });
+      showToast({ message: t("Error creating exam notification"), type: "error" });
     }
   };
 

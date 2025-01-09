@@ -21,8 +21,8 @@ export default function Login() {
   try {
     auth.redirectIfLoggedIn();
   } catch (error) {
-    setErrorText("Server can't be reached");
-    showToast({ message: `Server can't be reached: ${error}.`, type: "error" });
+    setErrorText(t("Server can't be reached"));
+    showToast({ message: `${t("Server can't be reached")}: ${error}.`, type: "error" });
   }
 
   // Handle login submission
@@ -35,11 +35,11 @@ export default function Login() {
       }
     } catch (error) {
       if (error instanceof TypeError) {
-        setErrorText("Server can't be reached");
-        showToast({ message: `Server can't be reached: ${error}.`, type: "error" });
+        setErrorText(t("Server can't be reached"));
+        showToast({ message: `${t("Server can't be reached")}: ${error}.`, type: "error" });
       } else {
-        setErrorText("Username or Password don't match.");
-        showToast({ message: `Username or Password don't match.`, type: "error" });
+        setErrorText(t("Username or Password don't match."));
+        showToast({ message: `${t("Username or Password don't match.")}`, type: "error" });
       }
     }
   };

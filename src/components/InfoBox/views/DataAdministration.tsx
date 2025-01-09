@@ -2,10 +2,9 @@ import React, { useState, useEffect, useMemo } from "react";
 import RecordForm from "../../RecordForm";
 import { showToast } from "../components/ToastMessage";
 import { useAuth } from "../../../hooks/AuthProvider";
-
 import fetchAll from "./FetchAll";
 import {formatDateTime } from "./ContentView";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 interface DataAdministrationProps {
   tableName: string;
@@ -26,6 +25,7 @@ interface RelationalRecord {
 }
 
 export default function DataAdministration(props: DataAdministrationProps) {
+  const { t } = useTranslation();
   const user = useAuth();
   const [data, setData] = useState<DataRecord[]>([]); // Data for the selected table
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -87,10 +87,10 @@ export default function DataAdministration(props: DataAdministrationProps) {
         setData(fetchedData);
         setFields(finalFields); // Include 'password' for form fields if table is 'users'
       } else {
-        showToast({ message: `Invalid API response: ${result}.`, type: "error" });
+        showToast({ message: `${t("Invalid API response")}: ${result}.`, type: "error" });
       }
     } catch (error) {
-      showToast({ message: `Error fetching data: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching data")}: ${error}.`, type: "error" });
     }
     setIsLoading(false);
   };
@@ -130,7 +130,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
             }),
           };
       } else {
-        throw new Error(`Invalid response format for ${field.populateTable}`);
+        throw new Error(`${t("Invalid response format for")} ${field.populateTable}`);
       }
     });
 
@@ -142,7 +142,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
       }, {} as { [key: string]: any[] });
       setRelationalData(relationalDataObject);
     } catch (error) {
-      showToast({ message: `Error fetching relational data: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching relational data")}: ${error}.`, type: "error" });
     }
   };
 
@@ -160,11 +160,11 @@ export default function DataAdministration(props: DataAdministrationProps) {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error" });
+        showToast({ message: `${t("Error adding record")}: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error" });
       }
       fetchData();
     } catch (error) {
-      showToast({ message: `Error adding record: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error adding record")}: ${error}.`, type: "error" });
     }
   };
 
@@ -182,11 +182,11 @@ export default function DataAdministration(props: DataAdministrationProps) {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error" });
+        showToast({ message: `${t("Error updating record")}: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error" });
       }
       fetchData();
     } catch (error) {
-      showToast({ message: `Error updating record: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error updating record")}: ${error}.`, type: "error" });
     }
   };
 
@@ -201,11 +201,11 @@ export default function DataAdministration(props: DataAdministrationProps) {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error" });
+        showToast({ message: `${t("Error deleting record")}: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error" });
       }
       fetchData();
     } catch (error) {
-      showToast({ message: `Error deleting record: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error deleting record")}: ${error}.`, type: "error" });
     }
   };
 
@@ -248,16 +248,16 @@ export default function DataAdministration(props: DataAdministrationProps) {
 
   return (
     <div className="p-4 h-full" role="region" aria-labelledby="data-admin-title">
-      <h1 id="data-admin-title" className="text-2xl font-bold mb-4 capitalize" tabIndex={0} role="heading">Data Administration - {props.tableName.replace("-", " ")}</h1>
+      <h1 id="data-admin-title" className="text-2xl font-bold mb-4 capitalize" tabIndex={0} role="heading">{t("Data Administration")} - {t(props.tableName.replace("-", " "))}</h1>
 
       {isLoading ? (
-        <p aria-live="polite" aria-busy="true">Loading...</p>
+        <p aria-live="polite" aria-busy="true">{t("Loading...")}</p>
       ) : (
         <div className="h-80 overflow-y-auto mb-4">
           <table className="table-auto w-full bg-white shadow-md rounded-lg" role="table">
             <thead>
               <tr role="row">
-                <th role="columnheader" scope="col" className="border px-4 py-2">ID</th>
+                <th role="columnheader" scope="col" className="border px-4 py-2">{t("ID")}</th>
                 {fields.map((field) => (
                   <th role="columnheader" scope="col" className="border px-4 py-2 capitalize" key={field}>
                     {field.replace("_", " ")}
@@ -265,15 +265,15 @@ export default function DataAdministration(props: DataAdministrationProps) {
                 ))}
                 {props.populateFields?.map((field) => (
                   <th role="columnheader" scope="col" className="border px-4 py-2 capitalize" key={field.name}>
-                    {field.name.replace("_", " ")}
+                    {t(field.name).replace("_", " ")}
                   </th>
                 ))}
-                <th role="columnheader" scope="col" className="border px-4 py-2">Actions</th>
+                <th role="columnheader" scope="col" className="border px-4 py-2">{t("Actions")}</th>
               </tr>
             </thead>
             <tbody>
               {data.map((record, idx) => (
-                <tr key={record.id} className="hover:bg-gray-100 text-center" role="row" aria-label={`Row ${idx + 1}`}>
+                <tr key={record.id} className="hover:bg-gray-100 text-center" role="row" aria-label={`${t("Row")} ${idx + 1}`}>
                   <td className="border px-4 py-2" role="cell">{record.id}</td>
                   {fields.map((field) => (
                     <td className="border px-4 py-2" role="cell" key={`${record.id}-${field}`}>
@@ -285,26 +285,26 @@ export default function DataAdministration(props: DataAdministrationProps) {
                           ? record[field].name
                         : field == "date" && record[field]
                           ? formatDateTime(record[field])
-                      : record[field] || "N/A"
+                      : record[field] || t("N/A")
                           }
                     </td>
                   ))}
                   {props.populateFields?.map((field) => (
                     <td className="border px-4 py-2" role="cell" key={`${record.id}-${field.name}`}>
-                      {record[field.name] || "N/A"}
+                      {record[field.name] || t("N/A")}
                     </td>
                   ))}
                   <td className="border px-4 py-2" role="cell">
                     <button
                       className="text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-label={`Edit record ${record.id}`}
+                      aria-label={`${t("Edit record")} ${record.id}`}
                       onClick={() => handleEditClick(record)}
                     >
                       {t("Edit")}
                     </button>
                     <button
                       className="text-red-500 hover:text-red-700 ml-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-                      aria-label={`Delete record ${record.id}`}
+                      aria-label={`${t("Delete record")} ${record.id}`}
                       onClick={() => openConfirmDialog(record.id!)}
                     >
                       {t("Delete")}
@@ -350,7 +350,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
           </div>
         </div>
       )}
-      <h2 id="record-form-title" className="text-xl font-bold mt-4" tabIndex={0} role="heading">{editingRecord ? "Edit Record" : "Add Record"}</h2>
+      <h2 id="record-form-title" className="text-xl font-bold mt-4" tabIndex={0} role="heading">{editingRecord ? t("Edit Record") : t("Add Record")}</h2>
       <div className="h-96 overflow-y-auto">
         <RecordForm
           record={editingRecord}

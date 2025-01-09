@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 interface PaginationInterface {
   activePage: number;
   callback: Function;
@@ -5,6 +7,7 @@ interface PaginationInterface {
 }
 
 export default function Pagination(props: PaginationInterface) {
+  const { t } = useTranslation();
   let pageNames: (number | string)[] = [];
 
   for (let i = 0; i < props.pageNames.length; i++) {
@@ -35,7 +38,7 @@ export default function Pagination(props: PaginationInterface) {
   }
 
   return (
-    <div className="center my-10 text-l flex w-full center justify-center overflow-hidden select-none" aria-label="Pagination Navigation">
+    <div className="center my-10 text-l flex w-full center justify-center overflow-hidden select-none" aria-label={t("Pagination Navigation")} >
       {pageNames.map((p, index) =>
         p === "..." ? (
           <div key={index} aria-hidden="true" className="w-7 aspect-square text-slate-700 text-center">{p}</div>
@@ -44,7 +47,7 @@ export default function Pagination(props: PaginationInterface) {
             {p}
           </button>
         ) : (
-          <button key={index} onClick={() => props.callback(p)} aria-label={`Go to page ${p}`} className="w-7 aspect-square hover:opacity-60 text-slate-700 border-2">
+          <button key={index} onClick={() => props.callback(p)} aria-label={`${t("Go to page")} ${p}`} className="w-7 aspect-square hover:opacity-60 text-slate-700 border-2">
             {p}
           </button>
         )

@@ -45,7 +45,7 @@ export default function NotificationButton(props: NButtonProps) {
       calcNotifications(t);
       setNotifications(t);
     } catch (error) {
-      showToast({ message: `Error fetching notifications: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching notifications")}: ${error}.`, type: "error" });
     }
   };
 
@@ -76,7 +76,7 @@ export default function NotificationButton(props: NButtonProps) {
       className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline relative inline-block align-center"
       tabIndex={0}
       role="button"
-      aria-label={`Notifications button, ${unreadNotifications} unread notifications`}
+      aria-label={`${t("Notifications button")}, ${unreadNotifications} ${t("unread notifications")}`}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           navigate(props.path);
@@ -85,7 +85,7 @@ export default function NotificationButton(props: NButtonProps) {
     >
       {unreadNotifications > 0 && (
         <div className="h-5 w-5 inline-block align-center justify-center absolute right-1 top-2 text-sm select-none" aria-live="polite" aria-atomic="true">
-          <p className="bg-red-400 rounded-full text-center m-0" aria-label={`${unreadNotifications} unread notifications`}>
+          <p className="bg-red-400 rounded-full text-center m-0" aria-label={`${unreadNotifications} ${t("unread notifications")}`}>
             {unreadNotifications}
           </p>
         </div>

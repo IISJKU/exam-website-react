@@ -6,7 +6,7 @@ import { showToast } from "../components/ToastMessage";
 import Exam, { ExamStatus } from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
 import fetchAll from "./FetchAll";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const localizer = momentLocalizer(moment);
 
@@ -15,6 +15,7 @@ interface RoomsCalenderProps {
 }
 
 export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
+  const { t } = useTranslation(); 
   const [exams, setExams] = useState<Exam[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -38,7 +39,7 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
         : data.filter((exam) => exam.status !== ExamStatus.archived);
       setExams(filteredExams);
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: "error"});
+      showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error"});
     } finally {
       setLoading(false);
     }
@@ -78,7 +79,7 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
   }
 
   return (
-    <div role="region" aria-label="Rooms Calendar" tabIndex={-1} className="rooms-calendar">
+    <div role="region" aria-label={t("Rooms Calendar")} tabIndex={-1} className="rooms-calendar">
       <BigCalendar
         defaultDate={defaultDate}
         defaultView={Views.WEEK}
@@ -95,9 +96,9 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
             <div
               role="button"
               tabIndex={0}
-              aria-label={`Exam: ${event.title}, starts at ${moment(event.start).format(
+              aria-label={`${t("Exam")}: ${event.title}, ${t("starts at")} ${moment(event.start).format(
                 "h:mm A"
-              )} and ends at ${moment(event.end).format("h:mm A")}`}
+              )} ${t("and ends at")} ${moment(event.end).format("h:mm A")}`}
               onClick={() => handleSelectEvent(event)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -111,12 +112,12 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
           ),
         }}
         messages={{
-          week: "Week View",
-          day: "Day View",
-          month: "Month View",
-          today: "Today",
-          previous: "Previous",
-          next: "Next",
+          week: t("Week View"),
+          day: t("Day View"),
+          month: t("Month View"),
+          today: t("Today"),
+          previous: t("Previous"),
+          next: t("Next"),
         }}
       />
         <h2 id="calendar-title" className="sr-only">

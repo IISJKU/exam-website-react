@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import EntryBase from "../../classes/EntryBase";
+import { useTranslation } from "react-i18next";
 
 interface DropdownOption {
   value: string | number;
@@ -14,11 +15,12 @@ interface ComparisonField {
 }
 
 export default function ComparisonField(props: ComparisonField) {
+  const { t } = useTranslation();
   // Get the label of the currently selected value (if any)
   let selectedOptionLabel: string | number | undefined = props.options.find((option) => option.value === props.value)?.label || "";
 
   if (props.options.length == 0) {
-    selectedOptionLabel = props.value;
+    selectedOptionLabel = props.value?.toString();
   }
 
   const makeString = (t: any) => {
@@ -40,7 +42,7 @@ export default function ComparisonField(props: ComparisonField) {
       {/* Label for the dropdown */}
       {props.label && (
         <label id={`comparison-field-${props.label?.toLowerCase()}`} className="font-bold">
-          {props.label}:
+          {t(props.label)}:
         </label>
       )}
 
@@ -48,15 +50,15 @@ export default function ComparisonField(props: ComparisonField) {
       <div className="mb-2 ">
         {props.proposedVal ? (
           <>
-            <div className="line-through" aria-label={`Current value: ${selectedOptionLabel}`}>
-              {selectedOptionLabel}
+            <div className="line-through" aria-label={`${t("Current value")}:  ${t(selectedOptionLabel)}`}>
+            {t(selectedOptionLabel)}
             </div>
-            <div className="text-red-500" aria-label={`Proposed value: ${props.proposedVal}`}>
-              {props.proposedVal}
+            <div className="text-red-500" aria-label={`${t("Proposed value")}: ${t(props.proposedVal)}`}>
+            {t(props.proposedVal)}
             </div>
           </>
         ) : (
-          <div aria-label={`Current value: ${selectedOptionLabel}`}>{selectedOptionLabel}</div>
+          <div aria-label={`${t("Current value")}: ${t(selectedOptionLabel)}`}>{t(selectedOptionLabel)}</div>
         )}
       </div>
     </div>

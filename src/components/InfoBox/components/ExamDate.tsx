@@ -1,31 +1,36 @@
+import { useTranslation } from "react-i18next";
+
 interface ExamDateProps {
   date: string;
 }
 
 export default function ExamDate(props: ExamDateProps) {
-  let date = new Date(props.date);
+  const { t } = useTranslation();
+  const date = new Date(props.date);
+
   const weekdays = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
+    t("Monday"),
+    t("Tuesday"),
+    t("Wednesday"),
+    t("Thursday"),
+    t("Friday"),
+    t("Saturday"),
+    t("Sunday"),
   ];
+
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    t("January"),
+    t("February"),
+    t("March"),
+    t("April"),
+    t("May"),
+    t("June"),
+    t("July"),
+    t("August"),
+    t("September"),
+    t("October"),
+    t("November"),
+    t("December"),
   ];
 
   const formattedDate = `${weekdays[date.getDay()]}, ${date.getDate()} ${
@@ -33,7 +38,7 @@ export default function ExamDate(props: ExamDateProps) {
   } ${date.getFullYear()}`;
 
   return (
-    <td aria-label="Exam Date" role="cell">
+    <td aria-label={t("Exam Date")} role="cell">
       <time dateTime={date.toISOString()}>{formattedDate}</time>
     </td>
   );

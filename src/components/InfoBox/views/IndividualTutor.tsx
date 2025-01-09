@@ -4,9 +4,10 @@ import EditField from "../components/EditField";
 import { showToast } from "../components/ToastMessage";
 import Tutor from "../../classes/Tutor";
 import { useAuth } from "../../../hooks/AuthProvider";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export default function IndividualTutor() {
+  const { t } = useTranslation();
   const { id } = useParams(); // Extract the tutor ID from the route parameters
   const navigate = useNavigate(); // For navigation
   const [loading, setLoading] = useState<boolean>(true);
@@ -32,7 +33,7 @@ export default function IndividualTutor() {
         });
         const tutorData = await response.json();
         if (!response.ok) {
-          showToast({ message: `HTTP error! Status: ${response.status}, Message: ${tutorData.error.message || "Unknown error"}.`, type: "error", });
+          showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${tutorData.error.message || t("Unknown error")}}.`, type: "error"});
         }
         setTutor(tutorData); // Set the fetched tutor data
         setLoading(false); // Stop loading
@@ -42,7 +43,7 @@ export default function IndividualTutor() {
         setMatrikelNum(tutorData.matrikel_number);
         setCourse(tutorData.course);
       } catch (error) {
-        showToast({ message: `Error fetching tutor data: ${(error as Error).message}.`, type: "error" });
+        showToast({ message: `${t("Error fetching tutor data")}: ${(error as Error).message}.`, type: "error" });
       } finally {
         setLoading(false);
       }
@@ -75,31 +76,31 @@ export default function IndividualTutor() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}.`, type: "error" });
-        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.error.message || "Unknown error"}`);
+        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`, type: "error" });
+        throw new Error(`${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`);
       }
 
       const result = await response.json();
-      showToast({ message: `${result.first_name} ${result.last_name}'s tutor record has been updated successfully.`, type: "success" });
+      showToast({ message: `${result.first_name} ${result.last_name} ${t("tutor record has been updated successfully.")}`, type: "success" });
 
       // Navigate back to tutor list or any other page
       //navigate("/admin/tutors");
     } catch (error) {
-      showToast({ message: `Error updating the tutor record: ${(error as Error).message}.`, type: "error" });
+      showToast({ message: `${t("Error updating the tutor record")}: ${(error as Error).message}.`, type: "error" });
     }
   };
 
   if (loading || !tutor) {
-    return <p aria-live="polite" aria-busy="true">Loading tutor data...</p>;
+    return <p aria-live="polite" aria-busy="true">{t("Loading tutor data...")}</p>;
   }
 
   return (
     <div className="m-5" role="main" aria-labelledby="tutor-details-heading">
         <h1 id="tutor-details-heading" className="text-2xl font-bold mb-4 sr-only">
-        Tutor Details
+          {t("Tutor Details")}
         </h1>
       <EditField
-        title="First Name"
+        title={t("First Name")}
         editMode={editMode}
         text={first_name}
         onChange={(e) => setFirstName(e.target.value)}
@@ -109,7 +110,7 @@ export default function IndividualTutor() {
       />
 
       <EditField
-        title="Last Name"
+        title={t("Last Name")}
         editMode={editMode}
         text={last_name}
         onChange={(e) => setLastName(e.target.value)}
@@ -119,7 +120,7 @@ export default function IndividualTutor() {
       />
 
       <EditField
-        title="Phone"
+        title={t("Phone")}
         editMode={editMode}
         text={phone}
         hideTitle={false}
@@ -130,7 +131,7 @@ export default function IndividualTutor() {
       />
 
       <EditField
-        title="Matrikel Nr"
+        title={t("Matrikel Number")}
         editMode={editMode}
         text={matrikel_number}
         hideTitle={false}
@@ -139,7 +140,7 @@ export default function IndividualTutor() {
       />
 
       <EditField
-        title="Course"
+        title={t("Course")}
         editMode={editMode}
         text={course}
         hideTitle={false}
@@ -149,14 +150,14 @@ export default function IndividualTutor() {
       <div className="mt-4 flex space-x-2">
         <button onClick={() => navigate(-1)}
           className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
-          aria-label="Go back to the previous page">{t("Back")}</button>
+          aria-label={t("Go back to the previous page")}>{t("Back")}</button>
         <button
           onClick={() => {
             setEditMode(!editMode);
             if (editMode) handleUpdate();
           }}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
-          aria-label={editMode ? "Save changes" : "Enable edit mode"}
+          aria-label={editMode ? t("Save changes") : t("Enable edit mode")}
         >
           {editMode ? t("Save") : t("Edit")}
         </button>
@@ -164,7 +165,7 @@ export default function IndividualTutor() {
           <button
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
             onClick={() => setEditMode(false)}
-            aria-label="Cancel editing"
+            aria-label={t("Cancel editing")}
           >
             {t("Cancel")}
           </button>

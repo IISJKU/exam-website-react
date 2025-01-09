@@ -1,5 +1,6 @@
 import React from "react";
 import { ExamStatus } from "../../classes/Exam";
+import { useTranslation } from "react-i18next";
 
 interface StatusSelectorProps {
   title?: string;
@@ -10,8 +11,9 @@ interface StatusSelectorProps {
 }
 
 export default function StatusSelector(props: StatusSelectorProps) {
-    const options = Object.values(ExamStatus);
-    let classList = (props.title) ? "flex flex-col relative w-96 mt-2" : "flex flex-col relative w-full";
+  const { t } = useTranslation();
+  const options = Object.values(ExamStatus);
+  let classList = (props.title) ? "flex flex-col relative w-96 mt-2" : "flex flex-col relative w-full";
 
   return (
       <div className={classList}>
@@ -21,15 +23,15 @@ export default function StatusSelector(props: StatusSelectorProps) {
             className="font-bold"
             id="status-label"
         >
-            {props.title}
+            {t(props.title)}
         </label> : null}
       {props.description && (
         <p id="status-description" className="text-sm text-gray-500">
-          {props.description}
+          {t(props.description)}
         </p>
       )}
        {props.disabled ? (
-        <div className="mb-2">{props.value}</div>
+        <div className="mb-2">{t(props.value)}</div>
       ) : (
         <select
           id="status"
@@ -41,7 +43,7 @@ export default function StatusSelector(props: StatusSelectorProps) {
         >
           {options.map((status) => (
             <option key={status} value={status}>
-              {status.charAt(0).toUpperCase() + status.slice(1)} {/* Capitalized */}
+               {t(status.charAt(0).toUpperCase() + status.slice(1))} {/* Capitalized */}
             </option>
           ))}
           </select>

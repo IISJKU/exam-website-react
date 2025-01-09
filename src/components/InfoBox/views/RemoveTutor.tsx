@@ -30,14 +30,14 @@ export default function RemoveTutor() {
         });
         const examData = await examResponse.json();
         if (!examResponse.ok) {
-          showToast({ message: `HTTP error! Status: ${examResponse.status}, Message: ${examData.error.message || "Unknown error"}.`, type: "error" });
+          showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${examResponse.status}, ${t("Message")}: ${examData.error.message || t("Unknown error")}}.`, type: "error"});
           return;
         }
 
         setExam(examData);
         setOriginalExam(examData);
       } catch (error) {
-        showToast({ message: "Error fetching exam data", type: "error" });
+        showToast({ message: t("Error fetching exam data"), type: "error" });
       } finally {
         setLoading(false);
       }
@@ -86,7 +86,7 @@ export default function RemoveTutor() {
       const data = await response.json();
 
       if (response.ok) {
-        showToast({ message: "Remove exam from monitoring submitted successfully", type: "success" });
+        showToast({ message: t("Remove exam from monitoring submitted successfully"), type: "success" });
 
         let change = examChanged();
 
@@ -105,21 +105,15 @@ export default function RemoveTutor() {
 
           if (!notify.ok) {
             const errorData = await response.json();
-            showToast({
-              message: `HTTP error! Status: ${notify.status}, Message: ${errorData.error.message || "Unknown error"}.`,
-              type: "error",
-            });
+            showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${notify.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`, type: "error"});
             return;
           }
         }
       } else {
-        showToast({
-          message: `HTTP error! Status: ${response.status}, Message: ${data.error?.message || "Unknown error"}.`,
-          type: "error",
-        });
+        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
       }
     } catch (error) {
-      showToast({ message: "Error submitting request to remove monitoring exam", type: "error" });
+      showToast({ message: t("Error submitting request to remove monitoring exam"), type: "error" });
     } finally {
       setShowConfirmDialog(false); // Close dialog after action
       navigate("/tutor/upcoming-exams");

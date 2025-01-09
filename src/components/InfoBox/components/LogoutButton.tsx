@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../hooks/AuthProvider";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export default function LogoutButton() {
+  const { t } = useTranslation();
   const auth = useAuth();
   const [showDialog, setShowDialog] = useState(false);
 

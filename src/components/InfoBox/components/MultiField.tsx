@@ -37,7 +37,7 @@ export default function MultiField<T extends { first_name: string; last_name: st
 
   return (
     <div className="mb-2">
-      {props.hideTitle !== true && (
+      {!props.hideTitle && (
         <label id={`${props.title.toLowerCase()}-label`} className="font-bold">{t(props.title)} </label>
       )}
 
@@ -46,16 +46,16 @@ export default function MultiField<T extends { first_name: string; last_name: st
           props.editMode ? (
             <div className="flex" role="listitem" key={index}>
               <div className="bg-slate-100 w-52 relative group hover:bg-white">
-                <button className="absolute left-0 inline-block group-hover:underline" aria-label={`Edit ${element.first_name} ${element.last_name}`}>
+                <button className="absolute left-0 inline-block group-hover:underline" aria-label={`${t("Edit")} ${element.first_name} ${element.last_name}`}>
                   {element.first_name + " " + element.last_name}</button>
                 <button
                   onClick={() => showPrompt(index)}
                   onBlur={() => hidePrompt(index)}
                   className="absolute right-0 inline-block hover:opacity-60 active:ring-2 focus:opacity-30"
-                  aria-label={`Delete ${element.first_name} ${element.last_name}`}
+                  aria-label={`${t("Delete")} ${element.first_name} ${element.last_name}`}
                 >
                   🗑️
-                </button>{" "}
+                </button>
               </div>
               <div className="mx-4 px-2 border-2 border-black" ref={refs[index]} style={{ visibility: "hidden" }} aria-hidden="true">
                 {t("Are you sure?")}
@@ -63,11 +63,11 @@ export default function MultiField<T extends { first_name: string; last_name: st
                   onMouseDown={() => deleteElem(index)}
                   onBlur={(e) => e.preventDefault()}
                   className="hover:opacity-60 hover:underline px-1 hover:bg-slate-200"
-                  aria-label={`Confirm delete ${element.first_name} ${element.last_name}`}
+                  aria-label={`${t("Confirm delete")} ${element.first_name} ${element.last_name}`}
                 >
                   {t("Yes")}
                 </button>
-                <button onClick={() => hidePrompt(index)} className="hover:opacity-60 hover:bg-slate-200 hover:underline px-1" aria-label={`Cancel delete ${element.first_name} ${element.last_name}`}>
+                <button onClick={() => hidePrompt(index)} className="hover:opacity-60 hover:bg-slate-200 hover:underline px-1" aria-label={`${t("Cancel delete")} ${element.first_name} ${element.last_name}`}>
                   {t("No")}
                 </button>
               </div>
@@ -84,8 +84,8 @@ export default function MultiField<T extends { first_name: string; last_name: st
       {props.editMode && (
       <button className="mb-3 p-1 focus:ring-2 hover:opacity-80 hover:underline"
         onClick={() => setElements([...elements, { first_name: "", last_name: "" } as T])}
-        aria-label={`Add new ${props.title}`} >
-          + Add {props.title}
+        aria-label={`${t("Add new")} ${props.title}`} >
+          + {t("Add")} {props.title}
         </button>
       )}
     </div>

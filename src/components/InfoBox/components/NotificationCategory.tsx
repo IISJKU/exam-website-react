@@ -3,6 +3,7 @@ import Exam from "../../classes/Exam";
 import NotificationComponent from "./NotificationComponent";
 import { useState } from "react";
 import moment from "moment";
+import { useTranslation } from "react-i18next";
 
 interface NotificationCategoryProps {
   notifications: Notification[];
@@ -13,6 +14,7 @@ interface NotificationCategoryProps {
 }
 
 export default function NotificationCategory(props: NotificationCategoryProps) {
+  const { t } = useTranslation();
   //sortNotifs(newNotifications)
   const [day, setDay] = useState<string>();
 
@@ -53,7 +55,7 @@ export default function NotificationCategory(props: NotificationCategoryProps) {
     return (
       <div tabIndex={0}>
         <h2 className="text-4xl p-3 pl-0" id="notification-category-title" key={props.text}>
-          {props.text}
+          {t(props.text)}
         </h2>
         <ul className="w-full text-left border-2" aria-labelledby="notification-category-title">
           {props.notifications.map((elem, index) => (
@@ -84,6 +86,5 @@ export default function NotificationCategory(props: NotificationCategoryProps) {
         </ul>
       </div>
     );
-  //else return <div aria-live="polite" >{props.text} - No notifications available.</div>;
   else return <></>;
 }

@@ -208,7 +208,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
                     }
                   }}
                 >
-                  "{searchTerm}"
+                  {searchTerm}
                 </li>
               )}
             </ul>

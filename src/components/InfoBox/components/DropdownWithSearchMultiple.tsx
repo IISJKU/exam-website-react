@@ -1,10 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useAuth } from "../../../hooks/AuthProvider";
-import Notification from "../../classes/Notification";
-import { showToast } from "./ToastMessage";
+import { useState, useRef } from "react";
 import DropdownWithSearch from "./DropdownWithSearch";
 import { useTranslation } from "react-i18next";
-import EntryBase from "../../classes/EntryBase";
 import Tutor from "../../classes/Tutor";
 
 interface DropdownOption {
@@ -26,9 +22,12 @@ interface DropdownWithSearchMultipleProps {
 }
 
 export default function DropdownWithSearchMultiple(props: DropdownWithSearchMultipleProps) {
-  let selected = [];
   const { t } = useTranslation();
   const initValue = useRef(props.value);
+  const [dropdownValue, setDropdownValue] = useState<number>();
+  const [checked, setChecked] = useState<boolean[]>(
+    new Array<boolean>(props.values.length + 1).fill(false)
+  );
 
   const checkIfContainsTutor = (): any[] => {
     let val = props.options[Number(initValue.current) - 1];
@@ -52,12 +51,6 @@ export default function DropdownWithSearchMultiple(props: DropdownWithSearchMult
   let values = props.values;
 
   if (checkIfContainsTutor().length != 0) values = checkIfContainsTutor().concat(values);
-
-  const [dropdownValue, setDropdownValue] = useState<number>();
-
-  let checkBoxStates = new Array<boolean>(values.length + 1).fill(false);
-
-  let [checked, setChecked] = useState(checkBoxStates);
 
   const click = (index: number) => {
     let temp = new Array<boolean>(values.length + 1).fill(false);
@@ -120,30 +113,30 @@ export default function DropdownWithSearchMultiple(props: DropdownWithSearchMult
     >
       {props.label && (
         <label id={`dropdown-label-${props.label}`} className="font-bold" htmlFor="dropdown-input">
-          {props.label}
+          {t(props.label)}
           {props.required && <span className="text-red-500"> *</span>}
         </label>
       )}
       {props.disabled ? (
         <div className={`${props.value && "grid grid-flow-col border border-slate-200"}`}>
-          {props.value && props.options && props.options.length != 0 ? (
+          {props.value && props.options.length != 0 ? (
             <div className="bg-slate-100 p-1 m-1">
-              <div className="font-light">Selected Tutor: </div>
-              <div>{props.options[Number(props.value) - 1].label}</div>
+              <div className="font-light">{t("Selected Tutor")}: </div>
+              <div>{props.options[Number(props.value) - 1]?.label}</div>
             </div>
           ) : (
             <div></div>
           )}
           <div className="p-1 m-1 border ">
             {values.length != 0 ? (
-              <div className="font-light">Registered Tutor(s):</div>
+              <div className="font-light">{t("Registered Tutor(s)")}:</div>
             ) : (
-              <div className="italic font-light">🚨 No Tutors asigned themselves yet</div>
+              <div className="italic font-light">🚨 {t("No Tutors assigned themselves yet")}</div>
             )}
             {
               /* All of the fields */
               values.map((elem: Tutor, index) =>
-                checked[index] ? <div>{elem["first_name"] + " " + elem["last_name"]}</div> : <div>{elem["first_name"] + " " + elem["last_name"]}</div>
+                <div key={index}>{elem["first_name"] + " " + elem["last_name"]}</div>
               )
             }
           </div>
@@ -153,7 +146,7 @@ export default function DropdownWithSearchMultiple(props: DropdownWithSearchMult
           <div className={`${!props.disabled ? "mt-1 bg-slate-100 border border-gray-300 rounded-md p-2" : ""}`}>
             {values.map((elem: Tutor, index) => (
               
-              <div className="align-middle w-full hover:bg-slate-300 rounded-md group-focus:bg-slate-300">
+              <div key={index} className="align-middle w-full hover:bg-slate-300 rounded-md group-focus:bg-slate-300">
                 <input
                   className="align-middle inline-block w-5 h-5"
                   type="checkbox"
@@ -179,7 +172,7 @@ export default function DropdownWithSearchMultiple(props: DropdownWithSearchMult
                 onClick={() => {
                   click(values.length);
                 }}
-                disabled={!dropdownValue ? true : false}
+                disabled={!dropdownValue}
               />
               <div className="align-middle inline-block w-80">
                 <DropdownWithSearch

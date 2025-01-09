@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface SearchProps {
   items: any[];
@@ -6,9 +7,23 @@ interface SearchProps {
 }
 
 export default function SearchBar(props: SearchProps) {
+  const { t } = useTranslation();
   const [input, changeInput] = useState<string>("");
 
-  const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const month = [
+    t("January"),
+    t("February"),
+    t("March"),
+    t("April"),
+    t("May"),
+    t("June"),
+    t("July"),
+    t("August"),
+    t("September"),
+    t("October"),
+    t("November"),
+    t("December"),
+  ];
   let matches: any[] = [];
 
   function check(key: string, item: object, searchString: string): boolean {
@@ -47,14 +62,14 @@ export default function SearchBar(props: SearchProps) {
   return (
     <div className="relative w-full md:w-2/3 lg:max-w-md">
       <label htmlFor="search-input" className="sr-only">
-        Search
+        {t("Search")}
       </label>
       <input
         id="search-input"
         type="search"
         className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Search..."
-        aria-label="Search items"
+        placeholder={t("Search...")}
+        aria-label={t("Search items")}
         onChange={(e) => filter(e.target.value)}
         value={input}
       />

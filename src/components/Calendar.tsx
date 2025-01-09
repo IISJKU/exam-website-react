@@ -26,7 +26,7 @@ export default function Calendar() {
       const filteredExams = data.filter((exam) => exam.status !== ExamStatus.archived);
       setExams(filteredExams);
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error" });
     } finally {
       setLoading(false);
     }
@@ -48,7 +48,7 @@ export default function Calendar() {
     let key = d.getDay();
     key = key - 1;
     if (key < 0) key = 6;
-    return weekdays[key];
+    return t(weekdays[key]);
   }
 
   function switchMonth(add: number): void {
@@ -107,7 +107,7 @@ export default function Calendar() {
     while (count <= numDays) {
       const row: string[][] = [];
       for (let i = 0; i < 7; i++) {
-        if (currentDate.getDate() === 1 && getWeekday(currentDate) !== weekdays[i]) {
+        if (currentDate.getDate() === 1 && getWeekday(currentDate) !== t(weekdays[i])) {
           row.push(["", ""]);
         } else if (count <= numDays) {
           const matchingExams = exams.filter((exam) => {
@@ -143,13 +143,13 @@ export default function Calendar() {
   }
 
   return (
-    <div className="w-4/5 sm:w-2/4 md:bg-cyan-200 md:w-full aspect-square select-none" role="region" aria-label="Calendar View">
+    <div className="w-4/5 sm:w-2/4 md:bg-cyan-200 md:w-full aspect-square select-none" role="region" aria-label={t("Calendar View")}>
       <div className="bg-slate-100 border-2 border-grey p-1 aspect-square">
-        <div className="bg-slate-300 w-full flex justify-center content-stretch my-1 text-xs md:text-sm " role="navigation" aria-label="Month Navigation">
+        <div className="bg-slate-300 w-full flex justify-center content-stretch my-1 text-xs md:text-sm " role="navigation" aria-label={t("Calendar View")}>
           <button
             className="basis-2/5 md:basis-1/5 text-left hover:underline"
             onClick={() => switchMonth(-1)}
-            aria-label={`Switch to previous month, ${t(month[(date.getMonth() + 11) % 12])}`}
+            aria-label={`${t("Switch to previous month")}, ${t(month[(date.getMonth() + 11) % 12])}`}
           >
             &lt; {t("Prev")}
           </button>
@@ -159,17 +159,17 @@ export default function Calendar() {
           <button
             onClick={() => switchMonth(1)}
             className="basis-2/5 md:basis-1/5 text-right hover:underline"
-            aria-label={`Switch to next month, ${t(month[(date.getMonth() + 1) % 12])}`}
+            aria-label={`${t("Switch to next month")}, ${t(month[(date.getMonth() + 1) % 12])}`}
           >
             {t("Next")} &gt;
           </button>
         </div>
-        <table className="w-full text-sm text-left table-fixed bg-white" role="table" aria-label="Monthly Calendar">
+        <table className="w-full text-sm text-left table-fixed bg-white" role="table" aria-label={t("Monthly Calendar")}>
           <thead>
             <tr>
               {weekdays.map((weekday, index) => (
                 <th key={index} role="columnheader" aria-label={t(weekday)}>
-                  {weekday.substring(0, 2)}
+                  {t(weekday.substring(0, 2))}
                 </th>
               ))}
             </tr>
@@ -198,7 +198,7 @@ export default function Calendar() {
                       background: day[0] ? day[1] : "",  // Use the gradient or single color here
                     }}
                     role="gridcell"
-                    aria-label={day[0] ? `Day ${day[0]} ${t(month[date.getMonth()])}` : "Empty cell"}
+                    aria-label={day[0] ? `${t("Day")} ${day[0]} ${t(month[date.getMonth()])}` : t("Empty cell")}
                   >
                     {day[0]}
                   </td>

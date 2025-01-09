@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import DateField from "./InfoBox/components/DateField";
-import { t } from "i18next";
 import { sendEmail } from "../services/EmailService";
 import { useAuth } from "../hooks/AuthProvider";
 import { match } from "./InfoBox/views/IndividualNotification";
 import moment from "moment";
 import StatusSelector from "./InfoBox/components/StatusSelector";
+import { useTranslation } from "react-i18next";
 
 interface RecordFormProps {
   record: DataRecord | null;
@@ -26,6 +26,7 @@ interface DataRecord {
 const defaultRecord: DataRecord = {};
 
 export default function RecordForm(props: RecordFormProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<DataRecord>(defaultRecord);
   const [role, setRole] = useState(formData.role || "");
   const user = useAuth();
@@ -70,10 +71,7 @@ export default function RecordForm(props: RecordFormProps) {
       }
   
       // For other fields, just update normally
-      return {
-        ...prev,
-        [name]: value,
-      };
+      return { ...prev, [name]: value };
     });
   
     // Update role state if the field name is 'role'
@@ -83,9 +81,9 @@ export default function RecordForm(props: RecordFormProps) {
   };
 
   function matchValue(options: any[], value: any): string {
-    if (!value || !options) return "N/A";
+    if (!value || !options) return t("N/A");
     const item = options.find((option) => option.id === Number(value));
-    return item ? item.displayValue : "N/A";
+    return item ? item.displayValue : t("N/A");
   }
 
   function getEmail(options: any[], selectedId: number): string | null {
@@ -109,16 +107,14 @@ export default function RecordForm(props: RecordFormProps) {
   
 
   function generateChangesHtml(oldData: any, newData: any, options: any): string {
-    console.log('old'+ JSON.stringify(oldData))
-    console.log('new'+ JSON.stringify(newData))
     const generateRow = (fieldName: string, oldValue: any, newValue: any) => {
-      const prev = oldValue || "N/A";
+      const prev = oldValue || t("N/A");
       const next = newValue || prev;
       const nextStyle = prev !== next ? `<span style="color: red; font-weight: bold;">${next}</span>` : next;
   
       return `
         <tr>
-          <td style="padding: 8px;">${fieldName}</td>
+          <td style="padding: 8px;">${t(fieldName)}</td>
           <td style="padding: 8px;">${prev}</td>
           <td style="padding: 8px;">${nextStyle}</td>
         </tr>
@@ -126,40 +122,38 @@ export default function RecordForm(props: RecordFormProps) {
     };
   
     return `
-      <h3>Exam Changes</h3>
-      <p>The following changes have been made:</p>
+      <h3>${t("Exam Changes")}</h3>
+      <p>${t("The following changes have been made")}:</p>
       <table border="1" style="border-collapse: collapse; width: 70%;">
         <thead>
           <tr>
-            <th style="padding: 8px; text-align: left;">Field</th>
-            <th style="padding: 8px; text-align: left;">Old</th>
-            <th style="padding: 8px; text-align: left;">New</th>
+            <th style="padding: 8px; text-align: left;">${t("Field")}</th>
+            <th style="padding: 8px; text-align: left;">${t("Old")}</th>
+            <th style="padding: 8px; text-align: left;">${t("New")}</th>
           </tr>
         </thead>
         <tbody>
-          ${generateRow("Title", oldData?.title, newData?.title)}
-          ${generateRow("LVA Number", oldData?.lva_num, newData?.lva_num)}
-          ${generateRow("Date", oldData?.date ? moment(oldData.date).format("DD.MM.YYYY HH:mm") : "N/A",
+          ${generateRow(t("Title"), oldData?.title, newData?.title)}
+          ${generateRow(t("LVA Number"), oldData?.lva_num, newData?.lva_num)}
+          ${generateRow(t("Date"), oldData?.date ? moment(oldData.date).format("DD.MM.YYYY HH:mm") : "N/A",
             newData.date ? moment(newData.date).format("DD.MM.YYYY HH:mm") : moment(oldData.date).format("DD.MM.YYYY HH:mm"))}
-          ${generateRow("Duration", oldData?.duration, newData?.duration)}
-          ${generateRow("Student", matchValue(options.student, oldData?.student_id), matchValue(options.student, newData?.student))}
-          ${generateRow("Tutor", matchValue(options.tutor, oldData?.tutor_id), matchValue(options.tutor, newData?.tutor))}
-          ${generateRow("Examiner", matchValue(options.examiner, oldData?.examiner_id), matchValue(options.examiner, newData?.examiner))}
-          ${generateRow("Major", matchValue(options.major, oldData?.major_id), matchValue(options.major, newData?.major))}
-          ${generateRow("Institute", matchValue(options.institute, oldData?.institute_id), matchValue(options.institute, newData?.institute))}
-          ${generateRow("Mode", matchValue(options.exam_mode, oldData?.exam_mode_id), matchValue(options.exam_mode, newData?.exam_mode))}
-          ${generateRow("Room", matchValue(options.room, oldData?.room_id), matchValue(options.room, newData?.room))}
-          ${generateRow("Notes", oldData?.notes, newData?.notes)}
-          ${generateRow("Status", oldData?.status, newData?.status)}
+          ${generateRow(t("Duration"), oldData?.duration, newData?.duration)}
+          ${generateRow(t("Student"), matchValue(options.student, oldData?.student_id), matchValue(options.student, newData?.student))}
+          ${generateRow(t("Tutor"), matchValue(options.tutor, oldData?.tutor_id), matchValue(options.tutor, newData?.tutor))}
+          ${generateRow(t("Examiner"), matchValue(options.examiner, oldData?.examiner_id), matchValue(options.examiner, newData?.examiner))}
+          ${generateRow(t("Major"), matchValue(options.major, oldData?.major_id), matchValue(options.major, newData?.major))}
+          ${generateRow(t("Institute"), matchValue(options.institute, oldData?.institute_id), matchValue(options.institute, newData?.institute))}
+          ${generateRow(t("Mode"), matchValue(options.exam_mode, oldData?.exam_mode_id), matchValue(options.exam_mode, newData?.exam_mode))}
+          ${generateRow(t("Room"), matchValue(options.room, oldData?.room_id), matchValue(options.room, newData?.room))}
+          ${generateRow(t("Notes"), oldData?.notes, newData?.notes)}
+          ${generateRow(t("Status"), oldData?.status, newData?.status)}
         </tbody>
       </table>
     `;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log(formData);
     e.preventDefault();
-
     const sanitizedData: DataRecord = {
       ...formData,
       student: formData.student || null,
@@ -190,8 +184,8 @@ export default function RecordForm(props: RecordFormProps) {
           emailPromises.push(
             sendEmail({
               to: tutorEmail,
-              subject: "Exam Update Notification",
-              text: "The exam details have been updated.",
+              subject: t("Exam Update Notification"),
+              text: t("The following exam details have been updated."),
               html: changesHtml,
               token: user.token,
             })
@@ -201,17 +195,16 @@ export default function RecordForm(props: RecordFormProps) {
           emailPromises.push(
             sendEmail({
               to: studentEmail,
-              subject: "Exam Update Notification",
-              text: "The exam details have been updated.",
+              subject: t("Exam Update Notification"),
+              text: t("The following exam details have been updated."),
               html: changesHtml,
               token: user.token,
             })
           );
         }
         await Promise.all(emailPromises);
-        console.log("Emails sent successfully!");
       } catch (error) {
-        console.error("Error sending emails:", error);
+        console.error(t("Error sending emails"), error);
       }
     }
   
@@ -245,6 +238,9 @@ export default function RecordForm(props: RecordFormProps) {
 
   return (
     <form onSubmit={handleSubmit} aria-labelledby="record-form-title" className="mt-4">
+      <h1 id="record-form-title" className="text-xl mb-4 sr-only">
+        {props.record ? t("Update Record") : t("Add New Record")}
+      </h1>
 
       {props.fields.map((field) => {
         const isRequired = !(props.optionalFields ?? []).includes(field);
@@ -354,7 +350,7 @@ export default function RecordForm(props: RecordFormProps) {
         <button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
-          aria-label={props.record ? "Update record" : "Add record"}
+          aria-label={props.record ? t("Update Record") : t("Add New Record")}
         >
           {props.record ? t("Update") : t("Add")}
         </button>

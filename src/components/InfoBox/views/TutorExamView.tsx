@@ -4,9 +4,10 @@ import { showToast } from "../components/ToastMessage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export default function TutorExamView() {
+  const { t } = useTranslation();
   const navigate = useNavigate(); // Initialize navigate
   const user = useAuth();
   const tutorId = user.userId;
@@ -17,8 +18,8 @@ export default function TutorExamView() {
 
   // Determine fields and keys dynamically based on screen size
   const fields = isMobileView
-    ? ["Exam Title", "Date/Time"] // Shortened fields for mobile
-    : ["Exam Title", "LVA Nr.", "Date/Time", "Duration", "Mode", "Student", "Examiner", "Institute", "Notes", "Student Misc"];
+    ? [t("Exam Title"), t("Date/Time")]
+    : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Institute"), t("Notes"), t("Student Misc")];
 
   const keys: (keyof Exam)[] = isMobileView
     ? ["title", "date"] // Shortened keys for mobile
@@ -47,7 +48,7 @@ export default function TutorExamView() {
       });
       const data = await response.json();
       if (!response.ok) {
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error" });
+        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
       }
 
       // Modify the data array before setting it to exams
@@ -79,7 +80,7 @@ export default function TutorExamView() {
 
       setExams(updatedData);
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error" });
     } finally {
       setLoading(false);
     }
@@ -98,13 +99,13 @@ export default function TutorExamView() {
   }
 
   return (
-    <div role="region" aria-label="Tutor's Upcoming Monitored Exams" className="tutor-exam-view">
+    <div role="region" aria-label={t("Tutor's Upcoming Monitored Exams")} className="tutor-exam-view">
       <ContentView
-        title={"Upcoming Monitored Exams"}
+        title={t("Upcoming Monitored Exams")}
         onRowClick={handleExamClick} // Pass the click handler for navigation
         fields={fields}
         keys={keys}
-        buttonName="Remove"
+        buttonName={t("Remove")}
         data={exams} 
       />
     </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Sorter from "./Sorter";
 import { SorterState } from "./Sorter";
+import { useTranslation } from "react-i18next";
 
 interface SHProps<T> {
   fields: string[];
@@ -10,6 +11,7 @@ interface SHProps<T> {
 }
 
 export default function SortableHeaders<T extends { id?: number }>(props: SHProps<T>) {
+  const { t } = useTranslation();
   const [states, setStates] = useState<SorterState[]>(Array(props.fields.length).fill(SorterState.off));
 
   function sortByKey(array: T[], key: keyof T, direction: SorterState): T[] {
@@ -82,7 +84,7 @@ export default function SortableHeaders<T extends { id?: number }>(props: SHProp
           key={index}
           onClick={() => setActiveKey(props.keys[index])}
           id={props.keys[index]}
-          name={props.fields[index].toString()}
+          name={t(props.fields[index].toString())}
           state={states[index]}
         />
       ))}

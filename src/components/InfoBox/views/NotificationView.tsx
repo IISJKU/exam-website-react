@@ -191,7 +191,7 @@ export default function NotificationView() {
       if (prop.length != 0) setProposals(prop.reverse());
       if (examData != undefined) setExams(examData);
     } catch (error) {
-      showToast({ message: `Error fetching notifications: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching notifications")}: ${error}.`, type: "error" });
     } finally {
       setLoading(false);
     }
@@ -269,7 +269,7 @@ export default function NotificationView() {
         rooms: roomsRes,
       });
     } catch (error) {
-      showToast({ message: "Error fetching dropdown options", type: "error" });
+      showToast({ message: t("Error fetching dropdown options"), type: "error" });
     }
   };
 
@@ -296,9 +296,7 @@ export default function NotificationView() {
 
   if (loading) {
     return (
-      <p aria-live="polite" aria-busy="true">
-        Loading notifications...
-      </p>
+      <p aria-live="polite" aria-busy="true">{t("Loading notifications...")}</p>
     );
   }
 

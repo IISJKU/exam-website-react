@@ -4,12 +4,13 @@ import ContentView from "./ContentView";
 import { showToast } from "../components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export default function StudentView() {
+  const { t } = useTranslation();
   const navigate = useNavigate(); // Initialize navigate for navigation
 
-  const fields = ["First Name", "Last Name", "Phone", "Emergency Contact", "Matrikel Number", "Major", "Bonus Time"];
+  const fields = [t("First Name"), t("Last Name"), t("Phone"), t("Emergency Contact"), t("Matrikel Number"), t("Major"), t("Bonus Time")];
 
   const keys: (keyof Student)[] = ["first_name", "last_name", "phone", "emergency_contact", "matrikel_number", "major", "bonus_time"];
 
@@ -30,18 +31,18 @@ export default function StudentView() {
       const data = await response.json();
       
       if (!response.ok) {
-        showToast({ message: `HTTP error! Status: ${response.status}, Message: ${data.error.message || "Unknown error"}.`, type: "error", });
+        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
         return;
        }
       // Map and modify data to extract the 'major' name
       const updatedData = data.map((student: any) => ({
         ...student,
-        major: student.major?.name || "N/A", // Set major name or "N/A" if not available
+        major: student.major?.name || t("N/A"), // Set major name or "N/A" if not available
       }));
 
       setStudentData(updatedData); // Update state with the fetched students
     } catch (error) {
-      showToast({ message: `Error fetching students: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching students")}: ${error}.`, type: "error" });
     } finally {
       setLoading(false); // Set loading to false once data fetching is done
     }
@@ -60,7 +61,7 @@ export default function StudentView() {
   }
 
   return (
-    <div role="region" aria-label="Student List" className="student-view">
+    <div role="region" aria-label={t("Students List")} className="student-view">
       <ContentView
         title={t("Students")}
         onRowClick={handleStudentClick}

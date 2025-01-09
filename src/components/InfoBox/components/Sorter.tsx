@@ -40,12 +40,13 @@ export default function Sorter(props: SorterProps) {
       tabIndex={0}
       role="button"
       aria-sort={
-      props.state === SorterState.up
-        ? "ascending"
-        : props.state === SorterState.down
-        ? "descending"
-        : "none"
+        props.state === SorterState.up
+          ? "ascending"
+          : props.state === SorterState.down
+            ? "descending"
+            : "none"
       }
+      aria-label={`${t("Sort by")} ${props.name}`}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") props.onClick(props.id); 
       }}

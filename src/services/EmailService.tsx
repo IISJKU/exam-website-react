@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 interface SendEmailParams {
   to: string; // Recipient email
   subject: string; // Subject of the email
@@ -7,6 +9,7 @@ interface SendEmailParams {
 }
 
 export const sendEmail = async (params: SendEmailParams): Promise<void> => {
+  const { t } = useTranslation();
   const { to, subject, text, html, token } = params;
 
   if (to == "") return;
@@ -24,7 +27,7 @@ export const sendEmail = async (params: SendEmailParams): Promise<void> => {
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Failed to send email:", errorData);
-      throw new Error(errorData.message || "Failed to send email");
+      throw new Error(errorData.message || t("Failed to send email"));
     }
 
     console.log("Email sent successfully!");

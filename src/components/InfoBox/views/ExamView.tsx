@@ -5,10 +5,12 @@ import { showToast } from "../components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import fetchAll from "./FetchAll";
 import { useAuth } from "../../../hooks/AuthProvider";
+import { useTranslation } from "react-i18next";
 
 export default function ExamView() {
   const navigate = useNavigate(); // Initialize navigate
   const user = useAuth();
+  const { t } = useTranslation(); 
 
   const [exams, setExams] = useState<Exam[]>([]); // Store exams
   const [loading, setLoading] = useState<boolean>(true); 
@@ -16,8 +18,8 @@ export default function ExamView() {
 
   // Determine fields and keys dynamically based on screen size
   const fields = isMobileView
-    ? ["Exam Title", "Date/Time", "Student"] // Shortened fields for mobile
-    : ["Exam Title", "LVA Nr.", "Date/Time", "Duration", "Mode", "Student", "Examiner", "Institute", "Notes", "Student Misc"];
+  ? [t("Exam Title"), t("Date/Time"), t("Student")]
+  : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Institute"), t("Notes"), t("Student Misc")];
 
   const keys: (keyof Exam)[] = isMobileView
     ? ["title", "date", "student"] // Shortened keys for mobile
@@ -79,7 +81,7 @@ export default function ExamView() {
 
       setExams(updatedData); 
     } catch (error) {
-      showToast({ message: `Error fetching exams: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error" });
     } finally {
       setLoading(false);
     }
@@ -95,16 +97,16 @@ export default function ExamView() {
   };
 
   if (loading) {
-    return <p aria-live="polite" aria-busy="true">Loading exams...</p>; 
+    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>; 
   }
 
   return (
     <ContentView
-      title={"Upcoming Exams"}
+      title={t("Upcoming Exams")}
       onRowClick={handleExamClick} 
       fields={fields}
       keys={keys}
-      buttonName={user.role === "Tutor" ? "View" : "Edit"}
+      buttonName={user.role === "Tutor" ? t("View") : t("Edit")}
       coloring={true}
       data={exams}
     />
