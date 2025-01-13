@@ -215,7 +215,6 @@ export default function RequestExam() {
       let notif = new Notification(JSON.stringify(data), "", user.user);
       notif.type = NotificationType.createExam;
 
-      console.log(data);
       if (addedEx != "") {
         const notify = await fetch(`http://localhost:1337/api/notifications`, {
           method: "POST",

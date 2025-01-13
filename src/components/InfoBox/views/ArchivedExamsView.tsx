@@ -41,7 +41,7 @@ export default function ArchivedExamsView() {
   const fetchExams = async () => {
     try {
 
-      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, "Http error!")) as Exam[];
+      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, t("Http error!"))) as Exam[];
 
       // Modify the data array before setting it to exams
       const updatedData = data.map((exam: any) => {

@@ -42,7 +42,7 @@ export default function ExamView() {
     try {
       //let data = [];
 
-      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, "Http error!")) as Exam[];
+      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, t("Http error!"))) as Exam[];
 
       // Filter out exams with the archived status
       const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);

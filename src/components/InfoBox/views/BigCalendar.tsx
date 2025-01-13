@@ -42,7 +42,7 @@ export default function BigCalendar() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, "Http error!")) as Exam[];
+      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, t("Http error!"))) as Exam[];
       // Filter out exams with the status not "archived"
       const filteredExams = data.filter((exam) => exam.status !== ExamStatus.archived);
       setExams(filteredExams);

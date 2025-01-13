@@ -31,10 +31,10 @@ export default function RoomManagement() {
   const fetchData = async (type: "exams" | "rooms", setData: Function) => {
     try {
       if (type === "exams") {
-        const data = (await fetchAll(`http://localhost:1337/api/${type}`, user.token, `Failed to fetch ${type}`)) as Exam[];
+        const data = (await fetchAll(`http://localhost:1337/api/${type}`, user.token, `${t("Failed to fetch")} ${type}`)) as Exam[];
         setData(data.filter((exam: Exam) => !exam.room)); // Filter exams without rooms
       } else {
-        const data = (await fetchAll(`http://localhost:1337/api/${type}`, user.token, `Failed to fetch ${type}`)) as Room[];
+        const data = (await fetchAll(`http://localhost:1337/api/${type}`, user.token, `${t("Failed to fetch")} ${type}`)) as Room[];
         setData(data.filter((room: Room) => room.isAvailable));
       }
     } catch (error) {

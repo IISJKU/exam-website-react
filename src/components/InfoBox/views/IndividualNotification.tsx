@@ -677,9 +677,8 @@ export const match = (arr: any[], val: any): string => {
 };
 
 export function generateRow(fieldName: string, previousValue: any, newValue: any = "", includeNewValue: boolean = false): string {
-  const { t } = useTranslation();
   // "N/A" if values are undefined or null
-  const prev = previousValue || t("N/A");
+  const prev = previousValue || "N/A";
   const next = newValue || prev;
 
   // Bold and highlight in red if there's a change

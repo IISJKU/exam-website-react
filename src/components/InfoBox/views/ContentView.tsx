@@ -126,12 +126,12 @@ export default function ContentView<T extends { id?: number; status?: ExamStatus
                 <td key={`${String(key)}-${idx}`} className="pl-2" tabIndex={0} role="cell">
                   {typeof element[key] === "string"
                     ? !isDate(element[key] as string)
-                      ? t(element[key] as string)
+                      ? element[key] as string
                       : formatDateTime(element[key] as string)
                     : Array.isArray(element[key])
                     ? (element[key] as string[]).join(", ")
                     : typeof element[key] === "number"
-                    ? element[key]
+                    ? (element[key] as number)
                     : " "}
                 </td>
               ))}

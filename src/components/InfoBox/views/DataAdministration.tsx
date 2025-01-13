@@ -47,7 +47,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
       const query = filteredFields.length ? filteredFields.map((field, index) => `fields[${index}]=${field}`).join("&") : "";
       const populateQuery = props.populateFields?.length ? `&populate=${props.populateFields.map((field) => field.name).join(",")}` : "";
 
-      const result = await fetchAll(`http://localhost:1337/api/${props.tableName}?${query}${populateQuery}`, user.token, "HTTP error!");
+      const result = await fetchAll(`http://localhost:1337/api/${props.tableName}?${query}${populateQuery}`, user.token, t("HTTP error!"));
 
       if (result && Array.isArray(result)) {
         const fetchedData = result.map((item: any) => {
@@ -98,7 +98,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
   // Fetch relational data for dropdowns
   const fetchRelationalData = async () => {
     const relationalPromises = props.populateFields?.map(async (field) => {
-      const result = await fetchAll(`http://localhost:1337/api/${field.populateTable}`, user.token, `HTTP error!`);
+      const result = await fetchAll(`http://localhost:1337/api/${field.populateTable}`, user.token, t(`HTTP error!`));
 
       const records =
         Array.isArray(result) && result.length > 0 && Array.isArray(result[result.length - 1]?.roles)

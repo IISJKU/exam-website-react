@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+import { showToast } from "../components/InfoBox/components/ToastMessage";
 
 interface SendEmailParams {
   to: string; // Recipient email
@@ -9,7 +9,6 @@ interface SendEmailParams {
 }
 
 export const sendEmail = async (params: SendEmailParams): Promise<void> => {
-  const { t } = useTranslation();
   const { to, subject, text, html, token } = params;
 
   if (to == "") return;
@@ -26,12 +25,10 @@ export const sendEmail = async (params: SendEmailParams): Promise<void> => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Failed to send email:", errorData);
-      throw new Error(errorData.message || t("Failed to send email"));
+      showToast({ message: `Failed to send email: ${errorData.message}.`, type: "error" });
+      throw new Error(errorData.message || "Failed to send email");
     }
-
-    console.log("Email sent successfully!");
   } catch (error) {
-    console.error("Error sending email:", error);
+    showToast({ message: `Failed to send email: ${error}.`, type: "error" });
   }
 };

@@ -67,12 +67,10 @@ const AuthProvider = ({ children }) => {
       if (userRes.role.name == "Admin") {
         setUserId(userRes.id);
       } else if (userRes.role.name == "Student") {
-        console.log("userRes.role.name");
       } else if (userRes.role.name == "Tutor") {
         setUserId(userRes.tutor.id);
       }
     } else {
-      console.log("i should never get here");
     }
 
     return userRes;
@@ -119,7 +117,6 @@ const AuthProvider = ({ children }) => {
 
   const redirectIfLoggedIn = async () => {
     if (token != "") {
-      //console.log(token);
       try {
         const response = await fetch(url + "/api/users/me?populate=*", {
           headers: {

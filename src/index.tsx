@@ -4,9 +4,9 @@ import "./index.css";
 import App from "./App";
 import "./i18n";
 import reportWebVitals from "./reportWebVitals";
-import { useTranslation } from "react-i18next";
+import i18n from './i18n';
 
-const { t } = useTranslation();
+const t = i18n.t;
 // Add accessible label to the root element
 const rootElement = document.getElementById("root") as HTMLElement;
 rootElement.setAttribute("aria-label", t("Application Root"));
@@ -19,6 +19,5 @@ root.render(
 );
 
 // If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
