@@ -10,10 +10,9 @@ import { useTranslation } from "react-i18next";
 import Examiner from "../../classes/Examiner";
 import ExamMode from "../../classes/ExamMode";
 import Institute from "../../classes/Institute";
-import Room from "../../classes/Room";
 import Exam from "../../classes/Exam";
 import Notification, { NotificationType } from "../../classes/Notification";
-import { stat } from "fs";
+import ExaminerDropdown from "../components/ExaminerDropdown";
 
 // Define initial state type to include all properties
 interface InitialState {
@@ -45,10 +44,12 @@ export default function RequestExam() {
   const [date, setDate] = useState<string>("");
   const [duration, setDuration] = useState<number | undefined>();
   const [examiner, setExaminer] = useState<number | string | undefined>();
+  const [examinerEmail, setExaminerEmail] = useState<string>("");
   const [institute, setInstitute] = useState<number | string | undefined>();
   const [mode, setMode] = useState<number | undefined>();
   const [notes, setNotes] = useState<string>(t("Pending"));
   const [studentEmail, setStudentEmail] = useState<string>(user.userEmail || "");
+  const [examiners, setExaminers] = useState<Examiner[]>([]);
 
   // Define initial state with the correct type
   const [initialState, setInitialState] = useState<InitialState>({
@@ -81,6 +82,7 @@ export default function RequestExam() {
           fetch("http://localhost:1337/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
         ]);
+        setExaminers(examinersRes ?? []); // Populate examiners
 
         setOptions({
           examiners: examinersRes ?? [],
@@ -197,9 +199,11 @@ export default function RequestExam() {
         let nuExaminer = new Examiner();
         let firstName = examiner?.substring(0, examiner.indexOf(" ")).trim();
         let lastName = examiner?.substring(examiner.indexOf(" "), examiner.length).trim();
+        let exEmail = examinerEmail ?? "";
 
         nuExaminer.first_name = firstName;
         nuExaminer.last_name = lastName;
+        nuExaminer.email = exEmail;
         data.examiner = nuExaminer;
       }
     }
@@ -261,7 +265,23 @@ export default function RequestExam() {
     list.map((item: any) => ({
       value: item.id,
       label: lastNameField ? `${item[firstNameField]} ${item[lastNameField]}` : item[firstNameField],
+  }));
+  
+  const handleAddExaminer = (newExaminer: Examiner) => {
+    setExaminers((prevExaminers) => [...prevExaminers, newExaminer]);
+    setOptions((prevOptions) => ({
+      ...prevOptions,
+      examiners: [...prevOptions.examiners, newExaminer],
     }));
+    setExaminer(newExaminer.first_name+ " "+newExaminer.last_name);
+    setExaminerEmail(newExaminer.email || "");
+    showToast({ message: t("Examiner added successfully"), type: "success" });
+  };
+
+  const handleSelectExaminer = (examinerId: number) => {
+    setExaminer(examinerId); 
+    //setExaminer(newExaminer.first_name+ " "+newExaminer.last_name);
+  };
 
   if (loading)
     return (
@@ -314,21 +334,15 @@ export default function RequestExam() {
         aria-required="true"
       />
 
-      <DropdownWithSearch
-        tableName="examiners"
-        label={t("Examiner")}
-        options={dropdownOptions(options.examiners, "first_name", "last_name")}
-        value={examiner ?? ""}
-        onChange={(val) => {
-          setExaminer(Number(val));
-        }}
-        placeholder={t("Search examiner...")}
-        disabled={!editMode}
-        submit={submit}
+      <ExaminerDropdown
+        examiners={examiners}
+        onAddExaminer={handleAddExaminer}
+        onSelectExaminer={handleSelectExaminer}
         aria-label={t("Add Exam Examiner")}
         required={true}
         aria-required="true"
       />
+      
       <DropdownWithSearch
         tableName="institutes"
         label={t("Institute")}

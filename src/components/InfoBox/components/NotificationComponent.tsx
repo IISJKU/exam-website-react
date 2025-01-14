@@ -1,12 +1,10 @@
-import { useState, useEffect, useTransition, ReactElement, ReactHTMLElement } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Import useParams and useNavigate
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Import useParams and useNavigate
 import Exam from "../../classes/Exam";
 import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
-import EntryBase from "../../classes/EntryBase";
 import moment from "moment";
 import { useAuth } from "../../../hooks/AuthProvider";
-import { stat } from "fs";
 
 interface NotificationComponentProps {
   sentBy: string;
@@ -37,6 +35,12 @@ export default function NotificationComponent(props: NotificationComponentProps)
   const hasStaticTitle = (title: string): boolean => staticTitles.includes(title);
 
   const getElem = (index: any, type: string): string => {
+    if (type === "examiner" ) {
+      if (index?.first_name && index?.last_name) {
+        return `${index.first_name} ${index.last_name}`;
+      }
+      return t("No examiner assigned");
+    }
     if (index?.id) index = index.id;
 
     if (!type.includes("_id") && !type.includes("exam_mode") && hasStaticTitle(type)) {
@@ -112,13 +116,6 @@ export default function NotificationComponent(props: NotificationComponentProps)
     return str;
   };
 
-  let color = "";
-  if (notifications[0].type == NotificationType.createExam || notifications[0].type == NotificationType.proposeChange)
-    color = " even:bg-red-100 odd:bg-red-200 border border-striped cursor-pointer ";
-
-  if (notifications[0].type == NotificationType.createExam)
-    color = "bg-red-300 even:bg-red-200 <odd:bg-red-3></odd:bg-red-3>00 cursor-pointer border border-white hover:border-black";
-
   calcTabs();
 
   useEffect(() => {
@@ -135,7 +132,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
     <li
       id={"notification" + (props.id?.toString() || "tempID")}
       key={props.id}
-      className={color == "" ? "even:bg-slate-200 odd:bg-slate-100 cursor-pointer border border-white hover:border-black " : color.toString()}
+      className={"even:bg-slate-200 odd:bg-slate-100 cursor-pointer border border-white hover:border-black "}
       onClick={() => toggleInfoPannel()}
       role="button"
       aria-expanded={infoOpen}
@@ -150,7 +147,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
         <p className="inline-block w-60 font-bold">{moment(notifications[0].createdAt).format("DD.MM.YYYY HH:mm") + ""}</p>
         {props.notification[0].type == NotificationType.createExam ? (
           <div className="inline-block " id={"notification" + props.id.toString() + "_div"}>
-            {getName()} ${t("proposed a new Exam")}
+            {getName()} {t("proposed a new Exam")}
             {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) ||
             auth.role == "Tutor" ||
             auth.role == "Student" ? null : (
@@ -225,6 +222,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                         : t("proposed a change")}
                       :
                       {Object.keys(JSON.parse(notification.information)).map((elem: string) => (
+                        (elem === "examiner_id" && JSON.parse(notification.information)[elem] == 0) ? <></> :  
                         <li className="bg-white border border-grey p-1" key={`entry2_${notification.id}`}>
                           {notification.type == NotificationType.createExam || notification.type == NotificationType.createExamOld
                             ? getTitle(JSON.parse(notification.information)[elem], elem) + ": " + getElem(JSON.parse(notification.information)[elem], elem)

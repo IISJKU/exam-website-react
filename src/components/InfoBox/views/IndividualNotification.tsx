@@ -1,9 +1,8 @@
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // Import useParams and useNavigate
 import Exam from "../../classes/Exam";
 import moment from "moment";
 import { showToast } from "../components/ToastMessage";
-import DropdownWithSearch from "../components/DropdownWithSearch";
 import Student from "../../classes/Student";
 import Tutor from "../../classes/Tutor";
 import Examiner from "../../classes/Examiner";
@@ -336,6 +335,34 @@ export default function IndividualNotification() {
       //reset notif, set to passive & apply changes
 
       try {
+        // Check if a new examiner needs to be created
+        if (isNewExaminer(proposedExam.examiner) && !proposedExam.examiner_id) {
+          const { first_name, last_name, email, phone } = proposedExam.examiner;
+
+          const examinerResponse = await fetch("http://localhost:1337/api/examiners", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
+            },
+            body: JSON.stringify({
+              data: {
+                first_name,
+                last_name,
+                email,
+                phone,
+              },
+            }),
+          });
+
+          if (!examinerResponse.ok) {
+            showToast({ message: t("Failed to save new examiner"), type: "error" });
+            return;
+          }
+
+          const savedExaminer = await examinerResponse.json();
+          proposedExam.examiner_id = savedExaminer.id; // Link the new examiner ID
+        }
         if (exam != null && exam.id != undefined) {
           const response = await fetch(`http://localhost:1337/api/exams/${exam.id}`, {
             method: "PUT",
@@ -518,10 +545,24 @@ export default function IndividualNotification() {
     navigate("/admin/notifications");
   };
 
-  if (loading || !exam) {
-    return (
-      <p aria-live="polite" aria-busy="true">{t("Loading exam data...")}</p>
-    );
+   // Update `proposedExam` with new examiner details.
+  const saveUpdatedExaminer = (updatedExaminer: { firstName: string; lastName: string; email: string; phone: string;}) => {
+    const newExaminer = new Examiner();
+    newExaminer.id = proposedExam.examiner_id || 0; // Default ID
+    newExaminer.first_name = updatedExaminer.firstName;
+    newExaminer.last_name = updatedExaminer.lastName;
+    newExaminer.email = updatedExaminer.email;
+    newExaminer.phone = updatedExaminer.phone;
+    newExaminer.exams = []; // Default empty array
+
+    setProposedExam((prev) => ({
+      ...prev,
+      examiner: newExaminer, // Proper instance of Examiner
+    }));
+  };
+
+  function isNewExaminer(obj: number | Examiner): obj is Examiner {
+    return typeof obj === "object" && obj !== null && "first_name" in obj && "last_name" in obj;
   }
 
   const dropdownOptions = (list: any[], firstNameField: string, lastNameField?: string) =>
@@ -530,7 +571,30 @@ export default function IndividualNotification() {
       label: lastNameField
         ? `${item[firstNameField]} ${item[lastNameField]}` // Concatenate first and last name
         : item[firstNameField], // For fields with just one field (like 'name' for institutes or majors)
-    }));
+  }));
+  
+  function doesNameExistInDropdown(obj: Examiner): Examiner | null {
+    const matchingExaminer = options.examiners.find(
+      (examiner) =>
+        examiner.first_name.toLowerCase() === obj.first_name.toLowerCase() &&
+        examiner.last_name.toLowerCase() === obj.last_name.toLowerCase()
+    );
+    return matchingExaminer ?? null; // Return null if undefined
+  }
+
+  function examinerCheck(proposedExam: Exam): string | { first_name: string; last_name: string; email: string; phone: string }{
+    if (isNewExaminer(proposedExam.examiner)) {
+      const matchingExaminer = doesNameExistInDropdown(proposedExam.examiner as Examiner);
+      if (matchingExaminer) {
+        // Return the name of the existing examiner
+        return match(options.examiners, matchingExaminer.id);
+      }
+      // Return the full name of the new examiner
+      return proposedExam.examiner;
+    }
+    // Fallback: Return the name of the examiner by ID if it's not a new examiner
+    return match(options.examiners, proposedExam.examiner_id);
+  }
 
   return (
     <div className="m-5" role="main" aria-labelledby="notification-heading">
@@ -589,7 +653,8 @@ export default function IndividualNotification() {
           label={t("Examiner")}
           options={dropdownOptions(options.examiners, "first_name", "last_name")}
           value={examiner || ""}
-          proposedVal={match(options.examiners, proposedExam.examiner_id)}
+          proposedVal={examinerCheck(proposedExam)}
+          onUpdateExaminer={saveUpdatedExaminer}
           aria-label={t("Examiner comparison")}
         />
 
@@ -630,7 +695,7 @@ export default function IndividualNotification() {
       <div className="mt-4 flex gap-4">
         <button
           onClick={() => handleUpdate(true)}
-          className="border-2 border-black p-2 rounded hover:bg-slate-400"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
           aria-label={t("Accept proposed changes")}
           tabIndex={0}
           onKeyDown={(e) => {
@@ -643,7 +708,7 @@ export default function IndividualNotification() {
         </button>
         <button
           onClick={() => handleUpdate(false)}
-          className="border-2 border-black p-2 rounded hover:bg-slate-400"
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
           aria-label={t("Discard proposed changes")}
           tabIndex={0}
           onKeyDown={(e) => {

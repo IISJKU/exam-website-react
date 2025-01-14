@@ -469,7 +469,6 @@ const resources = {
       "Are you sure you want to log out of your account?": "Bist du sicher dass du dich ausloggen möchtest?",
       "Are you sure you want to remove the exam from the monitoring list?": "Bist du sicher dass du die Prüfung nicht mehr betreuen möchtest?",
       "Request to Monitor": "Betreuung Eintragen",
-      // Danya Added these
       "Email Examiner Needed": "E-Mail des Prüfers erforderlich",
       "Material Needed": "Material benötigt",
       "No Tutor Needed": "Kein Tutor erforderlich",
@@ -855,6 +854,23 @@ const resources = {
       "Login Form": "Anmeldeformular",
       "Server can't be reached": "Server kann nicht erreicht werden",
       "Username or Password don't match.": "Benutzername oder Passwort stimmen nicht überein.",
+      //new
+      "Examiner added successfully": "Prüfer erfolgreich hinzugefügt",
+      "Failed to save new examiner": "Neuer Prüfer konnte nicht gespeichert werden",
+      "Both first and last name are required": "Vor- und Nachname sind erforderlich",
+      "Select an examiner": "Wählen Sie einen Prüfer aus",
+      "Select Examiner": "Prüfer auswählen",
+      "Add New": "Neu hinzufügen",
+      "Add New Examiner": "Neuen Prüfer hinzufügen",
+      "Enter examiner first name": "Geben Sie den Vornamen des Prüfers ein",
+      "Enter examiner last name": "Geben Sie den Nachnamen des Prüfers ein",
+      "Enter examiner email": "Geben Sie die E-Mail-Adresse des Prüfers ein",
+      "Examiner updated successfully": "Prüfer erfolgreich aktualisiert",
+      "New Examiner": "Neuer Prüfer",
+      "Current value": "Aktueller Wert",
+      "Proposed value": "Vorgeschlagener Wert",
+      "No examiner assigned": "Kein Prüfer zugewiesen",
+      "proposed a new Exam": "hat eine neue Prüfung vorgeschlagen"
     },
   },
 };
