@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"; // Import navigate from react-ro
 import fetchAll from "./FetchAll";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 export default function ArchivedExamsView() {
   const { t } = useTranslation();
@@ -41,7 +42,7 @@ export default function ArchivedExamsView() {
   const fetchExams = async () => {
     try {
 
-      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, t("Http error!"))) as Exam[];
+      const data = (await fetchAll(config.strapiUrl +"/api/exams", user.token, t("Http error!"))) as Exam[];
 
       // Modify the data array before setting it to exams
       const updatedData = data.map((exam: any) => {

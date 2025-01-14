@@ -7,6 +7,7 @@ import Exam, { ExamStatus } from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
 import fetchAll from "./FetchAll";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 const localizer = momentLocalizer(moment);
 
@@ -33,7 +34,7 @@ export default function RoomsCalender({ selectedRoomId }: RoomsCalenderProps) {
   // Fetch exams from the API, filtered by selected room
   const fetchExams = async () => {
     try {
-      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, t("Http error!"))) as Exam[];
+      const data = (await fetchAll(config.strapiUrl +"/api/exams", user.token, t("Http error!"))) as Exam[];
        // Filter exams by selected room and exclude those with the archived status
       const filteredExams = selectedRoomId ? data.filter((exam) => exam.room_id === selectedRoomId && exam.status !== ExamStatus.archived)
         : data.filter((exam) => exam.status !== ExamStatus.archived);

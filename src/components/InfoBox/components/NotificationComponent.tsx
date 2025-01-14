@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
 import moment from "moment";
 import { useAuth } from "../../../hooks/AuthProvider";
+import config from "../../../config";
 
 interface NotificationComponentProps {
   sentBy: string;
@@ -82,7 +83,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
           if (elem.seenBy.length == 0) elem.seenBy = auth.user;
           else elem.seenBy = elem.seenBy + " " + auth.user;
 
-          const response = fetch(`http://localhost:1337/api/notifications/${elem.id}`, {
+          const response = fetch(`${config.strapiUrl}/api/notifications/${elem.id}`, {
             method: "PUT",
             headers: {
               Authorization: `Bearer ${auth.token}`,

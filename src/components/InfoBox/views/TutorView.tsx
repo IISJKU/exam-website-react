@@ -5,6 +5,7 @@ import { showToast } from "../components/ToastMessage";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 export default function TutorView() {
   const { t } = useTranslation();
@@ -19,7 +20,7 @@ export default function TutorView() {
   // Fetch data from Strapi API
   const fetchTutors = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/tutors", {
+      const response = await fetch(config.strapiUrl +"/api/tutors", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,

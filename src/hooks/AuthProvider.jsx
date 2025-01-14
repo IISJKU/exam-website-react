@@ -1,8 +1,8 @@
 import { useContext, createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import config from "../config";
 
 const AuthContext = createContext();
-const url = "http://localhost:1337";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(localStorage.getItem("userName") || null);
@@ -14,7 +14,7 @@ const AuthProvider = ({ children }) => {
 
   const userData = async (token2) => {
     if (token2) {
-      const response = await fetch(url + "/api/users/me?populate=*", {
+      const response = await fetch(config.strapiUrl + "/api/users/me?populate=*", {
         headers: {
           Authorization: `Bearer ${token2}`,
         },
@@ -29,7 +29,7 @@ const AuthProvider = ({ children }) => {
   };
 
   const loginAction = async (data) => {
-    const response = await fetch(url + "/api/auth/local?populate=*", {
+    const response = await fetch(config.strapiUrl + "/api/auth/local?populate=*", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -118,7 +118,7 @@ const AuthProvider = ({ children }) => {
   const redirectIfLoggedIn = async () => {
     if (token != "") {
       try {
-        const response = await fetch(url + "/api/users/me?populate=*", {
+        const response = await fetch(config.strapiUrl + "/api/users/me?populate=*", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

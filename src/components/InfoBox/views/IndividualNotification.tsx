@@ -16,6 +16,7 @@ import Notification, { NotificationType } from "../../classes/Notification";
 import ComparisonField from "../components/ComparisonField";
 import fetchAll from "./FetchAll";
 import { sendEmail } from "../../../services/EmailService";
+import config from "../../../config";
 
 export default function IndividualNotification() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -78,7 +79,7 @@ export default function IndividualNotification() {
   useEffect(() => {
     const fetchNotification = async () => {
       try {
-        const response = await fetch(`http://localhost:1337/api/notifications`, {
+        const response = await fetch(`${config.strapiUrl}/api/notifications`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -147,7 +148,7 @@ export default function IndividualNotification() {
           setProposedExam(JSON.parse(proposedExams[0].information) as Exam);
         }
 
-        const examData = (await fetchAll("http://localhost:1337/api/exams", user.token)) as Exam[];
+        const examData = (await fetchAll(config.strapiUrl +"/api/exams", user.token)) as Exam[];
 
         if (examData) {
           let ex = new Exam();
@@ -186,43 +187,43 @@ export default function IndividualNotification() {
     const fetchDropdownOptions = async () => {
       try {
         const [studentsRes, tutorsRes, examinersRes, majorsRes, institutesRes, modesRes, roomsRes] = await Promise.all([
-          fetch("http://localhost:1337/api/students", {
+          fetch(config.strapiUrl +"/api/students", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/tutors", {
+          fetch(config.strapiUrl +"/api/tutors", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/examiners", {
+          fetch(config.strapiUrl +"/api/examiners", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/majors", {
+          fetch(config.strapiUrl +"/api/majors", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/institutes", {
+          fetch(config.strapiUrl +"/api/institutes", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/exam-modes", {
+          fetch(config.strapiUrl +"/api/exam-modes", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/rooms", {
+          fetch(config.strapiUrl +"/api/rooms", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -270,7 +271,7 @@ export default function IndividualNotification() {
     notif.type = NotificationType.confirmChange;
     if (!accept) notif.type = NotificationType.discardChange;
 
-    const notify = await fetch(`http://localhost:1337/api/notifications`, {
+    const notify = await fetch(`${config.strapiUrl}/api/notifications`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -339,7 +340,7 @@ export default function IndividualNotification() {
         if (isNewExaminer(proposedExam.examiner) && !proposedExam.examiner_id) {
           const { first_name, last_name, email, phone } = proposedExam.examiner;
 
-          const examinerResponse = await fetch("http://localhost:1337/api/examiners", {
+          const examinerResponse = await fetch(config.strapiUrl +"/api/examiners", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -364,7 +365,7 @@ export default function IndividualNotification() {
           proposedExam.examiner_id = savedExaminer.id; // Link the new examiner ID
         }
         if (exam != null && exam.id != undefined) {
-          const response = await fetch(`http://localhost:1337/api/exams/${exam.id}`, {
+          const response = await fetch(`${config.strapiUrl}/api/exams/${exam.id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -409,7 +410,7 @@ export default function IndividualNotification() {
         } else {
           fixProposedExam();
 
-          const response = await fetch(`http://localhost:1337/api/exams/`, {
+          const response = await fetch(`${config.strapiUrl}/api/exams/`, {
             method: "POST",
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -418,7 +419,7 @@ export default function IndividualNotification() {
             body: JSON.stringify({ data: proposedExam }),
           });
 
-          const examResponse = await fetch(`http://localhost:1337/api/exams/?sort[0]=id:desc&pagination[start]=0&pagination[limit]=25`, {
+          const examResponse = await fetch(`${config.strapiUrl}/api/exams/?sort[0]=id:desc&pagination[start]=0&pagination[limit]=25`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -450,7 +451,7 @@ export default function IndividualNotification() {
               newNotif.exam_id = newExam.id;
 
               newNotif.type = NotificationType.createExamOld;
-              const notif = await fetch(`http://localhost:1337/api/notifications/${newNotif.id}`, {
+              const notif = await fetch(`${config.strapiUrl}/api/notifications/${newNotif.id}`, {
                 method: "PUT",
                 headers: {
                   Authorization: `Bearer ${user.token}`,
@@ -490,7 +491,7 @@ export default function IndividualNotification() {
       const availableExam = (proposedExam.title == undefined) ? exam : proposedExam;
       //set notif to passive, discard changes
       if (notification && (exam == null || exam.id == undefined || exam.id == 0)) {
-        const notif = await fetch(`http://localhost:1337/api/notifications/${notification.id}`, {
+        const notif = await fetch(`${config.strapiUrl}/api/notifications/${notification.id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${user.token}`,

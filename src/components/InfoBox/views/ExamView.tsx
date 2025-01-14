@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"; // Import navigate from react-ro
 import fetchAll from "./FetchAll";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 export default function ExamView() {
   const navigate = useNavigate(); // Initialize navigate
@@ -42,7 +43,7 @@ export default function ExamView() {
     try {
       //let data = [];
 
-      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, t("Http error!"))) as Exam[];
+      const data = (await fetchAll(config.strapiUrl +"/api/exams", user.token, t("Http error!"))) as Exam[];
 
       // Filter out exams with the archived status
       const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);

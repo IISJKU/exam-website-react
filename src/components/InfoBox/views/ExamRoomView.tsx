@@ -10,6 +10,7 @@ import RoomsCalender from "./RoomsCalender";
 import fetchAll from "./FetchAll";
 import Notification from "../../classes/Notification";
 import { NotificationType } from "../../classes/Notification";
+import config from "../../../config";
 
 export default function RoomManagement() {
   const user = useAuth();
@@ -31,10 +32,10 @@ export default function RoomManagement() {
   const fetchData = async (type: "exams" | "rooms", setData: Function) => {
     try {
       if (type === "exams") {
-        const data = (await fetchAll(`http://localhost:1337/api/${type}`, user.token, `${t("Failed to fetch")} ${type}`)) as Exam[];
+        const data = (await fetchAll(`${config.strapiUrl}/api/${type}`, user.token, `${t("Failed to fetch")} ${type}`)) as Exam[];
         setData(data.filter((exam: Exam) => !exam.room)); // Filter exams without rooms
       } else {
-        const data = (await fetchAll(`http://localhost:1337/api/${type}`, user.token, `${t("Failed to fetch")} ${type}`)) as Room[];
+        const data = (await fetchAll(`${config.strapiUrl}/api/${type}`, user.token, `${t("Failed to fetch")} ${type}`)) as Room[];
         setData(data.filter((room: Room) => room.isAvailable));
       }
     } catch (error) {
@@ -44,7 +45,7 @@ export default function RoomManagement() {
 
   // Fetch exams
   const fetchAllExams = async () => {
-    const response = await fetch("http://localhost:1337/api/exams", {
+    const response = await fetch(config.strapiUrl +"/api/exams", {
       headers: { Authorization: `Bearer ${user.token}` },
     });
     const data = await response.json();
@@ -77,7 +78,7 @@ export default function RoomManagement() {
       let notif = new Notification('{"room_id":' + exam.room_id + "}", "{}", user.user, examId);
       notif.type = NotificationType.adminChange;
 
-      const notify = await fetch(`http://localhost:1337/api/notifications`, {
+      const notify = await fetch(`${config.strapiUrl}/api/notifications`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,7 +88,7 @@ export default function RoomManagement() {
       });
 
       // Update the exam with the selected room ID
-      const examUpdateResponse = await fetch(`http://localhost:1337/api/exams/${examId}`, {
+      const examUpdateResponse = await fetch(`${config.strapiUrl}/api/exams/${examId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -6,6 +6,7 @@ import Exam, { ExamStatus } from "../../classes/Exam";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 export default function TutorRegisteredExams() {
   const { t } = useTranslation();
@@ -43,7 +44,7 @@ export default function TutorRegisteredExams() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/exams/find-registered", {
+      const response = await fetch(config.strapiUrl +"/api/exams/find-registered", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -112,7 +113,7 @@ export default function TutorRegisteredExams() {
   }
 
   const handleRemove = async () => {
-    const response = await fetch("http://localhost:1337/api/exams/deregister-tutor", {
+    const response = await fetch(config.strapiUrl +"/api/exams/deregister-tutor", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

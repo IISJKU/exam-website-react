@@ -13,6 +13,7 @@ import Institute from "../../classes/Institute";
 import Exam from "../../classes/Exam";
 import Notification, { NotificationType } from "../../classes/Notification";
 import ExaminerDropdown from "../components/ExaminerDropdown";
+import config from "../../../config";
 
 // Define initial state type to include all properties
 interface InitialState {
@@ -76,11 +77,11 @@ export default function RequestExam() {
     const fetchDropdownOptions = async () => {
       try {
         const [examinersRes, studentRes, institutesRes, modesRes] = await Promise.all([
-          fetch("http://localhost:1337/api/examiners", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/institutes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch(config.strapiUrl +"/api/examiners", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch(config.strapiUrl +"/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch(config.strapiUrl +"/api/institutes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch(config.strapiUrl +"/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch(config.strapiUrl +"/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
         ]);
         setExaminers(examinersRes ?? []); // Populate examiners
 
@@ -220,7 +221,7 @@ export default function RequestExam() {
       notif.type = NotificationType.createExam;
 
       if (addedEx != "") {
-        const notify = await fetch(`http://localhost:1337/api/notifications`, {
+        const notify = await fetch(`${config.strapiUrl}/api/notifications`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

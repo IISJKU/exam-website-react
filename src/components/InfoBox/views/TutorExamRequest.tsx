@@ -6,6 +6,7 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
 import Exam from "../../classes/Exam";
+import config from "../../../config";
 
 export default function TutorExamRequest() {
   const { id } = useParams();
@@ -21,7 +22,7 @@ export default function TutorExamRequest() {
   useEffect(() => {
     const fetchExam = async () => {
       try {
-        const examResponse = await fetch(`http://localhost:1337/api/exams/${id}`, {
+        const examResponse = await fetch(`${config.strapiUrl}/api/exams/${id}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -48,7 +49,7 @@ export default function TutorExamRequest() {
   // Handle tutor request to monitor the exam
   const handleRequest = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/exams/add-tutor", {
+      const response = await fetch(config.strapiUrl +"/api/exams/add-tutor", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -66,7 +67,7 @@ export default function TutorExamRequest() {
           let notif = new Notification("", JSON.stringify(originalExam), user.user, originalExam.id);
           notif.type = NotificationType.tutorConfirm;
         
-          const notify = await fetch(`http://localhost:1337/api/notifications`, {
+          const notify = await fetch(`${config.strapiUrl}/api/notifications`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

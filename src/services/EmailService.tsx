@@ -1,4 +1,5 @@
 import { showToast } from "../components/InfoBox/components/ToastMessage";
+import config from "../config";
 
 interface SendEmailParams {
   to: string; // Recipient email
@@ -14,7 +15,7 @@ export const sendEmail = async (params: SendEmailParams): Promise<void> => {
   if (to == "") return;
 
   try {
-    const response = await fetch("http://localhost:1337/api/send-email", {
+    const response = await fetch(config.strapiUrl +"/api/send-email", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

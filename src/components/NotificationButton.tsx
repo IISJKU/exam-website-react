@@ -6,6 +6,7 @@ import { useAuth } from "../hooks/AuthProvider";
 import Notification from "./classes/Notification";
 import { showToast } from "./InfoBox/components/ToastMessage";
 import fetchAll from "./InfoBox/views/FetchAll";
+import config from "../config";
 
 interface NButtonProps {
   path: string;
@@ -18,9 +19,9 @@ export default function NotificationButton(props: NButtonProps) {
   const user = useAuth();
   const [notifications, setNotifications] = useState<Notification[] | null>(null);
 
-  let path = "http://localhost:1337/api/notifications";
+  let path = config.strapiUrl +"/api/notifications";
 
-  if (user.role != "Admin") path = "http://localhost:1337/api/notifications/me";
+  if (user.role != "Admin") path = config.strapiUrl +"/api/notifications/me";
 
   const fetchNotifications = async () => {
     try {

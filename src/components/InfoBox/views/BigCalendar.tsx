@@ -8,6 +8,7 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import fetchAll from "./FetchAll";
 import { t } from "i18next";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 const localizer = momentLocalizer(moment);
 
@@ -42,7 +43,7 @@ export default function BigCalendar() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const data = (await fetchAll("http://localhost:1337/api/exams", user.token, t("Http error!"))) as Exam[];
+      const data = (await fetchAll(config.strapiUrl +"/api/exams", user.token, t("Http error!"))) as Exam[];
       // Filter out exams with the status not "archived"
       const filteredExams = data.filter((exam) => exam.status !== ExamStatus.archived);
       setExams(filteredExams);

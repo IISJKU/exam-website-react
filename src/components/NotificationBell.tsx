@@ -7,6 +7,7 @@ import Notification, { NotificationType } from "./classes/Notification";
 import useInterval from "../hooks/UseInterval";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import config from "../config";
 
 export default function NotificationBell() {
   const { t } = useTranslation();
@@ -20,14 +21,14 @@ export default function NotificationBell() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/notifications", {
+      const response = await fetch(config.strapiUrl +"/api/notifications", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
       const data = await response.json();
 
-      const exResponse = await fetch("http://localhost:1337/api/exams", {
+      const exResponse = await fetch(config.strapiUrl +"/api/exams", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },

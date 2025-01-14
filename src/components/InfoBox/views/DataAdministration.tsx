@@ -5,6 +5,7 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import fetchAll from "./FetchAll";
 import {formatDateTime } from "./ContentView";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 interface DataAdministrationProps {
   tableName: string;
@@ -47,7 +48,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
       const query = filteredFields.length ? filteredFields.map((field, index) => `fields[${index}]=${field}`).join("&") : "";
       const populateQuery = props.populateFields?.length ? `&populate=${props.populateFields.map((field) => field.name).join(",")}` : "";
 
-      const result = await fetchAll(`http://localhost:1337/api/${props.tableName}?${query}${populateQuery}`, user.token, t("HTTP error!"));
+      const result = await fetchAll(`${config.strapiUrl}/api/${props.tableName}?${query}${populateQuery}`, user.token, t("HTTP error!"));
 
       if (result && Array.isArray(result)) {
         const fetchedData = result.map((item: any) => {
@@ -98,7 +99,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
   // Fetch relational data for dropdowns
   const fetchRelationalData = async () => {
     const relationalPromises = props.populateFields?.map(async (field) => {
-      const result = await fetchAll(`http://localhost:1337/api/${field.populateTable}`, user.token, t(`HTTP error!`));
+      const result = await fetchAll(`${config.strapiUrl}/api/${field.populateTable}`, user.token, t(`HTTP error!`));
 
       const records =
         Array.isArray(result) && result.length > 0 && Array.isArray(result[result.length - 1]?.roles)
@@ -150,7 +151,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
     try {
       // fix user add issue
       const bodyContent = props.tableName == "users" ? record : { data: record };
-      const response = await fetch(`http://localhost:1337/api/${props.tableName}`, {
+      const response = await fetch(`${config.strapiUrl}/api/${props.tableName}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -172,7 +173,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
     try {
       // fix user roles update issue
       const bodyContent = props.tableName == "users" ? record : { data: record };
-      const response = await fetch(`http://localhost:1337/api/${props.tableName}/${record.id}`, {
+      const response = await fetch(`${config.strapiUrl}/api/${props.tableName}/${record.id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -193,7 +194,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
   const deleteRecord = async (id: number) => {
     if (!id) return;
     try {
-      const response = await fetch(`http://localhost:1337/api/${props.tableName}/${id}`, {
+      const response = await fetch(`${config.strapiUrl}/api/${props.tableName}/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${user.token}`,

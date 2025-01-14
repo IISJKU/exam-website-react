@@ -6,6 +6,7 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
 import Exam from "../../classes/Exam";
+import config from "../../../config";
 
 export default function RemoveTutor() {
   const { id } = useParams();
@@ -22,7 +23,7 @@ export default function RemoveTutor() {
   useEffect(() => {
     const fetchExam = async () => {
       try {
-        const examResponse = await fetch(`http://localhost:1337/api/exams/${id}`, {
+        const examResponse = await fetch(`${config.strapiUrl}/api/exams/${id}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -75,7 +76,7 @@ export default function RemoveTutor() {
   // Handle tutor request to monitor the exam
   const handleRemove = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/exams/deregister-tutor", {
+      const response = await fetch(config.strapiUrl +"/api/exams/deregister-tutor", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +95,7 @@ export default function RemoveTutor() {
           let notif = new Notification(change, JSON.stringify(originalExam), user.user, exam.id);
           notif.type = NotificationType.tutorDecline;
 
-          const notify = await fetch(`http://localhost:1337/api/notifications`, {
+          const notify = await fetch(`${config.strapiUrl}/api/notifications`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

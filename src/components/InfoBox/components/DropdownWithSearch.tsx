@@ -78,36 +78,6 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
     let newRec = newRecord();
     setIsDropdownOpen(false);
     handleSelectOption(newRec);
-    /*
-    if (newRec != "") {
-      // Function to handle adding a new record to the database
-      try {
-        const response = await fetch(`http://localhost:1337/api/notifications`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-          //body: JSON.stringify({ label: searchTerm, value: searchTerm }), // Adjust payload as necessary
-          body: JSON.stringify({ data: new Notification("{}", "{" + props.label + ":" + newRec + "}", user.user) }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to add new record");
-        }
-
-        const newRecord = await response.json();
-
-        showToast({ message: `New record added: ` + newRec, type: "info" });
-
-        // Add the new option to the dropdown list
-        props.onChange(searchTerm); // Set the new record as the selected value
-        //setSearchTerm(""); // Clear the search input
-        setIsDropdownOpen(false); // Close dropdown
-      } catch (error) {
-        showToast({ message: `Error while adding new notification`, type: "error" });
-      }
-    } */
   };
 
   // Get the label of the currently selected value (if any)

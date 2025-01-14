@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import Exam, { ExamStatus } from "./classes/Exam";
 import fetchAll from "./InfoBox/views/FetchAll";
 import { useAuth } from "../hooks/AuthProvider";
+import config from "../config";
 
 export default function Calendar() {
   const { t } = useTranslation();
@@ -19,8 +20,8 @@ export default function Calendar() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      let link = "http://localhost:1337/api/exams";
-      if (user.role == "Student" || user.role == "Tutor") link = "http://localhost:1337/api/exams/me";
+      let link = config.strapiUrl +"/api/exams";
+      if (user.role == "Student" || user.role == "Tutor") link = config.strapiUrl +"/api/exams/me";
 
       const data = (await fetchAll(link, user.token)) as Exam[];
       const filteredExams = data.filter((exam) => exam.status !== ExamStatus.archived);

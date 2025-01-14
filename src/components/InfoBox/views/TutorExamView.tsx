@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import navigate from react-router-dom
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 export default function TutorExamView() {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ export default function TutorExamView() {
   // Fetch data from Strapi API
   const fetchTutorExams = async (tutorId: number) => {
     try {
-      const response = await fetch(`http://localhost:1337/api/exams/me`, {
+      const response = await fetch(`${config.strapiUrl}/api/exams/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,

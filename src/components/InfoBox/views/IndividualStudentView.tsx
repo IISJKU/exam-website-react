@@ -7,6 +7,7 @@ import Major from "../../classes/Major";
 import DropdownWithSearch from "../components/DropdownWithSearch";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 export default function IndividualStudent() {
   const { t } = useTranslation();
@@ -33,7 +34,7 @@ export default function IndividualStudent() {
     // Fetch student data based on ID from URL
     const fetchStudent = async () => {
       try {
-        const studentResponse = await fetch(`http://localhost:1337/api/students/${id}`, {
+        const studentResponse = await fetch(`${config.strapiUrl}/api/students/${id}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -60,7 +61,7 @@ export default function IndividualStudent() {
     // Fetch majors data for the dropdown
     const fetchMajors = async () => {
       try {
-        const response = await fetch("http://localhost:1337/api/majors", {
+        const response = await fetch(config.strapiUrl +"/api/majors", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -94,7 +95,7 @@ export default function IndividualStudent() {
     };
 
     try {
-      const response = await fetch(`http://localhost:1337/api/students/${id}`, {
+      const response = await fetch(`${config.strapiUrl}/api/students/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${user.token}`,

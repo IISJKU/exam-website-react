@@ -20,6 +20,7 @@ import DropdownWithSearchMultiple from "../components/DropdownWithSearchMultiple
 import { sendEmail } from "../../../services/EmailService";
 import { generateRow, match } from "./IndividualNotification";
 import StatusSelector from "../components/StatusSelector";
+import config from "../../../config";
 
 export default function ExamEditor() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -75,9 +76,9 @@ export default function ExamEditor() {
       try {
         let path = ``;
         if (user.role == "Admin" || user.role == "Tutor") {
-          path = `http://localhost:1337/api/exams/${id}`;
+          path = `${config.strapiUrl}/api/exams/${id}`;
         } else if (user.role == "Student") {
-          path = `http://localhost:1337/api/exams/me`;
+          path = `${config.strapiUrl}/api/exams/me`;
         }
         const examResponse = await fetch(path, {
           method: "GET",
@@ -134,44 +135,44 @@ export default function ExamEditor() {
     const fetchDropdownOptions = async () => {
       try {
         const [studentsRes, tutorsRes, examinersRes, majorsRes, institutesRes, modesRes, roomsRes] = await Promise.all([
-          fetch("http://localhost:1337/api/students", {
+          fetch(config.strapiUrl +"/api/students", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
           user.role == "Admin" &&
-            fetch("http://localhost:1337/api/tutors", {
+            fetch(config.strapiUrl +"/api/tutors", {
               method: "GET",
               headers: {
                 Authorization: `Bearer ${user.token}`,
               },
             }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/examiners", {
+          fetch(config.strapiUrl +"/api/examiners", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/majors", {
+          fetch(config.strapiUrl +"/api/majors", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/institutes", {
+          fetch(config.strapiUrl +"/api/institutes", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/exam-modes", {
+          fetch(config.strapiUrl +"/api/exam-modes", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch("http://localhost:1337/api/rooms", {
+          fetch(config.strapiUrl +"/api/rooms", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -197,7 +198,7 @@ export default function ExamEditor() {
 
     // Fetch exams
     const fetchAllExams = async () => {
-      const response = await fetch("http://localhost:1337/api/exams", {
+      const response = await fetch(config.strapiUrl +"/api/exams", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
@@ -296,7 +297,7 @@ export default function ExamEditor() {
 
     try {
       if (user.role == "Admin") {
-        const response = await fetch(`http://localhost:1337/api/exams/${id}`, {
+        const response = await fetch(`${config.strapiUrl}/api/exams/${id}`, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -370,7 +371,7 @@ export default function ExamEditor() {
         if (user.role == "Admin") notif.type = NotificationType.adminChange;
         else notif.type = NotificationType.proposeChange;
 
-        const notify = await fetch(`http://localhost:1337/api/notifications`, {
+        const notify = await fetch(`${config.strapiUrl}/api/notifications`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${user.token}`,

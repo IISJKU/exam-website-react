@@ -5,6 +5,7 @@ import ContentView from "./ContentView";
 import Exam from "../../classes/Exam";
 import { showToast } from "../components/ToastMessage";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 export default function StudentExamView() {
   const navigate = useNavigate(); 
@@ -40,7 +41,7 @@ export default function StudentExamView() {
   // Fetch data from Strapi API
   const fetchStudentExams = async (studentId: number) => {
     try {
-      const response = await fetch(`http://localhost:1337/api/exams/me`, {
+      const response = await fetch(`${config.strapiUrl}/api/exams/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,

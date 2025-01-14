@@ -18,6 +18,7 @@ import { showToast } from "../components/ToastMessage";
 import { useParams } from "react-router-dom";
 import fetchAll from "./FetchAll";
 import NotificationCategory from "../components/NotificationCategory";
+import config from "../../../config";
 
 export default function NotificationView() {
   const user = useAuth();
@@ -35,18 +36,18 @@ export default function NotificationView() {
 
   const studentId = user.userId;
 
-  let notificationRoute = "http://localhost:1337/api/notifications";
-  let examRoute = "http://localhost:1337/api/exams";
-  let tutRoute = "http://localhost:1337/api/tutors";
-  let studentRoute = "http://localhost:1337/api/students";
+  let notificationRoute = config.strapiUrl +"/api/notifications";
+  let examRoute = config.strapiUrl +"/api/exams";
+  let tutRoute = config.strapiUrl +"/api/tutors";
+  let studentRoute = config.strapiUrl +"/api/students";
 
   if (user.role == "Student") {
-    notificationRoute = `http://localhost:1337/api/notifications/me`;
-    examRoute = `http://localhost:1337/api/exams/me`;
-    tutRoute = `http://localhost:1337/api/tutors/me`;
-    studentRoute = "http://localhost:1337/api/students/me";
+    notificationRoute = `${config.strapiUrl}/api/notifications/me`;
+    examRoute = `${config.strapiUrl}/api/exams/me`;
+    tutRoute = `${config.strapiUrl}/api/tutors/me`;
+    studentRoute = config.strapiUrl +"/api/students/me";
   } else if (user.role == "Tutor") {
-    notificationRoute = `http://localhost:1337/api/notifications/me`;
+    notificationRoute = `${config.strapiUrl}/api/notifications/me`;
   }
 
   const [options, setOptions] = useState({
@@ -119,8 +120,8 @@ export default function NotificationView() {
       //let data = await response.json(); //should probably rewrite api response, instead of changing stuff here
       let data = (await fetchAll(notificationRoute, user.token)) as any;
 
-      let examsLink = "http://localhost:1337/api/exams";
-      if (user.role == "Student") examsLink = "http://localhost:1337/api/exams/me";
+      let examsLink = config.strapiUrl +"/api/exams";
+      if (user.role == "Student") examsLink = config.strapiUrl +"/api/exams/me";
 
       const examData = (await fetchAll(examsLink, user.token)) as Exam[];
 
@@ -225,31 +226,31 @@ export default function NotificationView() {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch("http://localhost:1337/api/examiners", {
+        fetch(config.strapiUrl +"/api/examiners", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch("http://localhost:1337/api/majors", {
+        fetch(config.strapiUrl +"/api/majors", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch("http://localhost:1337/api/institutes", {
+        fetch(config.strapiUrl +"/api/institutes", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch("http://localhost:1337/api/exam-modes", {
+        fetch(config.strapiUrl +"/api/exam-modes", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch("http://localhost:1337/api/rooms", {
+        fetch(config.strapiUrl +"/api/rooms", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,

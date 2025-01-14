@@ -5,6 +5,7 @@ import { showToast } from "../components/ToastMessage";
 import Tutor from "../../classes/Tutor";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 export default function IndividualTutor() {
   const { t } = useTranslation();
@@ -25,7 +26,7 @@ export default function IndividualTutor() {
   useEffect(() => {
     const fetchTutor = async () => {
       try {
-        const response = await fetch(`http://localhost:1337/api/tutors/${id}`, {
+        const response = await fetch(`${config.strapiUrl}/api/tutors/${id}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -65,7 +66,7 @@ export default function IndividualTutor() {
     };
 
     try {
-      const response = await fetch(`http://localhost:1337/api/tutors/${id}`, {
+      const response = await fetch(`${config.strapiUrl}/api/tutors/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${user.token}`,

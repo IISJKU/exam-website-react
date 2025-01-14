@@ -6,6 +6,7 @@ import { showToast } from "../components/ToastMessage";
 import Exam from "../../classes/Exam";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
+import config from "../../../config";
 
 const localizer = momentLocalizer(moment);
 
@@ -40,7 +41,7 @@ export default function TutorBigCalender() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch(`http://localhost:1337/api/exams/me`, {
+      const response = await fetch(`${config.strapiUrl}/api/exams/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,
