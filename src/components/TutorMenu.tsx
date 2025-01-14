@@ -32,7 +32,7 @@ export default function TutorMenu() {
         onClick={() => navigate("tutor/registered-exams")}
         className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline"
         aria-current={location.pathname === "tutor/registered-exams" ? "page" : undefined}
-        aria-label={t("Go to Upcoming tutor/Registered Exams")}
+        aria-label={t("Go to Upcoming/Registered Exams")}
       >
         {t("Registered Exams")}
       </button>

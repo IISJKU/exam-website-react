@@ -31,7 +31,15 @@ export default function EditField(props: EditFieldProps) {
 
   if (props.hideTitle !== undefined) hide = props.hideTitle;
 
-  if ((props.title === "First Name" || props.title === "Last Name" || props.title === "Exam Title") && !props.editMode) {
+  if (
+    (props.title === "First Name" ||
+      props.title === "Last Name" ||
+      props.title === "Exam Title" ||
+      props.title === "Vorname" ||
+      props.title === "Nachname" ||
+      props.title === "Prüfungstitel") &&
+    !props.editMode
+  ) {
     classList = "relative inline-block pr-2 text-3xl";
   }
 
