@@ -860,7 +860,7 @@ const resources = {
       "Both first and last name are required": "Vor- und Nachname sind erforderlich",
       "Select an examiner": "Wählen Sie einen Prüfer aus",
       "Select Examiner": "Prüfer auswählen",
-      "Add New": "Neu hinzufügen",
+      "Add New": "Neuen Eintrag hinzufügen",
       "Add New Examiner": "Neuen Prüfer hinzufügen",
       "Enter examiner first name": "Geben Sie den Vornamen des Prüfers ein",
       "Enter examiner last name": "Geben Sie den Nachnamen des Prüfers ein",
@@ -870,7 +870,7 @@ const resources = {
       "Current value": "Aktueller Wert",
       "Proposed value": "Vorgeschlagener Wert",
       "No examiner assigned": "Kein Prüfer zugewiesen",
-      "proposed a new Exam": "hat eine neue Prüfung vorgeschlagen"
+      "proposed a new Exam": "hat eine neue Prüfung vorgeschlagen",
     },
   },
 };
