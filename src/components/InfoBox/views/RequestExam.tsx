@@ -26,7 +26,6 @@ interface InitialState {
   examiner?: number | string;
   institute?: number | string;
   mode?: number;
-  notes: string;
   studentEmail: string;
 }
 
@@ -48,7 +47,6 @@ export default function RequestExam() {
   const [examinerEmail, setExaminerEmail] = useState<string>("");
   const [institute, setInstitute] = useState<number | string | undefined>();
   const [mode, setMode] = useState<number | undefined>();
-  const [notes, setNotes] = useState<string>(t("Pending"));
   const [studentEmail, setStudentEmail] = useState<string>(user.userEmail || "");
   const [examiners, setExaminers] = useState<Examiner[]>([]);
 
@@ -63,7 +61,6 @@ export default function RequestExam() {
     examiner: undefined,
     institute: undefined,
     mode: undefined,
-    notes: t("Pending"),
     studentEmail: user.userEmail,
   });
 
@@ -103,7 +100,6 @@ export default function RequestExam() {
           examiner,
           institute,
           mode,
-          notes,
           studentEmail,
         });
       } catch (error) {
@@ -137,7 +133,6 @@ export default function RequestExam() {
     t = t + ' "lva_num" : "' + lva_num + '",';
     t = t + ' "date" : "' + date + '",';
     t = t + ' "duration" : "' + duration + '",';
-    t = t + ' "notes" : "' + notes + '",';
 
     t = t + ' "student_id" : "' + student + '",';
     t = t + ' "examiner_id" : "' + examiner + '",';
@@ -189,7 +184,6 @@ export default function RequestExam() {
       institute_id: 0,
       exam_mode: mode,
       lva_num,
-      notes,
       student_email: studentEmail,
     };
 
@@ -257,7 +251,6 @@ export default function RequestExam() {
     setExaminer(initialState.examiner);
     setInstitute(initialState.institute);
     setMode(initialState.mode);
-    setNotes(initialState.notes);
 
     navigate("/student/all-exams");
   };
@@ -368,16 +361,6 @@ export default function RequestExam() {
         submit={submit}
         aria-label={t("Add Exam Mode")}
         required={true}
-        aria-required="true"
-      />
-
-      <EditField
-        title={t("Notes")}
-        editMode={editMode}
-        text={notes}
-        hideTitle={false}
-        onChange={(e) => setNotes("Pending")}
-        aria-label={t("Add Exam Notes")}
         aria-required="true"
       />
 

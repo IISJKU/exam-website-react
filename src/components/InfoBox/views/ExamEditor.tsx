@@ -768,15 +768,6 @@ export default function ExamEditor() {
           aria-required="true"
         />
 
-        <EditField
-          title={t("Notes")}
-          editMode={editMode}
-          text={notes}
-          hideTitle={false}
-          onChange={(e) => setNotes("Pending")}
-          aria-label={t("Exam Notes")}
-        />
-
         <div className="mt-4 flex space-x-2">
           <button
             onClick={() => navigate(-1)}
