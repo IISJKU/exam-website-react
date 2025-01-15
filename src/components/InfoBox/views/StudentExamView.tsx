@@ -20,11 +20,11 @@ export default function StudentExamView() {
   // Determine fields and keys dynamically based on screen size
   const fields = isMobileView
     ? [t("Exam Title"), t("Date/Time")]
-    : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Examiner"), t("Institute"), t("Notes")];
+    : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Examiner"), t("Institute")];
 
   const keys: (keyof Exam)[] = isMobileView
     ? ["title", "date"] // Shortened keys for mobile
-    : ["title", "lva_num", "date", "duration", "exam_mode", "examiner", "institute", "notes"];
+    : ["title", "lva_num", "date", "duration", "exam_mode", "examiner", "institute"];
 
   // Update `isMobileView` based on window width
   useEffect(() => {
