@@ -274,7 +274,6 @@ export default function RequestExam() {
 
   const handleSelectExaminer = (examinerId: number) => {
     setExaminer(examinerId); 
-    //setExaminer(newExaminer.first_name+ " "+newExaminer.last_name);
   };
 
   if (loading)

@@ -100,24 +100,30 @@ export default function ComparisonField(props: ComparisonField) {
                 )}
               </>
               ) : (
-                <div className="p-4 border border-gray-300 bg-gray-50">
+                  <form className="p-4 border border-gray-300 bg-gray-50"
+                  aria-labelledby="add-examiner-form"
+                  onSubmit={handleSaveChanges}>
                   <EditField
                     title={t("First Name")}
                     editMode={true}
                     text={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
+                    required={true}
                   />
                   <EditField
                     title={t("Last Name")}
                     editMode={true}
                     text={lastName}
                     onChange={(e) => setLastName(e.target.value)}
+                    required={true}
                   />
                   <EditField
                     title={t("Email")}
+                    type="email"
                     editMode={true}
                     text={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required={true}
                   />
                   <EditField
                     title={t("Phone")}
@@ -126,12 +132,12 @@ export default function ComparisonField(props: ComparisonField) {
                     onChange={(e) => setPhone(e.target.value)}
                   />
                   <button
+                    type="submit"
                     className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
-                    onClick={handleSaveChanges}
                   >
                     {t("Save")}
                   </button>
-                </div>
+                </form>
               )}
             </div>
           </>

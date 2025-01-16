@@ -27,7 +27,7 @@ export default function ExaminerDropdown(props: ExaminerDropdownProps) {
     }
 
     const newExaminer = new Examiner(); // Create a new instance of the Examiner class
-    newExaminer.id = dropdownExaminers.length + 1; // Assign a unique ID
+    newExaminer.id = dropdownExaminers.length + 2; // Assign a unique ID
     newExaminer.first_name = firstName;
     newExaminer.last_name = lastName;
     newExaminer.email = email;
@@ -85,9 +85,10 @@ export default function ExaminerDropdown(props: ExaminerDropdownProps) {
       </button>
 
       {showAddForm && (
-        <div
+        <form
           className="mt-4 p-4 border border-gray-300 shadow-lg rounded-lg bg-gray-50"
           aria-labelledby="add-examiner-form"
+          onSubmit={handleAddExaminer}
         >
           <h4 id="add-examiner-form" className="mb-4 font-bold text-lg">
             {t("Add New Examiner")}
@@ -110,6 +111,7 @@ export default function ExaminerDropdown(props: ExaminerDropdownProps) {
           />        
           <EditField
             title={t("Email")}
+            type="email"
             editMode={true}
             text={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -117,14 +119,13 @@ export default function ExaminerDropdown(props: ExaminerDropdownProps) {
             required={true}
           />
           <button
-            type="button"
+            type="submit"
             className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none"
-            onClick={handleAddExaminer}
           >
             {t("Save")}
           </button>
             
-        </div>
+        </form>
         )}
     </div>
   );

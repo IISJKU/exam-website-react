@@ -5,6 +5,7 @@ interface EditFieldProps {
   editMode: boolean;
   text: string | number;
   title?: string;
+  type?: string;
   hideTitle?: boolean;
   onChange?: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   required?: boolean;
@@ -71,7 +72,7 @@ export default function EditField(props: EditFieldProps) {
               id={`edit-field-${props.title?.replace(/\s+/g, "-").toLowerCase()}`}
               onChange={handleChange}
               className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
-              type="text"
+              type={(props.type || "text")}
               value={value}
               aria-label={t(props.title || "Field")}
               required={props.required}

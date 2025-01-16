@@ -79,7 +79,7 @@ export default function DropdownWithSearchMultiple(props: DropdownWithSearchMult
   };
 
   const isChecked = (elem: Tutor): boolean => {
-    if (props.options && elem.first_name + " " + elem.last_name == props.options[Number(props.value) - 1].label) {
+    if (props.value != "" && props.options && elem.first_name + " " + elem.last_name == props.options[Number(props.value) - 1].label) {
       return true;
     }
 

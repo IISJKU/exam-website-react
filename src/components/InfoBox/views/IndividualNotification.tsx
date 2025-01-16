@@ -362,7 +362,8 @@ export default function IndividualNotification() {
           }
 
           const savedExaminer = await examinerResponse.json();
-          proposedExam.examiner_id = savedExaminer.id; // Link the new examiner ID
+          proposedExam.examiner_id = savedExaminer.data.id; // Link the new examiner ID
+          setExaminer(savedExaminer.data.id);
         }
         if (exam != null && exam.id != undefined) {
           const response = await fetch(`${config.strapiUrl}/api/exams/${exam.id}`, {
