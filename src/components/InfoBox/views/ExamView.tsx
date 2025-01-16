@@ -18,14 +18,22 @@ export default function ExamView() {
   const [isMobileView, setIsMobileView] = useState<boolean>(false); // Track mobile view
 
   // Determine fields and keys dynamically based on screen size
-  const fields = isMobileView
-  ? [t("Exam Title"), t("Date/Time"), t("Student")]
-  : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Institute"), t("Notes"), t("Student Misc")];
-
-  const keys: (keyof Exam)[] = isMobileView
-    ? ["title", "date", "student"] // Shortened keys for mobile
-    : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute", "notes", "student_misc"];
+  let fields = isMobileView ? [t("Exam Title"), t("Date/Time"), t("Student")]
+    : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Institute"), t("Notes"), t("Student Misc")];
   
+  let keys: (keyof Exam)[] = isMobileView ? ["title", "date", "student"] // Shortened keys for mobile
+   : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute", "notes", "student_misc"];
+
+  if (user.role === "Tutor") {
+    fields = isMobileView
+      ? [t("Exam Title"), t("Date/Time"), t("Student")]
+      : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Institute")];
+
+    keys = isMobileView
+      ? ["title", "date", "student"] // Shortened keys for mobile
+      : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute"];
+  } 
+ 
   // Update `isMobileView` based on window width
   useEffect(() => {
     const handleResize = () => {

@@ -177,12 +177,6 @@ export default function TutorExamRequest() {
           </dt>
           <dd>{exam.exam_mode && typeof exam.exam_mode === "object" ? exam.exam_mode.name : t("Not Assigned")}</dd>
         </div>
-        <div>
-          <dt>
-            <strong>{t("Notes")}:</strong>
-          </dt>
-          <dd>{exam.notes}</dd>
-        </div>
       </dl>
       {/* Request to Monitor Button */}
       <button

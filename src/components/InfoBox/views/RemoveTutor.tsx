@@ -197,12 +197,6 @@ export default function RemoveTutor() {
           </dt>
           <dd>{exam.exam_mode && typeof exam.exam_mode === "object" ? exam.exam_mode.name : t("Not Assigned")}</dd>
         </div>
-        <div>
-          <dt>
-            <strong>{t("Notes")}:</strong>
-          </dt>
-          <dd>{exam.notes}</dd>
-        </div>
       </dl>
       <div className="mt-4 flex space-x-2">
         <button
