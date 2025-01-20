@@ -68,7 +68,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
             str = temp["name" as keyof typeof temp].toString();
           } else if (temp["first_name" as keyof typeof temp] != undefined) {
             str = temp["first_name" as keyof typeof temp].toString() + " " + temp["last_name" as keyof typeof temp].toString();
-          } else str = "whatt";
+          } else str = "";
         }
       });
     }
@@ -223,7 +223,9 @@ export default function NotificationComponent(props: NotificationComponentProps)
                         : t("proposed a change")}
                       :
                       {Object.keys(JSON.parse(notification.information)).map((elem: string) => (
-                        (elem === "examiner_id" && JSON.parse(notification.information)[elem] == 0) ? <></> :  
+                        ((elem === "examiner_id" && JSON.parse(notification.information)[elem] == 0)
+                          || (auth.role == "Student" && (elem === "student_id" || elem === "student_email"))
+                          || (getElem(JSON.parse(notification.information)[elem], elem) == "")) ? <></> :  
                         <li className="bg-white border border-grey p-1" key={`entry2_${notification.id}`}>
                           {notification.type == NotificationType.createExam || notification.type == NotificationType.createExamOld
                             ? getTitle(JSON.parse(notification.information)[elem], elem) + ": " + getElem(JSON.parse(notification.information)[elem], elem)
@@ -253,15 +255,15 @@ export default function NotificationComponent(props: NotificationComponentProps)
                       ).toString()}
                     >
                       {notification.sentBy} {notification.type === NotificationType.confirmChange ? t("approved the changes.") : t("declined the changes.")}
-                      {notification.oldInformation != "" &&
-                        Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) => (
+                      {notification.oldInformation != "" && Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) => (
+                        getElem(JSON.parse(notification.oldInformation)[elem], elem) == "" ? <></> : 
                           <li
                             className={
                               (notification.type == NotificationType.discardChange ? "line-through " : "").toString() + "bg-white border border-black p-1"
                             }
                             key={"entry_" + notification.id}
                           >
-                            {getElem(JSON.parse(notification.oldInformation)[elem], elem)}
+                             {getTitle(JSON.parse(notification.oldInformation)[elem], elem) + ": " + getElem(JSON.parse(notification.oldInformation)[elem], elem)}
                           </li>
                         ))}{" "}
                     </div>
