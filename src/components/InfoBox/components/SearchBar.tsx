@@ -26,8 +26,10 @@ export default function SearchBar(props: SearchProps) {
   ];
   let matches: any[] = [];
 
-  function check(key: string, item: object, searchString: string): boolean {
-    if (key.toLowerCase().includes(searchString.toLowerCase())) {
+  function check(key: string | number, item: object, searchString: string): boolean {
+    const keyString = key.toString().toLowerCase();
+    const searchStringLower = searchString.toLowerCase();
+    if (keyString.includes(searchStringLower)) {
       if (!matches.includes(item)) return true;
     }
     return false;
@@ -35,20 +37,23 @@ export default function SearchBar(props: SearchProps) {
 
   function filter(value: string) {
     changeInput(value);
-    if (value == "" || value == " " || value == undefined) return props.filter(props.items);
+    if (value === "" || value === " " || value === undefined) {
+      props.filter(props.items);
+      return;
+    }
     matches = [];
     props.items.forEach((item) => {
       for (const key in item) {
-        if (typeof item[key] === "string") {
+        if (typeof item[key] === "string" || typeof item[key] === "number") {
           if (check(item[key], item, value)) matches.push(item);
         } else if (item[key] instanceof Date) {
-          let dateString = item[key].getDate() + " " + month[item[key].getMonth()] + " " + item[key].getFullYear();
+          const dateString =item[key].getDate() + " " + month[item[key].getMonth()] + " " + item[key].getFullYear();
           if (check(dateString, item, value)) matches.push(item);
         }
 
-        if (key == "first_name" && item["last_name"] != undefined) {
-          let temp1 = item["first_name"] + " " + item["last_name"];
-          let temp2 = item["last_name"] + " " + item["first_name"];
+        if (key === "first_name" && item["last_name"] !== undefined) {
+          const temp1 = item["first_name"] + " " + item["last_name"];
+          const temp2 = item["last_name"] + " " + item["first_name"];
           if (check(temp1, item, value) || check(temp2, item, value)) matches.push(item);
         }
       }
