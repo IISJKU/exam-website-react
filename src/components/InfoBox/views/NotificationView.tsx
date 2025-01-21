@@ -1,11 +1,8 @@
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useEffect, useState } from "react";
-import { useOutletContext, useLocation as useReactLocation } from "react-router-dom"; 
-import Pagination from "../components/Pagination";
-import SearchBar from "../components/SearchBar";
+import { useOutletContext } from "react-router-dom"; 
 import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
-import NotificationComponent from "../components/NotificationComponent";
 import Exam from "../../classes/Exam";
 import Student from "../../classes/Student";
 import Tutor from "../../classes/Tutor";
@@ -32,7 +29,6 @@ export default function NotificationView() {
   const [seenNotifications, setSeenNotifications] = useState<Notification[]>([]);
   const [newNotifications, setNewNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // State for loading
-  const reactLocation = useReactLocation(); 
   const { refreshKey } = useOutletContext<{ refreshKey: number }>(); 
 
   let notificationRoute = config.strapiUrl +"/api/notifications";
@@ -100,7 +96,6 @@ export default function NotificationView() {
     tempArr.sort((a: Notification, b: Notification) => {
       const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0); // Default to epoch (earliest date) if undefined
       const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0); // Default to epoch (earliest date) if undefined
-
       return dateB.getTime() - dateA.getTime(); // Sorting in descending order (latest date first)
     });
 
@@ -115,14 +110,12 @@ export default function NotificationView() {
 
       let examsLink = config.strapiUrl +"/api/exams";
       if (user.role == "Student") examsLink = config.strapiUrl +"/api/exams/me";
-
       const examData = (await fetchAll(examsLink, user.token)) as Exam[];
 
       let tempNew: Notification[] = [];
       let tempOld: Notification[] = [];
       let accReq: Notification[] = [];
       let all: Notification[] = [];
-
       let prop: Notification[] = [];
 
       data.forEach((element: any) => {
@@ -191,7 +184,7 @@ export default function NotificationView() {
     }
   };
 
-/*   useEffect(() => {
+  /* useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
     if (reactLocation.pathname === "/"+ user.role.toLowerCase() +"/notifications") {
@@ -275,9 +268,6 @@ export default function NotificationView() {
     fetchNotifications();
     fetchDropdownOptions();
   }, []);
-
-
-  const [openId, setOpenId] = useState<undefined | number>(Number(id));
 
   if (loading) {
     return (
