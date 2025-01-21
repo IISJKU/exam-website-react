@@ -3,14 +3,18 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router-dom"; // For navigation
 import NotificationButton from "./NotificationButton";
 
-export default function SideMenu() {
+interface NotificationRefresh {
+  onNotificationRefresh: () => void;
+}
+
+export default function SideMenu(props: NotificationRefresh) {
   const { t } = useTranslation();
   const navigate = useNavigate(); // React Router hook for navigation
   const location = useLocation();
 
   return (
     <nav className="p-5 text-xl h-full w-full bg-slate-200 grid grid-flow-col md:grid-flow-row " role="navigation" aria-label={t("Side Menu")}>
-      <NotificationButton path="admin/notifications" />
+      <NotificationButton path="admin/notifications" onRefresh={props.onNotificationRefresh}/>
       {/* Exams Overview Button */}
       <button
         onClick={() => navigate("admin/exams")}

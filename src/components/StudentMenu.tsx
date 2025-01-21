@@ -3,7 +3,11 @@ import { useNavigate, useLocation } from "react-router-dom"; // For navigation
 import Calendar from "./Calendar";
 import NotificationButton from "./NotificationButton";
 
-export default function StudentMenu() {
+interface NotificationRefresh {
+  onNotificationRefresh: () => void;
+}
+
+export default function StudentMenu(props: NotificationRefresh) {
   const { t } = useTranslation();
   const navigate = useNavigate(); // React Router hook for navigation
   const location = useLocation();
@@ -14,7 +18,7 @@ export default function StudentMenu() {
       role="navigation"
       aria-label={t("Side Menu")}
     >
-      <NotificationButton path="student/notifications" />
+      <NotificationButton path="student/notifications" onRefresh={props.onNotificationRefresh}/>
       {/* Exams Overview Button */}
       <button
         onClick={() => navigate("student/all-exams")}

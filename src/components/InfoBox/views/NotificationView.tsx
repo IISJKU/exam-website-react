@@ -1,6 +1,6 @@
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useEffect, useState } from "react";
-import { useLocation as useReactLocation } from "react-router-dom"; 
+import { useOutletContext, useLocation as useReactLocation } from "react-router-dom"; 
 import Pagination from "../components/Pagination";
 import SearchBar from "../components/SearchBar";
 import { useTranslation } from "react-i18next";
@@ -33,8 +33,7 @@ export default function NotificationView() {
   const [newNotifications, setNewNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // State for loading
   const reactLocation = useReactLocation(); 
-
-  const studentId = user.userId;
+  const { refreshKey } = useOutletContext<{ refreshKey: number }>(); 
 
   let notificationRoute = config.strapiUrl +"/api/notifications";
   let examRoute = config.strapiUrl +"/api/exams";
@@ -60,11 +59,6 @@ export default function NotificationView() {
     rooms: [] as Room[],
   });
 
-  const containsNotif = (notif: Notification, arr: Notification[]): boolean => {
-    for (let i = 0; i < arr.length; i++) if (arr[i].exam_id == notif.exam_id) return true;
-
-    return false;
-  };
 
   const getNotifications = (id: number): Notification[] => {
     let notifs: Notification[] = [];
@@ -116,9 +110,8 @@ export default function NotificationView() {
   // Fetch data from Strapi API
   const fetchNotifications = async () => {
     try {
-      //let c = await response.json();
-      //let data = await response.json(); //should probably rewrite api response, instead of changing stuff here
-      let data = (await fetchAll(notificationRoute, user.token)) as any;
+      setLoading(true);
+      const data = (await fetchAll(notificationRoute, user.token)) as any;
 
       let examsLink = config.strapiUrl +"/api/exams";
       if (user.role == "Student") examsLink = config.strapiUrl +"/api/exams/me";
@@ -133,7 +126,7 @@ export default function NotificationView() {
       let prop: Notification[] = [];
 
       data.forEach((element: any) => {
-        let el = new Notification(element.information, element.oldInformation, element.sentBy, element.exam_id);
+        const el = new Notification(element.information, element.oldInformation, element.sentBy, element.exam_id);
         el.id = element.id;
         el.type = element.type;
         el.createdAt = element.createdAt;
@@ -153,6 +146,7 @@ export default function NotificationView() {
             if (threads[i][0].exam_id == elem.exam_id && elem.exam_id != 0) {
               threads[i].push(elem);
               foundThread = true;
+
             }
           }
         }
@@ -184,12 +178,11 @@ export default function NotificationView() {
         });
       });
 
-      if (all.length != 0) setNotifications(all);
-      if (tempNew.length != 0) setNewNotifications(tempNew);
-      if (tempOld.length != 0) setSeenNotifications(tempOld);
-      if (accReq.length != 0) setActionsRequired(accReq);
-
-      if (prop.length != 0) setProposals(prop.reverse());
+      setNotifications(all);
+      setNewNotifications(tempNew);
+      setSeenNotifications(tempOld);
+      setActionsRequired(accReq);
+      setProposals(prop.reverse());
       if (examData != undefined) setExams(examData);
     } catch (error) {
       showToast({ message: `${t("Error fetching notifications")}: ${error}.`, type: "error" });
@@ -198,18 +191,22 @@ export default function NotificationView() {
     }
   };
 
-  useEffect(() => {
+/*   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
     if (reactLocation.pathname === "/"+ user.role.toLowerCase() +"/notifications") {
       fetchNotifications(); // Fetch immediately when user lands on the page
-      interval = setInterval(fetchNotifications, 3000); // Poll every 3 seconds
+      interval = setInterval(fetchNotifications, 60000); // 60000 Fetch every 1 minute
     }
 
     return () => {
       if (interval) clearInterval(interval); // Clear interval when user leaves
     };
-  }, [reactLocation.pathname]); // Trigger useEffect when route changes
+  }, [reactLocation.pathname]); // Trigger useEffect when route changes */
+
+  useEffect(() => {
+    fetchNotifications(); // Fetch when refreshKey changes
+  }, [refreshKey]);
 
   const fetchDropdownOptions = async () => {
     try {
@@ -279,19 +276,6 @@ export default function NotificationView() {
     fetchDropdownOptions();
   }, []);
 
-  const getExam = (id: number): Exam => {
-    if (id == 0) return new Exam();
-
-    let x = new Exam();
-
-    exams?.forEach((element) => {
-      if (Number(element.id) == Number(id)) {
-        x = element;
-        return element;
-      }
-    });
-    return x;
-  };
 
   const [openId, setOpenId] = useState<undefined | number>(Number(id));
 

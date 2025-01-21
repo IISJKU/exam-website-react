@@ -10,6 +10,7 @@ import config from "../config";
 
 interface NButtonProps {
   path: string;
+  onRefresh: () => void;
 }
 
 export default function NotificationButton(props: NButtonProps) {
@@ -20,20 +21,16 @@ export default function NotificationButton(props: NButtonProps) {
   const [notifications, setNotifications] = useState<Notification[] | null>(null);
 
   let path = config.strapiUrl +"/api/notifications";
-
   if (user.role != "Admin") path = config.strapiUrl +"/api/notifications/me";
 
   const fetchNotifications = async () => {
     try {
       const data = (await fetchAll(path, user.token)) as any[];
-
       let t: Notification[] = [];
 
       data.forEach((element: any) => {
         let e = new Notification(element.information, element.oldInformation, element.sentBy, element.exam_id);
-
         e.id = element.id;
-
         e.seenBy = element.seenBy;
         e.type = element.type;
 
@@ -51,7 +48,6 @@ export default function NotificationButton(props: NButtonProps) {
 
   function calcNotifications(data: Notification[]) {
     let numNotifications = 0;
-
     if (data != null) {
       data.forEach((notification) => {
         numNotifications++;
@@ -71,7 +67,11 @@ export default function NotificationButton(props: NButtonProps) {
   return (
     <button
       onClick={() => {
-        navigate(props.path);
+        if (window.location.pathname === "/"+ props.path) {
+          props.onRefresh(); // Trigger refresh if already on the same page
+        } else {
+          navigate(props.path); // Navigate to the route if different
+        }
       }}
       className="w-full text-left border-2 bg-white active:bg-slate-600 border-grey my-1 p-1 hover:bg-slate-400 hover:underline relative inline-block align-center"
       tabIndex={0}
@@ -79,7 +79,11 @@ export default function NotificationButton(props: NButtonProps) {
       aria-label={`${t("Notifications button")}, ${unreadNotifications} ${t("unread notifications")}`}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
-          navigate(props.path);
+          if (window.location.pathname === props.path) {
+            props.onRefresh(); // Trigger refresh if already on the same page
+          } else {
+            navigate(props.path); // Navigate to the route if different
+          }
         }
       }}
     >
