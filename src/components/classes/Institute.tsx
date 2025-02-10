@@ -1,13 +1,13 @@
 import EntryBase from "./EntryBase";
+import Faculty from "./Faculty";
 
 export default class Institute extends EntryBase {
   id!: number;
   name!: string;
   abbreviation!: string;
-  faculty!: string;
   email!: string;
-  city!: string;
   department!: string;
+
   getName(): string {
     return this.name;
   }

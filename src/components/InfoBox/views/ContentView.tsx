@@ -124,16 +124,18 @@ export default function ContentView<T extends { id?: number; status?: ExamStatus
             >
               {props.keys.map((key, idx) => (
                 <td key={`${String(key)}-${idx}`} className="pl-2" tabIndex={0} role="cell">
-                  {typeof element[key] === "string"
-                    ? !isDate(element[key] as string)
-                      ? element[key] as string
-                      : formatDateTime(element[key] as string)
-                    : Array.isArray(element[key])
-                    ? (element[key] as string[]).join(", ")
-                    : typeof element[key] === "number"
-                    ? (element[key] as number)
-                    : " "}
-                </td>
+                {typeof element[key] === "boolean"
+                  ? element[key] ? t("Yes") : t("No") 
+                  : typeof element[key] === "string"
+                  ? !isDate(element[key] as string)
+                    ? element[key] as string
+                    : formatDateTime(element[key] as string)
+                  : Array.isArray(element[key])
+                  ? (element[key] as string[]).join(", ")
+                  : typeof element[key] === "number"
+                  ? (element[key] as number)
+                  : " "}
+              </td>
               ))}
               <td className="pr-3" key="editButton" role="cell">
                 <button aria-label={`${t("Edit")} ${props.title} ${t("Row")} ${index + 1}`} className="focus:outline-none focus:ring-2 focus:ring-blue-500 hover:underline">
@@ -171,5 +173,8 @@ export const formatDateTime = (dateString: string): string => {
   const formattedDate = date.toLocaleDateString("en-GB", dateOptions);
   const formattedTime = date.toLocaleTimeString("en-GB", timeOptions);
 
-  return `${formattedDate} ${formattedTime}`;
+  // Check if dateString contains time information
+  const hasTime = dateString.includes("T") && !dateString.endsWith("T00:00:00.000Z");
+
+  return hasTime ? `${formattedDate} ${formattedTime}` : formattedDate;
 };

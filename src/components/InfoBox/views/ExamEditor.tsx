@@ -19,8 +19,8 @@ import Notification, { NotificationType } from "../../classes/Notification";
 import DropdownWithSearchMultiple from "../components/DropdownWithSearchMultiple";
 import { sendEmail } from "../../../services/EmailService";
 import { generateRow, match } from "./IndividualNotification";
-import StatusSelector from "../components/StatusSelector";
 import config from "../../../config";
+import EnumSelector from "../components/EnumSelector";
 
 export default function ExamEditor() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -455,14 +455,6 @@ export default function ExamEditor() {
     );
   }
 
-  const dropdownOptions = (list: any[], firstNameField: string, lastNameField?: string) =>
-    list.map((item: any) => ({
-      value: item.id,
-      label: lastNameField
-        ? `${item[firstNameField]} ${item[lastNameField]}` // Concatenate first and last name
-        : item[firstNameField], // For fields with just one field (like 'name' for institutes or majors)
-    }));
-
   //customise site layout depending on role of user
   if (user.role == "Admin")
     return (
@@ -540,11 +532,12 @@ export default function ExamEditor() {
           aria-label={t("Exam Tutor")}
         />
           
-        <StatusSelector
+        <EnumSelector
           title={t("Status")}
           value={status}
           disabled={!editMode}
           onChange={(newValue) => setStatus((newValue))}
+          options={Object.values(ExamStatus)}
         />
       </div>
       <div
@@ -807,3 +800,11 @@ export default function ExamEditor() {
       </div>
     );
 }
+
+export const dropdownOptions = (list: any[], firstNameField: string, lastNameField?: string) =>
+  list.map((item: any) => ({
+    value: item.id,
+    label: lastNameField
+      ? `${item[firstNameField]} ${item[lastNameField]}` // Concatenate first and last name
+      : item[firstNameField], // For fields with just one field (like 'name' for institutes or majors)
+  }));

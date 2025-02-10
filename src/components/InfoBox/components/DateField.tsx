@@ -18,12 +18,12 @@ export default function DateField(props: DateFieldProps) {
   const formattedTime = props.dateValue ? moment(props.dateValue).format("HH:mm") : "";
 
   return (
-    <div role="group" aria-labelledby={props.title ? `datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}` : undefined} tabIndex={0}>
+    <div className="flex flex-col relative w-96" role="group" aria-labelledby={props.title ? `datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}` : undefined} tabIndex={0}>
       {props.title ? (<label id={`datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{t(props.title)}{" "}
         {props.required && <span className="text-red-500">{" "}*</span>}  
       </label>) : null}
       {props.editMode ? (
-        <div>
+        <div >
           {/* Date Input */}
           <label htmlFor="date-input" className="sr-only">
           {t("Enter date")}
@@ -38,17 +38,21 @@ export default function DateField(props: DateFieldProps) {
             aria-label={t("Enter date")}
             required={props.required} 
           />
-          {/* Time Input */}
-          <label htmlFor="time-input" className="sr-only">
-          {t("Enter time")}
-          </label>
-          <input id="time-input" type="time" value={formattedTime} onChange={props.onTimeChange} className="border border-gray-300 p-2 w-32 rounded-md ml-1" aria-required="true"
-            aria-label={t("Enter time")} required={props.required}/>
+          {props.onTimeChange && (
+            <>
+              {/* Time Input */}
+              <label htmlFor="time-input" className="sr-only">
+              {t("Enter time")}
+              </label>
+              <input id="time-input" type="time" value={formattedTime} onChange={props.onTimeChange} className="border border-gray-300 p-2 w-32 rounded-md ml-1" aria-required="true"
+                    aria-label={t("Enter time")} required={props.required} /> 
+            </>
+          )}
         </div>
       ) : (
         <div>
-          <span aria-label={`${t("Selected date and time")}: ${formattedDate} ${formattedTime}`}>
-            {formattedDate} {formattedTime}
+          <span aria-label={`${t("Selected date and time")}: ${formattedDate} ${props.onTimeChange ? formattedTime : ""}`}>
+            {formattedDate} {props.onTimeChange ? formattedTime : ""}
           </span>
         </div>
       )}
