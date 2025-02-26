@@ -156,7 +156,7 @@ export default function IndividualTutor() {
         editMode={editMode}
         text={first_name}
         onChange={(e) => setFirstName(e.target.value)}
-        aria-label={t("Edit tutor's first name")}
+        aria-label={t("Edit tutor first name")}
         required={true}
         aria-required="true"
       />
@@ -166,7 +166,7 @@ export default function IndividualTutor() {
         editMode={editMode}
         text={last_name}
         onChange={(e) => setLastName(e.target.value)}
-        aria-label={t("Edit tutor's last name")}
+        aria-label={t("Edit tutor last name")}
         required={true}
         aria-required="true"
       />
@@ -177,7 +177,7 @@ export default function IndividualTutor() {
         text={phone}
         hideTitle={false}
         onChange={(e) => setPhone(e.target.value)}
-        aria-label={t("Edit tutor's phone")}
+        aria-label={t("Edit tutor phone")}
         required={true}
         aria-required="true"
       />
@@ -188,7 +188,7 @@ export default function IndividualTutor() {
         text={matrikel_number}
         hideTitle={false}
         onChange={(e) => setMatrikelNum(e.target.value)}
-        aria-label={t("Edit tutor's matrikel number")}
+        aria-label={t("Edit tutor matrikel number")}
       />
 
       <EditField
@@ -197,7 +197,7 @@ export default function IndividualTutor() {
         text={study || t("N/A")}
         hideTitle={false}
         onChange={(e) => setStudy(e.target.value)}
-        aria-label={t("Edit tutor's Study")}
+        aria-label={t("Edit tutor Study")}
       />
 
       <EnumSelector
@@ -206,7 +206,7 @@ export default function IndividualTutor() {
         disabled={!editMode}
         onChange={(newValue) => setContractType((newValue))}
         options={Object.values(ContractType)}
-        aria-label={t("Edit tutor's contract type")}
+        aria-label={t("Edit tutor contract type")}
       />
 
       <EnumSelector
@@ -215,7 +215,7 @@ export default function IndividualTutor() {
         disabled={!editMode}
         onChange={(newValue) => setContractCompleted((newValue))}
         options={Object.values(ContractCompleted)}
-        aria-label={t("Edit tutor's contract completed")}
+        aria-label={t("Edit tutor contract completed")}
       />
 
       <EnumSelector
@@ -224,7 +224,7 @@ export default function IndividualTutor() {
         disabled={!editMode}
         onChange={(newValue) => setDistributionList((newValue))}
         options={Object.values(DistributionList)}
-        aria-label={t("Edit tutor's in distribution list value")}
+        aria-label={t("Edit tutor in distribution list value")}
       />
 
       {(!salto_access) && (!editMode) ? (
