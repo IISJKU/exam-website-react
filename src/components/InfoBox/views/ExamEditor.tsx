@@ -538,6 +538,7 @@ export default function ExamEditor() {
             disabled={!editMode}
             onChange={(newValue) => setStatus((newValue))}
             options={Object.values(ExamStatus)}
+            aria-label={t("Exam Status")}
           />
         </div>
         <div

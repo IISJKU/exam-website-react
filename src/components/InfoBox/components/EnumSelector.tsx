@@ -1,17 +1,15 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-// Define a generic interface for props
 interface EnumSelectorProps<T> {
-  title: string; // Optional title for the dropdown
-  value: T; // Current selected value
-  disabled?: boolean; // Whether the dropdown is disabled
-  onChange: (newValue: T) => void; // Callback when the value changes
-  options: T[]; // List of available options
-  description?: string; // Optional description for the dropdown
+  title: string; 
+  value: T;
+  disabled?: boolean;
+  onChange: (newValue: T) => void;
+  options: T[];
+  description?: string;
 }
 
-// Generic Selector Component
 export default function EnumSelector<T>(props: EnumSelectorProps<T>) {
   const { t } = useTranslation();
 
@@ -22,7 +20,7 @@ export default function EnumSelector<T>(props: EnumSelectorProps<T>) {
     <div className={classList}>
       {/* Title */}
       {props.title && (
-        <label htmlFor={t(props.title)} className="font-bold" id="status-label">
+        <label htmlFor={t(props.title)} className="font-bold" id={t(props.title) + "-" + t("label")}>
           {t(props.title)}
         </label>
       )}

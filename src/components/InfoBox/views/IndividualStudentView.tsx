@@ -252,7 +252,7 @@ export default function IndividualStudent() {
             onChange={setConditionsApproved}
             required={true}
             disabled={!editMode}
-            aria-label={t("Edit studnet's condition approved value")}
+            aria-label={t("Edit student condition approved value")}
             aria-required="true"
           />
 
@@ -262,6 +262,7 @@ export default function IndividualStudent() {
             disabled={!editMode}
             onChange={(newValue) => setInDistList((newValue))}
             options={Object.values(InDistrbutionList)}
+            aria-label={t("Edit student in distribution list value")}
           />
 
           <EditField
@@ -280,6 +281,7 @@ export default function IndividualStudent() {
             value={location ?? ""}
             onChange={(val) => setLocation(Number(val))}
             disabled={!editMode}
+            aria-label={t("Edit student location")}
           />
 
           <DropdownWithSearch
@@ -289,6 +291,7 @@ export default function IndividualStudent() {
             value={faculty ?? ""}
             onChange={(val) => setFaculty(Number(val))}
             disabled={!editMode}
+            aria-label={t("Edit student faculty")}
           />
 
           <EnumSelector
@@ -297,6 +300,7 @@ export default function IndividualStudent() {
             disabled={!editMode}
             onChange={(newValue) => setPresenceMulti(newValue as PresenceMultimedia)}
             options={Object.values(PresenceMultimedia)}
+            aria-label={t("Edit student presence or Multimedia value")}
           />
 
           <MultiSelect
@@ -308,6 +312,7 @@ export default function IndividualStudent() {
             }}
             disabled={!editMode}
             placeholder={t("Select disability types")}
+            aria-label={t("Edit student disability types")}
           />
           
           <EditField

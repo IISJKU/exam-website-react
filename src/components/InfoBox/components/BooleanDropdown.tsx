@@ -12,8 +12,8 @@ interface BooleanDropdownProps {
 
 export default function BooleanDropdown(props: BooleanDropdownProps) {
   const options = [
-    { label: "Yes", value: true },
-    { label: "No", value: false },
+    { label: t("Yes"), value: true },
+    { label: t("No"), value: false },
   ];
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

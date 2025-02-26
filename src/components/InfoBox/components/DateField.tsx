@@ -23,7 +23,7 @@ export default function DateField(props: DateFieldProps) {
         {props.required && <span className="text-red-500">{" "}*</span>}  
       </label>) : null}
       {props.editMode ? (
-        <div >
+        <div>
           {/* Date Input */}
           <label htmlFor="date-input" className="sr-only">
           {t("Enter date")}

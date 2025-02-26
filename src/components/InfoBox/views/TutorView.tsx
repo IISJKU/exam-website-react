@@ -12,7 +12,7 @@ export default function TutorView() {
   const navigate = useNavigate(); // Initialize navigate for navigation
   const user = useAuth();
 
-  const fields = [t("First Name"), t("Last Name"), t("Phone"), t("Matrikel Number"), t("Study"), t("Contract Type"), t("Contract Completed"), t("Distribution List"), t("Salto Access"), t("Location")];
+  const fields = [t("First Name"), t("Last Name"), t("Phone"), t("Matrikel Number"), t("Study"), t("Contract Type"), t("Contract Completed"), t("In Distribution List"), t("Salto Access"), t("Location")];
   const keys: (keyof Tutor)[] = ["first_name", "last_name", "phone", "matrikel_number", "study", "contract_type", "contract_completed", "distribution_list", "salto_access", "location"];
   const [tutors, setTutors] = useState<Tutor[]>([]); // Type tutors as Tutor array
   const [loading, setLoading] = useState<boolean>(true); // State for loading

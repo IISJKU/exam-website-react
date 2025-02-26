@@ -28,7 +28,7 @@ export default function IndividualTutor() {
   const [contract_type, setContractType] = useState<ContractType>();
   const [contract_completed, setContractCompleted] = useState<ContractCompleted>(ContractCompleted.completed_no);
   const [distribution_list, setDistributionList] = useState<DistributionList>(DistributionList.DistList_no);
-  const [salto_access, setSaltoAccess] = useState<string>("No");
+  const [salto_access, setSaltoAccess] = useState<string>(t("No"));
   const [location, setLocation] = useState<number | undefined>();
   const [locationOptions, setLocationOptions] = useState<Location[]>([]);
 
@@ -206,6 +206,7 @@ export default function IndividualTutor() {
         disabled={!editMode}
         onChange={(newValue) => setContractType((newValue))}
         options={Object.values(ContractType)}
+        aria-label={t("Edit tutor's contract type")}
       />
 
       <EnumSelector
@@ -214,6 +215,7 @@ export default function IndividualTutor() {
         disabled={!editMode}
         onChange={(newValue) => setContractCompleted((newValue))}
         options={Object.values(ContractCompleted)}
+        aria-label={t("Edit tutor's contract completed")}
       />
 
       <EnumSelector
@@ -222,6 +224,7 @@ export default function IndividualTutor() {
         disabled={!editMode}
         onChange={(newValue) => setDistributionList((newValue))}
         options={Object.values(DistributionList)}
+        aria-label={t("Edit tutor's in distribution list value")}
       />
 
       {(!salto_access) && (!editMode) ? (

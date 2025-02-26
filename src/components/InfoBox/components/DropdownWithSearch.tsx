@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../../hooks/AuthProvider";
-import Notification from "../../classes/Notification";
-import { showToast } from "./ToastMessage";
 
 interface DropdownOption {
   value: string | number;
