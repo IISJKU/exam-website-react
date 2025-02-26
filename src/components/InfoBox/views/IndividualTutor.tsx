@@ -217,7 +217,7 @@ export default function IndividualTutor() {
       />
 
       <EnumSelector
-        title={t("Distribution List")}
+        title={t("In Distribution List")}
         value={distribution_list || t("N/A")}
         disabled={!editMode}
         onChange={(newValue) => setDistributionList((newValue))}

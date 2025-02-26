@@ -56,7 +56,7 @@ export default function EditField(props: EditFieldProps) {
       )}
       <div className="relative mt-1">
         {props.editMode ? (
-          props.title === "Notes" ? (
+          props.title === "Notes" || props.title ==="Misc" || props.title ==="Updates" ? (
             <textarea
               id={`edit-field-${props.title?.replace(/\s+/g, "-").toLowerCase()}`}
               onChange={handleChange}

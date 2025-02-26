@@ -108,7 +108,7 @@ export default function DropdownWithSearch(props: DropdownWithSearchProps) {
 
   return (
     <div
-      className="flex flex-col relative w-96 mt-2"
+      className="flex flex-col relative w-96 mt-1"
       ref={dropdownRef}
       onKeyDown={handleKeyDown}
       role="combobox"

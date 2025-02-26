@@ -11,9 +11,9 @@ export default function StudentView() {
   const { t } = useTranslation();
   const navigate = useNavigate(); // Initialize navigate for navigation
 
-  const fields = [t("First Name"), t("Last Name"), t("Phone"), t("Emergency Contact"), t("Matrikel Number"), t("Major"), t("Bonus Time")];
+  const fields = [t("First Name"), t("Last Name"), t("Phone"), t("Emergency Contact"), t("Matrikel Nr."), t("Major"), t("Bonus Time"), t("In Distribution List"), t("Location"), t("Disability"), t("Presence/Multimedia")];
 
-  const keys: (keyof Student)[] = ["first_name", "last_name", "phone", "emergency_contact", "matrikel_number", "major", "bonus_time"];
+  const keys: (keyof Student)[] = ["first_name", "last_name", "phone", "emergency_contact", "matrikel_number", "major", "bonus_time", "in_distribution_list", "location", "disability", "presence_multimedia"];
 
   const [studentData, setStudentData] = useState<Student[]>([]); // State for students data
   const [loading, setLoading] = useState<boolean>(true); // State for loading
@@ -39,6 +39,8 @@ export default function StudentView() {
       const updatedData = data.map((student: any) => ({
         ...student,
         major: student.major?.name || t("N/A"), // Set major name or "N/A" if not available
+        location: student.location?.name || t("N/A"),
+        faculty: student.faculty?.abbreviation || t("N/A"),
       }));
 
       setStudentData(updatedData); // Update state with the fetched students

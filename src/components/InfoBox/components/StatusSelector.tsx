@@ -13,7 +13,7 @@ interface StatusSelectorProps {
 export default function StatusSelector(props: StatusSelectorProps) {
   const { t } = useTranslation();
   const options = Object.values(ExamStatus);
-  let classList = (props.title) ? "flex flex-col relative w-96 mt-2" : "flex flex-col relative w-full";
+  let classList = (props.title) ? "flex flex-col relative w-96 mt-1" : "flex flex-col relative w-full";
 
   return (
       <div className={classList}>

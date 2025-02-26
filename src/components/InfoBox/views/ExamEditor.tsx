@@ -475,141 +475,141 @@ export default function ExamEditor() {
         />
       </div>
       <div className="flex flex-col md:flex-row justify-between gap-4 px-2" role="region" aria-labelledby="side-by-side-divs-heading" > 
-      {/* First div */}
-      <div className="w-1/2 p-4 rounded shadow-md" role="region" aria-labelledby="first-div-heading">
-        <EditField
-          title={t("LVA Num")}
-          editMode={editMode}
-          text={lva_num ? lva_num.toString() : ""}
-          hideTitle={false}
-          onChange={(e) => setLvaNum(Number(e.target.value))}
-          aria-label={t("LVA course Number")}
-          required={true}
-        />
+        {/* First div */}
+        <div className="w-1/2 p-4 rounded shadow-md" role="region" aria-labelledby="first-div-heading">
+          <EditField
+            title={t("LVA Num")}
+            editMode={editMode}
+            text={lva_num ? lva_num.toString() : ""}
+            hideTitle={false}
+            onChange={(e) => setLvaNum(Number(e.target.value))}
+            aria-label={t("LVA course Number")}
+            required={true}
+          />
 
-        <DateField
-          title={t("Date/Time")}
-          editMode={editMode}
-          dateValue={date}
-          onDateChange={handleDateChange}
-          onTimeChange={handleTimeChange}
-          aria-label={t("Exam Date and Time")}
-          required={true}
-        />
-        <EditField
-          title={t("Duration")}
-          editMode={editMode}
-          text={duration ? duration.toString() : ""}
-          hideTitle={false}
-          onChange={(e) => setDuration(Number(e.target.value))}
-          aria-label={t("Exam Duration")}
-          required={true}
-        />
+          <DateField
+            title={t("Date/Time")}
+            editMode={editMode}
+            dateValue={date}
+            onDateChange={handleDateChange}
+            onTimeChange={handleTimeChange}
+            aria-label={t("Exam Date and Time")}
+            required={true}
+          />
+          <EditField
+            title={t("Duration")}
+            editMode={editMode}
+            text={duration ? duration.toString() : ""}
+            hideTitle={false}
+            onChange={(e) => setDuration(Number(e.target.value))}
+            aria-label={t("Exam Duration")}
+            required={true}
+          />
 
-        <DropdownWithSearch
-          tableName="students"
-          label={t("Student")}
-          options={dropdownOptions(options.students, "first_name", "last_name")}
-          value={student ?? ""}
-          onChange={(newValue) => setStudent(Number(newValue))}
-          placeholder={t("Search student...")}
-          disabled={!editMode}
-          aria-label={t("Exam Student")}
-          required={true}
-        />
+          <DropdownWithSearch
+            tableName="students"
+            label={t("Student")}
+            options={dropdownOptions(options.students, "first_name", "last_name")}
+            value={student ?? ""}
+            onChange={(newValue) => setStudent(Number(newValue))}
+            placeholder={t("Search student...")}
+            disabled={!editMode}
+            aria-label={t("Exam Student")}
+            required={true}
+          />
 
-        <DropdownWithSearchMultiple
-          tableName="tutors"
-          label={t("Tutors")}
-          options={dropdownOptions(options.tutors, "first_name", "last_name")}
-          value={tutor ?? ""}
-          values={registeredTutors}
-          onChange={(newValue) => {
-            setTutor(Number(newValue));
-          }}
-          placeholder={t("Search tutors...")}
-          disabled={!editMode}
-          aria-label={t("Exam Tutor")}
-        />
-          
-        <EnumSelector
-          title={t("Status")}
-          value={status}
-          disabled={!editMode}
-          onChange={(newValue) => setStatus((newValue))}
-          options={Object.values(ExamStatus)}
-        />
-      </div>
-      <div
-        className="w-1/2 p-4 rounded shadow-md"
-        role="region"
-        aria-labelledby="second-div-heading"
-      >
-        <DropdownWithSearch
-          tableName="examiners"
-          label={t("Examiner")}
-          options={dropdownOptions(options.examiners, "first_name", "last_name")}
-          value={examiner ?? ""}
-          onChange={(newVal) => setExaminer(Number(newVal))}
-          placeholder={t("Search examiner...")}
-          disabled={!editMode}
-          aria-label={t("Course Examiner")}
-          required={true}
-            />
+          <DropdownWithSearchMultiple
+            tableName="tutors"
+            label={t("Tutors")}
+            options={dropdownOptions(options.tutors, "first_name", "last_name")}
+            value={tutor ?? ""}
+            values={registeredTutors}
+            onChange={(newValue) => {
+              setTutor(Number(newValue));
+            }}
+            placeholder={t("Search tutors...")}
+            disabled={!editMode}
+            aria-label={t("Exam Tutor")}
+          />
             
-        <DropdownWithSearch
-          tableName="majors"
-          label={t("Major")}
-          options={dropdownOptions(options.majors, "name")}
-          value={major ?? ""}
-          onChange={(newVal) => setMajor(Number(newVal))}
-          placeholder={t("Search majors...")}
-          disabled={!editMode}
-          aria-label={t("Course Major")}
-        />
+          <EnumSelector
+            title={t("Status")}
+            value={status}
+            disabled={!editMode}
+            onChange={(newValue) => setStatus((newValue))}
+            options={Object.values(ExamStatus)}
+          />
+        </div>
+        <div
+          className="w-1/2 p-4 rounded shadow-md"
+          role="region"
+          aria-labelledby="second-div-heading"
+        >
+          <DropdownWithSearch
+            tableName="examiners"
+            label={t("Examiner")}
+            options={dropdownOptions(options.examiners, "first_name", "last_name")}
+            value={examiner ?? ""}
+            onChange={(newVal) => setExaminer(Number(newVal))}
+            placeholder={t("Search examiner...")}
+            disabled={!editMode}
+            aria-label={t("Course Examiner")}
+            required={true}
+              />
+              
+          <DropdownWithSearch
+            tableName="majors"
+            label={t("Major")}
+            options={dropdownOptions(options.majors, "name")}
+            value={major ?? ""}
+            onChange={(newVal) => setMajor(Number(newVal))}
+            placeholder={t("Search majors...")}
+            disabled={!editMode}
+            aria-label={t("Course Major")}
+          />
 
-        <DropdownWithSearch
-          tableName="institutes"
-          label={t("Institute")}
-          options={dropdownOptions(options.institutes, "name")}
-          value={institute ?? ""}
-          onChange={(newVal) => setInstitute(Number(newVal))}
-          placeholder={t("Search institutes...")}
-          disabled={!editMode}
-          aria-label={t("Course Institute")}
-        />
+          <DropdownWithSearch
+            tableName="institutes"
+            label={t("Institute")}
+            options={dropdownOptions(options.institutes, "name")}
+            value={institute ?? ""}
+            onChange={(newVal) => setInstitute(Number(newVal))}
+            placeholder={t("Search institutes...")}
+            disabled={!editMode}
+            aria-label={t("Course Institute")}
+          />
 
-        <DropdownWithSearch
-          tableName="exam-modes"
-          label={t("Mode")}
-          options={dropdownOptions(options.modes, "name")}
-          value={mode ?? ""}
-          onChange={(newVal) => setMode(Number(newVal))}
-          placeholder={t("Search modes...")}
-          disabled={!editMode}
-          aria-label={t("Exam Mode")}
-          required={true}
-        />
+          <DropdownWithSearch
+            tableName="exam-modes"
+            label={t("Mode")}
+            options={dropdownOptions(options.modes, "name")}
+            value={mode ?? ""}
+            onChange={(newVal) => setMode(Number(newVal))}
+            placeholder={t("Search modes...")}
+            disabled={!editMode}
+            aria-label={t("Exam Mode")}
+            required={true}
+          />
 
-        <DropdownWithSearch
-          tableName="rooms"
-          label={t("Room")}
-          options={dropdownOptions(options.rooms, "name")}
-          value={room ?? ""}
-          onChange={(newVal) => handleRoomChange(Number(newVal))}
-          placeholder={t("Search rooms...")}
-          disabled={!editMode}
-          aria-label={t("Room Selector")}
-        />
+          <DropdownWithSearch
+            tableName="rooms"
+            label={t("Room")}
+            options={dropdownOptions(options.rooms, "name")}
+            value={room ?? ""}
+            onChange={(newVal) => handleRoomChange(Number(newVal))}
+            placeholder={t("Search rooms...")}
+            disabled={!editMode}
+            aria-label={t("Room Selector")}
+          />
 
-        <EditField
-          title={t("Notes")}
-          editMode={editMode}
-          text={notes}
-          hideTitle={false}
-          onChange={(e) => setNotes(e.target.value)}
-          aria-label={t("Exam Notes")}
-        />
+          <EditField
+            title={t("Notes")}
+            editMode={editMode}
+            text={notes}
+            hideTitle={false}
+            onChange={(e) => setNotes(e.target.value)}
+            aria-label={t("Exam Notes")}
+          />
       </div>
     </div>
     <div className="m-5 mt-4 flex flex-row md:flex-row space-x-2">
