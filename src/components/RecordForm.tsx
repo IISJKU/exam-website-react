@@ -2,10 +2,14 @@ import React, { useState, useEffect } from "react";
 import DateField from "./InfoBox/components/DateField";
 import { sendEmail } from "../services/EmailService";
 import { useAuth } from "../hooks/AuthProvider";
-import { match } from "./InfoBox/views/IndividualNotification";
 import moment from "moment";
-import StatusSelector from "./InfoBox/components/StatusSelector";
 import { useTranslation } from "react-i18next";
+import EnumSelector from "./InfoBox/components/EnumSelector";
+import { InDistrbutionList, PresenceMultimedia } from "./classes/Student";
+import { ContractCompleted, ContractType, DistributionList } from "./classes/Tutor";
+import { ExamStatus } from "./classes/Exam";
+import MultiSelect from "./InfoBox/components/MultiSelect";
+import { dropdownOptions } from "./InfoBox/views/ExamEditor";
 
 interface RecordFormProps {
   record: DataRecord | null;
@@ -42,7 +46,7 @@ export default function RecordForm(props: RecordFormProps) {
 
       // Find the role value in relationalFields if it exists
       const roleField = props.relationalFields?.find((field) => field.name === "role");
-      const roleValue = roleField?.options.find((option) => option.id === initialData.role)?.displayValue.toLowerCase() || "";
+      const roleValue = roleField?.options.find((option) => option.id === initialData.role)?.displayValue?.toLowerCase() || "";
       setRole(roleValue); // Initialize role state if role field exists
 
     } else {
@@ -250,7 +254,7 @@ export default function RecordForm(props: RecordFormProps) {
           return (
             <div className="mb-4" key={field}>
               <label id={`${field}-label`} htmlFor={field} className="block text-gray-700 capitalize">
-                {field.replace("_", " ")}:
+                {t(field.replace("_", " "))}:
               </label>
               <select
                 id={field}
@@ -269,37 +273,43 @@ export default function RecordForm(props: RecordFormProps) {
             </div>
           );
         }
+        const handleEnumChange = (fieldName: string, newValue: any) => {
+          setFormData((prev) => ({
+            ...prev,
+            [fieldName]: newValue,
+          }));
+        };
+
+        const fieldComponents: Record<string, JSX.Element> = {
+          date: <DateField editMode={true} dateValue={formData[field]} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />,
+          salto_access: <DateField editMode={true} dateValue={formData[field]} onDateChange={handleDateChange} />,
+          status: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(ExamStatus)} />,
+          in_distribution_list: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(InDistrbutionList)} />,
+          presence_multimedia: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(PresenceMultimedia)} />,
+          contract_type: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(ContractType)} />,
+          contract_completed: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(ContractCompleted)} />,
+          distribution_list: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(DistributionList)} />,
+        };
 
         return (
           <div className="mb-4" key={field}>
             <label id={`${field}-label`} htmlFor={field} className="block text-gray-700 capitalize">
-              {field.replace("_", " ")}:
+              {t(field.replace("_", " "))}:
             </label>
-            {field === "date" ? (
-            <DateField editMode={true} dateValue={formData[field]} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />
-            ) : field === "status" ? (
-              <StatusSelector
-                value={formData[field] || ""}
-                onChange={(newValue) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    [field]: newValue,
-                  }));
-                }}
-              />
-            ) : (
-              <input
-                type="text"
-                id={field}
-                name={field}
-                value={formData[field] || ""}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 w-full rounded-md"
-                required={isRequired}
-                min="3"
-                aria-required={isRequired}
-                aria-describedby={isRequired ? errorId : undefined}
-            /> )}
+            {fieldComponents[field] ?? (
+            <input
+              type="text"
+              id={field}
+              name={field}
+              value={formData[field] || ""}
+              onChange={handleChange}
+              className="border border-gray-300 p-2 w-full rounded-md"
+              required={isRequired}
+              min="3"
+              aria-required={isRequired}
+              aria-describedby={isRequired ? errorId : undefined}
+            />
+            )}
           </div>
         );
       })}
@@ -321,27 +331,48 @@ export default function RecordForm(props: RecordFormProps) {
           return (
             <div className="mb-4" key={field.name}>
               <label id={`${field}-label`} htmlFor={field.name} className="block text-gray-700 capitalize">
-                {field.name.replace("_", " ")}:
+                {t(field.name.replace("_", " "))}:
               </label>
-              <select
-                name={field.name}
-                value={formData[field.name] || ""}
-                onChange={handleChange}
-                className={`border border-gray-300 p-2 w-full rounded-md ${isDisabled ? "opacity-50" : ""}`}
-                disabled={isDisabled}
-                required={isRequired}
-                aria-required={isRequired}
-                aria-labelledby={`${field.name}-label`}
-              >
-                <option value="">
-                  Select {(field.name.charAt(0).toUpperCase() + field.name.slice(1)).replace("_", " ")}
-                </option>
-                {field.options.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.displayValue}
+              {field.name === "disability_types" ? (
+              <MultiSelect
+                options={dropdownOptions(field.options, "displayValue")}
+                value={
+                  Array.isArray(formData[field.name])
+                    ? formData[field.name].map((item: any) =>
+                        typeof item === "object" && item !== null ? item.id : item
+                      )
+                    : []
+                }
+                onChange={(selectedIds) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    [field.name]: field.options.filter((option) =>selectedIds.includes(option.id)),
+                  }));
+                }}
+                placeholder={t("Select Disability Types")}
+                aria-label={t("Edit student disability types")}
+              />
+              ) : (
+                <select
+                  name={field.name}
+                  value={formData[field.name] || ""}
+                  onChange={handleChange}
+                  className={`border border-gray-300 p-2 w-full rounded-md ${isDisabled ? "opacity-50" : ""}`}
+                  disabled={isDisabled}
+                  required={isRequired}
+                  aria-required={isRequired}
+                  aria-labelledby={`${field.name}-label`}
+                >
+                  <option value="">
+                    Select {(field.name.charAt(0).toUpperCase() + field.name.slice(1)).replace("_", " ")}
                   </option>
-                ))}
-              </select>
+                  {field.options.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.displayValue}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
           );
         })}

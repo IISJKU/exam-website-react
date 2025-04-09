@@ -21,6 +21,8 @@ export default function MultiSelect(props: MultiSelectProps) {
   const [filteredOptions, setFilteredOptions] = useState<Option[]>(props.options);
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  let classList = props.label ? "flex flex-col relative w-80 mt-1" : "flex flex-col relative w-full";
+
 
   useEffect(() => {
     if (searchTerm) {
@@ -72,8 +74,8 @@ export default function MultiSelect(props: MultiSelectProps) {
   };
 
   return (
-    <div className="flex flex-col relative w-96 mt-1" ref={dropdownRef} tabIndex={0}>
-        {props.label && <label className="block font-bold mb-1">{props.label}</label>}
+    <div className={classList} ref={dropdownRef} tabIndex={0}>
+        {props.label && <label className="block font-bold mb-1">{t(props.label)}</label>}
         {props.disabled ? (
         <div className="mb-2">
             {props.value
@@ -82,7 +84,7 @@ export default function MultiSelect(props: MultiSelectProps) {
             .join(", ")}
         </div>
         ) : (
-        <div className={`border border-gray-300 p-2 w-80 rounded-md cursor-pointer bg-white ${props.disabled ? "opacity-50 cursor-not-allowed" : "hover:border-blue-500"}`}
+        <div className={`border border-gray-300 p-2 rounded-md cursor-pointer bg-white ${props.disabled ? "opacity-50 cursor-not-allowed" : "hover:border-blue-500"}`}
           onClick={toggleDropdown}
         >
           <div className="flex flex-wrap gap-2">
@@ -104,16 +106,16 @@ export default function MultiSelect(props: MultiSelectProps) {
                 </span>
               ))
             ) : (
-              <span className="text-gray-500" tabIndex={0}>{props.placeholder || t("Select options...")}</span>
+              <span tabIndex={0}>{props.placeholder || t("Select options...")}</span>
             )}
           </div>
         </div>
       )}
       {isOpen && (
-        <div className="absolute left-0 bg-white shadow-lg z-50 w-full max-h-40 border border-gray-300 rounded-md mt-1">
+        <div className="absolute top-full left-0 z-10 border border-gray-300 p-2 w-full rounded-md bg-white shadow-lg transition-all duration-200">
           <input
             type="text"
-            className="w-full p-2 border-b border-gray-300"
+            className="w-full border-b"
             placeholder={t("Search...")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -127,7 +129,7 @@ export default function MultiSelect(props: MultiSelectProps) {
                   key={option.value}
                   className={`p-2 cursor-pointer ${
                     props.value.includes(option.value) ? "bg-blue-100 font-bold" : ""
-                  } ${highlightedIndex === index ? "bg-blue-500 text-white" : "hover:bg-gray-100"}`}
+                  } ${highlightedIndex === index ? "bg-blue-500 text-white" : "hover:bg-white"}`}
                   onClick={() => handleSelectOption(option.value)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                   tabIndex={0}

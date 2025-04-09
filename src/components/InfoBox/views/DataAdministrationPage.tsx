@@ -7,19 +7,26 @@ import { useTranslation } from "react-i18next";
 const tableConfigurations = {
     students: {
       tableName: "students",
-      selectedFields: ["first_name", "last_name", "matrikel_number", "phone", "emergency_contact", "bonus_time", "misc"],
-      optionalFields: ["misc"],
-      populateFields: [{ name: "major", populateTable: "majors", displayField: ["name"] },],
+      selectedFields: ["first_name", "last_name", "matrikel_number", "phone", "emergency_contact", "bonus_time", "misc", "conditions_approved", "in_distribution_list", "disability", "presence_multimedia", "updates"],
+      optionalFields: ["misc","conditions_approved","disability", "presence_multimedia", "updates", "disability_type"],
+      populateFields: [
+        { name: "major", populateTable: "majors", displayField: ["name"] },
+        { name: "location", populateTable: "locations", displayField: ["name"] },
+        { name: "disability_types", populateTable: "disability-types", displayField: ["abbreviation"] },
+        { name: "faculty", populateTable: "faculties", displayField: ["name"] },
+      ],
     },
     tutors: {
       tableName: "tutors",
-      selectedFields: ["first_name", "last_name", "matrikel_number", "phone"],
-      optionalFields: [],
-      populateFields: [],
+      selectedFields: ["first_name", "last_name", "matrikel_number", "phone", "study", "contract_type", "contract_completed", "salto_access", "distribution_list"],
+      optionalFields: ["matrikel_number", "study", "contract_type", "contract_completed", "salto_access", "distribution_list", "location"],
+      populateFields: [
+        { name: "location", populateTable: "locations", displayField: ["name"] },
+      ],
     },
     exams: {
       tableName: "exams",
-      selectedFields: ["title", "date", "duration", "lva_num", "notes", "status"],
+      selectedFields: ["title", "date", "duration", "lva_num", "notes", "status", "confirmed"],
       optionalFields: [],
       populateFields: [
         { name: "student", populateTable: "students", displayField: ["matrikel_number"] },
@@ -44,21 +51,25 @@ const tableConfigurations = {
     },
     institutes: {
       tableName: "institutes",
-      selectedFields: ["name", "abbreviation", "email", "faculty", "city", "department"],
-      optionalFields: ["city", "department"],
+      selectedFields: ["name", "abbreviation", "email", "department"],
+      optionalFields: ["department"],
       populateFields: [],
     },
     majors: {
       tableName: "majors",
-      selectedFields: ["name", "abbreviation", "faculty"],
+      selectedFields: ["name", "abbreviation"],
       optionalFields: [],
-      populateFields: [],
+      populateFields: [
+        { name: "faculty", populateTable: "faculties", displayField: ["name"] },
+      ],
     },
     rooms: {
       tableName: "rooms",
-      selectedFields: ["name", "building", "capacity", "location", "isAvailable"],
+      selectedFields: ["name", "building", "capacity", "isAvailable"],
       optionalFields: [],
-      populateFields: [],
+      populateFields: [
+        { name: "location", populateTable: "locations", displayField: ["name"] },
+      ],
     },
     users: {
       tableName: "users",
@@ -70,6 +81,28 @@ const tableConfigurations = {
         { name: "tutor", populateTable: "tutors", displayField: ["first_name", "last_name"] },
       ],
     },
+    disability_type: {
+    tableName: "disability-types",
+    selectedFields: ["abbreviation", "definition"],
+    optionalFields: [],
+    populateFields: [],
+    },
+    faculty: {
+    tableName: "faculties",
+    selectedFields: ["abbreviation", "name"],
+    optionalFields: [],
+    populateFields: [
+      { name: "location", populateTable: "locations", displayField: ["name"] },
+    ],
+    },
+    location: {
+    tableName: "locations",
+    selectedFields: ["name"],
+    optionalFields: [],
+    populateFields: [
+      { name: "faculty", populateTable: "faculties", displayField: ["name"] },
+    ],
+  },
 };
 
 export default function DataAdministrationPage() {

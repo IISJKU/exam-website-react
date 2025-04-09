@@ -57,7 +57,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
           // Identify boolean fields dynamically
           const detectedBooleanFields: string[] = [];
           filteredFields.forEach((field) => {
-            if (typeof item[field] === "boolean") {
+            if (result.some((item: any) => typeof item[field] === "boolean")) {
               detectedBooleanFields.push(field);
             }
           });
@@ -68,14 +68,17 @@ export default function DataAdministration(props: DataAdministrationProps) {
           props.populateFields?.forEach((field) => {
             if (item[field.name]) {
               // Concatenate multiple display fields
-              const displayValue = field.displayField
-                .map((df) => item[field.name][df])
-                .filter(Boolean)
-                .join(" ");
+              const displayValue =
+                Array.isArray(item[field.name]) ? item[field.name].map((obj: any) => field.displayField.map((df) => obj[df]).filter(Boolean).join(" ")).join(", ") // separate multiple items with comma
+                  : field.displayField.map((df) => item[field.name]?.[df]).filter(Boolean).join(" ");
               record[field.name] = displayValue || "N/A";
-              record[`${field.name}_id`] = item[field.name].id;
+              // Build ID(s)
+              record[`${field.name}_id`] = Array.isArray(item[field.name])
+              ? item[field.name].map((obj: any) => obj.id)
+              : item[field.name].id;
             } else {
               record[field.name] = "N/A";
+              record[`${field.name}_id`] = Array.isArray(item[field.name]) ? [] : null;
             }
           });
 
@@ -292,7 +295,10 @@ export default function DataAdministration(props: DataAdministrationProps) {
                   ))}
                   {props.populateFields?.map((field) => (
                     <td className="border px-4 py-2" role="cell" key={`${record.id}-${field.name}`}>
-                      {record[field.name] || t("N/A")}
+                      {Array.isArray(record[field.name])
+                        ? record[field.name].map((item: any) => item.abbreviation || item.displayValue || item.name).join(", ")
+                        : (record[field.name] || t("N/A"))
+                      }
                     </td>
                   ))}
                   <td className="border px-4 py-2" role="cell">

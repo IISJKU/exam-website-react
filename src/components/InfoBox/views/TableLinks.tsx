@@ -12,6 +12,9 @@ const tableConfigurations = {
   majors: { tableName: "majors" },
   rooms: { tableName: "rooms" },
   users: { tableName: "users" },
+  disability_type: { tableName: "disability-types" },
+  faculty: { tableName: "faculties" },
+  location: { tableName: "locations" },
 };
 
 export default function TableLinks() {
