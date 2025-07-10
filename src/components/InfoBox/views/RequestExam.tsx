@@ -72,7 +72,7 @@ export default function RequestExam() {
   useEffect(() => {
     const fetchDropdownOptions = async () => {
       try {
-        const [examinersRes, studentRes, institutesRes, modesRes] = await Promise.all([
+        const [examinersRes, studentRes, modesRes] = await Promise.all([
           fetch(config.strapiUrl + "/api/examiners", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch(config.strapiUrl + "/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
           fetch(config.strapiUrl + "/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
@@ -95,7 +95,6 @@ export default function RequestExam() {
           date,
           duration,
           examiner,
-          institute,
           mode,
           studentEmail,
         });
@@ -133,7 +132,6 @@ export default function RequestExam() {
 
     t = t + ' "student_id" : "' + student + '",';
     t = t + ' "examiner_id" : "' + examiner + '",';
-    t = t + ' "institute_id" : "' + institute + '",';
     t = t + ' "exam_mode" : "' + mode + '",';
     t = t + ' "student_email" : "' + studentEmail + '",';
 
