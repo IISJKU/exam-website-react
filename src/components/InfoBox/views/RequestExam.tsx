@@ -66,7 +66,6 @@ export default function RequestExam() {
 
   const [options, setOptions] = useState({
     examiners: [] as Examiner[],
-    institutes: [] as Institute[],
     modes: [] as ExamMode[],
   });
 
@@ -74,17 +73,15 @@ export default function RequestExam() {
     const fetchDropdownOptions = async () => {
       try {
         const [examinersRes, studentRes, institutesRes, modesRes] = await Promise.all([
-          fetch(config.strapiUrl +"/api/examiners", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/institutes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch(config.strapiUrl + "/api/examiners", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch(config.strapiUrl + "/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch(config.strapiUrl + "/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+          fetch(config.strapiUrl + "/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
         ]);
         setExaminers(examinersRes ?? []); // Populate examiners
 
         setOptions({
           examiners: examinersRes ?? [],
-          institutes: institutesRes ?? [],
           modes: modesRes ?? [],
         });
 
@@ -157,7 +154,6 @@ export default function RequestExam() {
       date: t("Date/Time"),
       duration: t("Duration"),
       examiner: t("Examiner"),
-      institute: t("Institute"),
       mode: t("Mode"),
     };
 
@@ -181,7 +177,6 @@ export default function RequestExam() {
       duration: duration,
       examiner_id: 0,
       examiner: undefined,
-      institute_id: 0,
       exam_mode: mode,
       lva_num,
       student_email: studentEmail,
@@ -203,10 +198,6 @@ export default function RequestExam() {
       }
     }
 
-    if (typeof institute == "number") {
-      data.institute_id = institute;
-    }
-
     setExam(data as Exam);
     try {
       let addedEx = addedExam();
@@ -226,7 +217,10 @@ export default function RequestExam() {
 
         if (!notify.ok) {
           const errorData = await notify.json();
-          showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${notify.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`, type: "error"});
+          showToast({
+            message: `${t("HTTP error!")} ${t("Status")}: ${notify.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`,
+            type: "error",
+          });
           return;
         }
 
@@ -249,7 +243,7 @@ export default function RequestExam() {
     setStudent(initialState.student);
     setDuration(initialState.duration);
     setExaminer(initialState.examiner);
-    setInstitute(initialState.institute);
+    //setInstitute(initialState.institute);
     setMode(initialState.mode);
 
     navigate("/student/all-exams");
@@ -259,21 +253,21 @@ export default function RequestExam() {
     list.map((item: any) => ({
       value: item.id,
       label: lastNameField ? `${item[firstNameField]} ${item[lastNameField]}` : item[firstNameField],
-  }));
-  
+    }));
+
   const handleAddExaminer = (newExaminer: Examiner) => {
     setExaminers((prevExaminers) => [...prevExaminers, newExaminer]);
     setOptions((prevOptions) => ({
       ...prevOptions,
       examiners: [...prevOptions.examiners, newExaminer],
     }));
-    setExaminer(newExaminer.first_name+ " "+newExaminer.last_name);
+    setExaminer(newExaminer.first_name + " " + newExaminer.last_name);
     setExaminerEmail(newExaminer.email || "");
     showToast({ message: t("Examiner added successfully"), type: "success" });
   };
 
   const handleSelectExaminer = (examinerId: number) => {
-    setExaminer(examinerId); 
+    setExaminer(examinerId);
   };
 
   if (loading)
@@ -335,7 +329,8 @@ export default function RequestExam() {
         required={true}
         aria-required="true"
       />
-      
+
+      {/* 
       <DropdownWithSearch
         tableName="institutes"
         label={t("Institute")}
@@ -349,6 +344,7 @@ export default function RequestExam() {
         required={true}
         aria-required="true"
       />
+      */}
       <DropdownWithSearch
         tableName="exam-modes"
         label={t("Mode")}

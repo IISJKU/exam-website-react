@@ -440,7 +440,7 @@ const resources = {
       Topic: "Kurs",
       Username: "Benutzername",
       Password: "Passwort",
-      "Exam Overview": "Kursübersicht",
+      "Exam Overview": "Alle Prüfungen",
       "Emergency Contact": "Notfallkontakt",
       Duration: "Dauer",
       "Date/Time": "Datum/Zeit",
