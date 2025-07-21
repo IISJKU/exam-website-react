@@ -129,6 +129,7 @@ export default function ExamEditor() {
           showToast({ message: t("No exam data found"), type: "error" });
         }
       } catch (error) {
+        console.error("Fetch error:", error);
         showToast({ message: t("Error fetching exam data"), type: "error" });
       } finally {
         setLoading(false);
