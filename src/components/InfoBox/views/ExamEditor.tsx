@@ -89,7 +89,10 @@ export default function ExamEditor() {
 
         const rawData = await examResponse.json();
         if (!examResponse.ok) {
-          showToast({ message: `${t("Error fetching exam data")}: ${examResponse.status}, Message: ${rawData.error.message || "Unknown error"}.`, type: "error" });
+          showToast({
+            message: `${t("Error fetching exam data")}: ${examResponse.status}, Message: ${rawData.error.message || "Unknown error"}.`,
+            type: "error",
+          });
         }
 
         let examData: Exam | undefined;
@@ -108,20 +111,20 @@ export default function ExamEditor() {
 
           setExam(examData);
           setOriginalExam(examData);
-          setTitle(examData.title);
-          setLvaNum(examData.lva_num);
-          setDate(examData.date);
-          setDuration(examData.duration);
-          setRoom(examData.room_id);
-          setNotes(examData.notes);
-          setTutor(examData.tutor_id);
-          setRegisteredTutors(examData.registeredTutors);
-          setStudent(examData.student_id);
-          setExaminer(examData.examiner_id);
-          setMajor(examData.major_id);
-          setInstitute(examData.institute_id);
-          setMode(examData.mode_id);
-          setStatus(examData.status);
+          setTitle(examData.title ?? "");
+          setLvaNum(examData.lva_num ?? "");
+          setDate(examData.date ?? null);
+          setDuration(examData.duration ?? 0);
+          setRoom(examData.room_id ?? null);
+          setNotes(examData.notes ?? "");
+          setTutor(examData.tutor_id ?? null);
+          setRegisteredTutors(examData.registeredTutors ?? []);
+          setStudent(examData.student_id ?? null);
+          setExaminer(examData.examiner_id ?? null);
+          setMajor(examData.major_id ?? null);
+          setInstitute(examData.institute_id ?? null);
+          setMode(examData.mode_id ?? null);
+          setStatus(examData.status ?? "");
         } else {
           showToast({ message: t("No exam data found"), type: "error" });
         }
@@ -135,44 +138,44 @@ export default function ExamEditor() {
     const fetchDropdownOptions = async () => {
       try {
         const [studentsRes, tutorsRes, examinersRes, majorsRes, institutesRes, modesRes, roomsRes] = await Promise.all([
-          fetch(config.strapiUrl +"/api/students", {
+          fetch(config.strapiUrl + "/api/students", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
           user.role == "Admin" &&
-            fetch(config.strapiUrl +"/api/tutors", {
+            fetch(config.strapiUrl + "/api/tutors", {
               method: "GET",
               headers: {
                 Authorization: `Bearer ${user.token}`,
               },
             }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/examiners", {
+          fetch(config.strapiUrl + "/api/examiners", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/majors", {
+          fetch(config.strapiUrl + "/api/majors", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/institutes", {
+          fetch(config.strapiUrl + "/api/institutes", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/exam-modes", {
+          fetch(config.strapiUrl + "/api/exam-modes", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/rooms", {
+          fetch(config.strapiUrl + "/api/rooms", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -198,12 +201,12 @@ export default function ExamEditor() {
 
     // Fetch exams
     const fetchAllExams = async () => {
-      const response = await fetch(config.strapiUrl +"/api/exams", {
+      const response = await fetch(config.strapiUrl + "/api/exams", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
       const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
-    setAllExams(nonArchivedExams);
+      setAllExams(nonArchivedExams);
     };
 
     fetchExam();
@@ -277,7 +280,7 @@ export default function ExamEditor() {
     }
     return t;
   }
-  
+
   const handleUpdate = async () => {
     const data: Partial<Exam> = {
       title,
@@ -328,8 +331,12 @@ export default function ExamEditor() {
             <tbody>
                ${generateRow("Title", exam?.title, title, true)}
                ${generateRow("LVA Number", exam?.lva_num, lva_num, true)}
-               ${generateRow("Date", exam?.date ? moment(exam.date).format("DD.MM.YYYY HH:mm") : "N/A",
-                 date ? moment(date).format("DD.MM.YYYY HH:mm") : moment(exam?.date).format("DD.MM.YYYY HH:mm"), true)}
+               ${generateRow(
+                 "Date",
+                 exam?.date ? moment(exam.date).format("DD.MM.YYYY HH:mm") : "N/A",
+                 date ? moment(date).format("DD.MM.YYYY HH:mm") : moment(exam?.date).format("DD.MM.YYYY HH:mm"),
+                 true
+               )}
               ${generateRow("Duration", exam?.duration, duration, true)}
               ${generateRow("Tutor", match(options.tutors, exam?.tutor_id), match(options.tutors, tutor), true)}
               ${generateRow("Student", match(options.students, exam?.student_id), match(options.students, student), true)}
@@ -343,24 +350,24 @@ export default function ExamEditor() {
             </tbody>
           </table>
         `;
-        // Send emails to both tutor and student
-        const emailPromises = [
-          sendEmail({
-            to: exam?.tutor_email || "",
-            subject: "Exam Update Notification",
-            text: "The exam has been updated successfully.",
-            html: changesHtml,
-            token: user.token,
-          }),
-          sendEmail({
-            to: exam?.student_email || "",
-            subject: "Exam Update Notification",
-            text: "The exam has been updated successfully.",
-            html: changesHtml,
-            token: user.token,
-          }),
-        ];
-        await Promise.all(emailPromises);
+          // Send emails to both tutor and student
+          const emailPromises = [
+            sendEmail({
+              to: exam?.tutor_email || "",
+              subject: "Exam Update Notification",
+              text: "The exam has been updated successfully.",
+              html: changesHtml,
+              token: user.token,
+            }),
+            sendEmail({
+              to: exam?.student_email || "",
+              subject: "Exam Update Notification",
+              text: "The exam has been updated successfully.",
+              html: changesHtml,
+              token: user.token,
+            }),
+          ];
+          await Promise.all(emailPromises);
         }
       }
 
@@ -459,225 +466,221 @@ export default function ExamEditor() {
   if (user.role == "Admin")
     return (
       <>
-      <div className="flex flex-row md:flex-row justify-between items-center px-4">
-        <h1 id="exam-editor-title" className="text-2xl font-bold mb-4 sr-only" tabIndex={0}>
-          {t("Exam Editor")}
+        <div className="flex flex-row md:flex-row justify-between items-center px-4">
+          <h1 id="exam-editor-title" className="text-2xl font-bold mb-4 sr-only" tabIndex={0}>
+            {t("Exam Editor")}
           </h1>
-          
-        <EditField
-          title={t("Exam Title")}
-          editMode={editMode}
-          text={title}
-          hideTitle={true}
-          onChange={(e) => setTitle(e.target.value)}
-          aria-label={t("Exam Title")}
-          required={true}
-        />
-      </div>
-      <div className="flex flex-col md:flex-row justify-between gap-4 px-2" role="region" aria-labelledby="side-by-side-divs-heading" > 
-        {/* First div */}
-        <div className="w-1/2 p-4 rounded shadow-md" role="region" aria-labelledby="first-div-heading">
+
           <EditField
-            title={t("LVA Num")}
+            title={t("Exam Title")}
             editMode={editMode}
-            text={lva_num ? lva_num.toString() : ""}
-            hideTitle={false}
-            onChange={(e) => setLvaNum(Number(e.target.value))}
-            aria-label={t("LVA course Number")}
+            text={title}
+            hideTitle={true}
+            onChange={(e) => setTitle(e.target.value)}
+            aria-label={t("Exam Title")}
             required={true}
-          />
-
-          <DateField
-            title={t("Date/Time")}
-            editMode={editMode}
-            dateValue={date}
-            onDateChange={handleDateChange}
-            onTimeChange={handleTimeChange}
-            aria-label={t("Exam Date and Time")}
-            required={true}
-          />
-          <EditField
-            title={t("Duration")}
-            editMode={editMode}
-            text={duration ? duration.toString() : ""}
-            hideTitle={false}
-            onChange={(e) => setDuration(Number(e.target.value))}
-            aria-label={t("Exam Duration")}
-            required={true}
-          />
-
-          <DropdownWithSearch
-            tableName="students"
-            label={t("Student")}
-            options={dropdownOptions(options.students, "first_name", "last_name")}
-            value={student ?? ""}
-            onChange={(newValue) => setStudent(Number(newValue))}
-            placeholder={t("Search student...")}
-            disabled={!editMode}
-            aria-label={t("Exam Student")}
-            required={true}
-          />
-
-          <DropdownWithSearchMultiple
-            tableName="tutors"
-            label={t("Tutors")}
-            options={dropdownOptions(options.tutors, "first_name", "last_name")}
-            value={tutor ?? ""}
-            values={registeredTutors}
-            onChange={(newValue) => {
-              setTutor(Number(newValue));
-            }}
-            placeholder={t("Search tutors...")}
-            disabled={!editMode}
-            aria-label={t("Exam Tutor")}
-          />
-            
-          <EnumSelector
-            title={t("Status")}
-            value={status}
-            disabled={!editMode}
-            onChange={(newValue) => setStatus((newValue))}
-            options={Object.values(ExamStatus)}
-            aria-label={t("Exam Status")}
           />
         </div>
-        <div
-          className="w-1/2 p-4 rounded shadow-md"
-          role="region"
-          aria-labelledby="second-div-heading"
-        >
-          <DropdownWithSearch
-            tableName="examiners"
-            label={t("Examiner")}
-            options={dropdownOptions(options.examiners, "first_name", "last_name")}
-            value={examiner ?? ""}
-            onChange={(newVal) => setExaminer(Number(newVal))}
-            placeholder={t("Search examiner...")}
-            disabled={!editMode}
-            aria-label={t("Course Examiner")}
-            required={true}
-              />
-              
-          <DropdownWithSearch
-            tableName="majors"
-            label={t("Major")}
-            options={dropdownOptions(options.majors, "name")}
-            value={major ?? ""}
-            onChange={(newVal) => setMajor(Number(newVal))}
-            placeholder={t("Search majors...")}
-            disabled={!editMode}
-            aria-label={t("Course Major")}
-          />
+        <div className="flex flex-col md:flex-row justify-between gap-4 px-2" role="region" aria-labelledby="side-by-side-divs-heading">
+          {/* First div */}
+          <div className="w-1/2 p-4 rounded shadow-md" role="region" aria-labelledby="first-div-heading">
+            <EditField
+              title={t("LVA Num")}
+              editMode={editMode}
+              text={lva_num ? lva_num.toString() : ""}
+              hideTitle={false}
+              onChange={(e) => setLvaNum(Number(e.target.value))}
+              aria-label={t("LVA course Number")}
+              required={true}
+            />
 
-          <DropdownWithSearch
-            tableName="institutes"
-            label={t("Institute")}
-            options={dropdownOptions(options.institutes, "name")}
-            value={institute ?? ""}
-            onChange={(newVal) => setInstitute(Number(newVal))}
-            placeholder={t("Search institutes...")}
-            disabled={!editMode}
-            aria-label={t("Course Institute")}
-          />
+            <DateField
+              title={t("Date/Time")}
+              editMode={editMode}
+              dateValue={date}
+              onDateChange={handleDateChange}
+              onTimeChange={handleTimeChange}
+              aria-label={t("Exam Date and Time")}
+              required={true}
+            />
+            <EditField
+              title={t("Duration")}
+              editMode={editMode}
+              text={duration ? duration.toString() : ""}
+              hideTitle={false}
+              onChange={(e) => setDuration(Number(e.target.value))}
+              aria-label={t("Exam Duration")}
+              required={true}
+            />
 
-          <DropdownWithSearch
-            tableName="exam-modes"
-            label={t("Mode")}
-            options={dropdownOptions(options.modes, "name")}
-            value={mode ?? ""}
-            onChange={(newVal) => setMode(Number(newVal))}
-            placeholder={t("Search modes...")}
-            disabled={!editMode}
-            aria-label={t("Exam Mode")}
-            required={true}
-          />
+            <DropdownWithSearch
+              tableName="students"
+              label={t("Student")}
+              options={dropdownOptions(options.students, "first_name", "last_name")}
+              value={student ?? ""}
+              onChange={(newValue) => setStudent(Number(newValue))}
+              placeholder={t("Search student...")}
+              disabled={!editMode}
+              aria-label={t("Exam Student")}
+              required={true}
+            />
 
-          <DropdownWithSearch
-            tableName="rooms"
-            label={t("Room")}
-            options={dropdownOptions(options.rooms, "name")}
-            value={room ?? ""}
-            onChange={(newVal) => handleRoomChange(Number(newVal))}
-            placeholder={t("Search rooms...")}
-            disabled={!editMode}
-            aria-label={t("Room Selector")}
-          />
+            <DropdownWithSearchMultiple
+              tableName="tutors"
+              label={t("Tutors")}
+              options={dropdownOptions(options.tutors, "first_name", "last_name")}
+              value={tutor ?? ""}
+              values={registeredTutors}
+              onChange={(newValue) => {
+                setTutor(Number(newValue));
+              }}
+              placeholder={t("Search tutors...")}
+              disabled={!editMode}
+              aria-label={t("Exam Tutor")}
+            />
 
-          <EditField
-            title={t("Notes")}
-            editMode={editMode}
-            text={notes}
-            hideTitle={false}
-            onChange={(e) => setNotes(e.target.value)}
-            aria-label={t("Exam Notes")}
-          />
-      </div>
-    </div>
-    <div className="m-5 mt-4 flex flex-row md:flex-row space-x-2">
-      <button
-        onClick={() => navigate(-1)}
-        className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
-        aria-label={t("Back to previous page")}
-      >
-        {"Back"}
-      </button>
-      <button
-        onClick={() => {
-          setEditMode(!editMode);
-          if (editMode) handleUpdate();
-        }}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
-        aria-label={editMode ? t("Save changes") : t("Edit exam")}
-      >
-        {editMode ? t("Save") : t("Edit")}
-        </button>
-        {editMode && (
+            <EnumSelector
+              title={t("Status")}
+              value={status}
+              disabled={!editMode}
+              onChange={(newValue) => setStatus(newValue)}
+              options={Object.values(ExamStatus)}
+              aria-label={t("Exam Status")}
+            />
+          </div>
+          <div className="w-1/2 p-4 rounded shadow-md" role="region" aria-labelledby="second-div-heading">
+            <DropdownWithSearch
+              tableName="examiners"
+              label={t("Examiner")}
+              options={dropdownOptions(options.examiners, "first_name", "last_name")}
+              value={examiner ?? ""}
+              onChange={(newVal) => setExaminer(Number(newVal))}
+              placeholder={t("Search examiner...")}
+              disabled={!editMode}
+              aria-label={t("Course Examiner")}
+              required={true}
+            />
+
+            <DropdownWithSearch
+              tableName="majors"
+              label={t("Major")}
+              options={dropdownOptions(options.majors, "name")}
+              value={major ?? ""}
+              onChange={(newVal) => setMajor(Number(newVal))}
+              placeholder={t("Search majors...")}
+              disabled={!editMode}
+              aria-label={t("Course Major")}
+            />
+
+            <DropdownWithSearch
+              tableName="institutes"
+              label={t("Institute")}
+              options={dropdownOptions(options.institutes, "name")}
+              value={institute ?? ""}
+              onChange={(newVal) => setInstitute(Number(newVal))}
+              placeholder={t("Search institutes...")}
+              disabled={!editMode}
+              aria-label={t("Course Institute")}
+            />
+
+            <DropdownWithSearch
+              tableName="exam-modes"
+              label={t("Mode")}
+              options={dropdownOptions(options.modes, "name")}
+              value={mode ?? ""}
+              onChange={(newVal) => setMode(Number(newVal))}
+              placeholder={t("Search modes...")}
+              disabled={!editMode}
+              aria-label={t("Exam Mode")}
+              required={true}
+            />
+
+            <DropdownWithSearch
+              tableName="rooms"
+              label={t("Room")}
+              options={dropdownOptions(options.rooms, "name")}
+              value={room ?? ""}
+              onChange={(newVal) => handleRoomChange(Number(newVal))}
+              placeholder={t("Search rooms...")}
+              disabled={!editMode}
+              aria-label={t("Room Selector")}
+            />
+
+            <EditField
+              title={t("Notes")}
+              editMode={editMode}
+              text={notes}
+              hideTitle={false}
+              onChange={(e) => setNotes(e.target.value)}
+              aria-label={t("Exam Notes")}
+            />
+          </div>
+        </div>
+        <div className="m-5 mt-4 flex flex-row md:flex-row space-x-2">
           <button
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
-            onClick={() => {
-              setEditMode(false);
-            }}
-            aria-label={t("Cancel editing")}
+            onClick={() => navigate(-1)}
+            className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-700 focus:outline-none focus:ring-2 focus:bg-slate-700"
+            aria-label={t("Back to previous page")}
           >
-            {t("Cancel")}
+            {"Back"}
           </button>
-        )}
-    </div>
-    {showConfirmDialog && (
-      <div
-        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="confirm-dialog-title"
-        aria-describedby="confirm-dialog-description"
-      >
-        <div className="bg-white p-4 rounded shadow-lg max-w-sm">
-          <h2 id="confirm-dialog-title" className="text-lg font-bold mb-4">
-            {t("Confirm Room Selection")}
-          </h2>
-          <p id="confirm-dialog-description" className="mb-4">
-            {t("The selected room has a capacity of 0. Do you want to continue?")}
-          </p>
-          <div className="flex justify-end space-x-2">
+          <button
+            onClick={() => {
+              setEditMode(!editMode);
+              if (editMode) handleUpdate();
+            }}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
+            aria-label={editMode ? t("Save changes") : t("Edit exam")}
+          >
+            {editMode ? t("Save") : t("Edit")}
+          </button>
+          {editMode && (
             <button
-              onClick={handleCancelRoomSelection}
-              className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 focus:ring-2 focus:ring-gray-400"
-              aria-label={t("Cancel room selection")}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
+              onClick={() => {
+                setEditMode(false);
+              }}
+              aria-label={t("Cancel editing")}
             >
               {t("Cancel")}
             </button>
-            <button
-              onClick={handleConfirmRoomSelection}
-              className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 focus:ring-2 focus:ring-red-500"
-              aria-label={t("Confirm room selection")}
-            >
-              {t("Confirm")}
-            </button>
-          </div>
+          )}
         </div>
-      </div>
-    )}
-    </>
+        {showConfirmDialog && (
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-dialog-title"
+            aria-describedby="confirm-dialog-description"
+          >
+            <div className="bg-white p-4 rounded shadow-lg max-w-sm">
+              <h2 id="confirm-dialog-title" className="text-lg font-bold mb-4">
+                {t("Confirm Room Selection")}
+              </h2>
+              <p id="confirm-dialog-description" className="mb-4">
+                {t("The selected room has a capacity of 0. Do you want to continue?")}
+              </p>
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={handleCancelRoomSelection}
+                  className="border-2 border-gray-300 bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 focus:ring-2 focus:ring-gray-400"
+                  aria-label={t("Cancel room selection")}
+                >
+                  {t("Cancel")}
+                </button>
+                <button
+                  onClick={handleConfirmRoomSelection}
+                  className="border-2 border-red-500 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 focus:ring-2 focus:ring-red-500"
+                  aria-label={t("Confirm room selection")}
+                >
+                  {t("Confirm")}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   else
     return (
@@ -687,13 +690,14 @@ export default function ExamEditor() {
         </h1>
         <EditField
           title={t("Exam Title")}
-          editMode={editMode} text={title}
+          editMode={editMode}
+          text={title}
           onChange={(e) => setTitle(e.target.value)}
           aria-label={t("Exam Title")}
           required={true}
           aria-required="true"
         />
-        
+
         <EditField
           title={t("LVA Num")}
           editMode={editMode}
