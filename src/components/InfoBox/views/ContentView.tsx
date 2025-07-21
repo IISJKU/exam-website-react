@@ -6,7 +6,7 @@ import Pagination from "../components/Pagination";
 import { useAuth } from "../../../hooks/AuthProvider";
 import { ExamStatus } from "../../classes/Exam";
 import Tutor from "../../classes/Tutor";
-import SortableStatus from "../components/SortableStatus";
+//import SortableStatus from "../components/SortableStatus";
 
 interface ContentViewInterface<T> {
   title: string;
@@ -92,16 +92,10 @@ export default function ContentView<T extends { id?: number; status?: ExamStatus
               { color: "bg-blue-200", label: "No Tutor Picked Yet" },
               { color: "bg-slate-300", label: "No Action Required" },
             ].map((item, index) => (
-              <SortableStatus
-                index={index}
-                label={item.label}
-                color={item.color}
-                fields={props.fields.map((field) => t(field))}
-                keys={props.keys}
-                elements={filtered}
-                original={props.data}
-                setElements={setFilteredData}
-              ></SortableStatus>
+              <li key={index} className="flex items-center" role="listitem" aria-label={item.label}>
+                <span className={`w-6 h-6 ${item.color} border-dashed border-black border-2 inline-block mr-2`} role="presentation" aria-hidden="true"></span>
+                {item.label}
+              </li>
             ))}
           </ul>
         </div>
