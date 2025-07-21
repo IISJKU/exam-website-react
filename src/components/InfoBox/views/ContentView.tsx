@@ -104,13 +104,7 @@ export default function ContentView<T extends { id?: number; status?: ExamStatus
       <div className="overflow-x-auto" role="table" aria-label={`${t(props.title)} ${t("Table")}`}>
         <table className="min-w-full table-auto text-left border-2">
           <thead>
-            <SortableHeaders
-              fields={props.fields.map((field) => t(field))}
-              keys={props.keys}
-              elements={filtered}
-              setElements={setFilteredData}
-              original={props.data}
-            />
+            <SortableHeaders fields={props.fields.map((field) => t(field))} keys={props.keys} elements={filtered} setElements={setFilteredData} />
           </thead>
           <tbody>
             {entries.map((element: T, index) => (
