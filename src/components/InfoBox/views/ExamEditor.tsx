@@ -63,7 +63,7 @@ export default function ExamEditor() {
 
   const formatExamData = (exam: Exam): Exam => {
     typeof exam.examiner == "number" ? (exam.examiner_id = exam.examiner) : (exam.examiner_id = exam.examiner.id);
-    typeof exam.institute == "number" ? (exam.institute_id = exam.institute) : (exam.institute_id = exam.institute.id);
+    typeof exam.institute == "number" ? (exam.institute_id = exam.institute) : (exam.institute_id = exam.institute?.id ?? null);
     typeof exam.student == "number" ? (exam.student_id = exam.student) : (exam.student_id = exam.student.id);
     typeof exam.exam_mode == "number" ? (exam.mode_id = exam.exam_mode) : (exam.mode_id = exam.exam_mode.id);
 
