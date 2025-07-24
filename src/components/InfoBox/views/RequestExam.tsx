@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import EditField from "../components/EditField";
 import DateField from "../components/DateField";
@@ -49,6 +49,8 @@ export default function RequestExam() {
   const [mode, setMode] = useState<number | undefined>();
   const [studentEmail, setStudentEmail] = useState<string>(user.userEmail || "");
   const [examiners, setExaminers] = useState<Examiner[]>([]);
+
+  const dialog = useRef();
 
   // Define initial state with the correct type
   const [initialState, setInitialState] = useState<InitialState>({

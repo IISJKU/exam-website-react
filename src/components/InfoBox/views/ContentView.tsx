@@ -67,105 +67,112 @@ export default function ContentView<T extends { id?: number; status?: ExamStatus
   const pages = Array.from({ length: numPages }, (_, i) => i + 1);
 
   const className = "hover:bg-slate-100 even:bg-slate-300 odd:bg-slate-200 cursor-pointer focus:outline-none focus:ring-2";
-
-  return (
-    <div className="w-full h-full p-5 select-none" role="region" aria-labelledby="table-title">
-      <div className="flex flex-wrap justify-between items-center mb-4">
-        <h2 id="table-title" className="text-4xl w-full md:w-1/3 my-2">
-          {t(props.title)}
-        </h2>
-        <SearchBar items={props.data} filter={setFilteredData} />
-      </div>
-      {/* Color Legend for Admin */}
-      {user.role === "Admin" && props.coloring && (
-        <div className="mb-4 p-4 bg-gray-100 rounded-md" role="region" aria-labelledby="legend-title">
-          <h6 id="legend-title" className="text-lg font-semibold mb-2 sr-only">
-            {t("Color Legend for Exam Statuses")}
-          </h6>
-          <ul className="flex flex-wrap gap-3" role="list" aria-label={t("Exam status color legend")}>
-            {[
-              { color: "bg-red-300", label: "Email Examiner Needed" },
-              { color: "bg-yellow-300", label: "Material Needed" },
-              { color: "bg-orange-300", label: "No Room Assigned" },
-              { color: "bg-green-300", label: "No Tutor Needed" },
-              { color: "bg-blue-400", label: "No Tutors Assigned" },
-              { color: "bg-blue-200", label: "No Tutor Picked Yet" },
-              { color: "bg-slate-300", label: "No Action Required" },
-            ].map((item, index) => (
-              <li key={index} className="flex items-center" role="listitem" aria-label={item.label}>
-                <span className={`w-6 h-6 ${item.color} border-dashed border-black border-2 inline-block mr-2`} role="presentation" aria-hidden="true"></span>
-                {item.label}
-              </li>
-            ))}
-          </ul>
+  if (props.data.length > 0)
+    return (
+      <div className="w-full h-full p-5 select-none" role="region" aria-labelledby="table-title">
+        <div className="flex flex-wrap justify-between items-center mb-4">
+          <h2 id="table-title" className="text-4xl w-full md:w-1/3 my-2">
+            {t(props.title)}
+          </h2>
+          <SearchBar items={props.data} filter={setFilteredData} />
         </div>
-      )}
-      {/* Table Wrapper with Horizontal Scrolling */}
-      <div className="overflow-x-auto" role="table" aria-label={`${t(props.title)} ${t("Table")}`}>
-        <table className="min-w-full table-auto text-left border-2">
-          <thead>
-            <SortableHeaders fields={props.fields.map((field) => t(field))} keys={props.keys} elements={filtered} setElements={setFilteredData} />
-          </thead>
-          <tbody>
-            {entries.map((element: T, index) => (
-              <tr
-                key={`${element.id}-${index}`}
-                className={`${
-                  user.role == "Admin" && props.coloring
-                    ? getBorderColor(element.status, element.room_id, element.registeredTutors, element.tutor_id)
-                    : className
-                }`}
-                tabIndex={0}
-                role="row"
-                aria-label={`${t("Row")} ${index + 1}`}
-                onClick={() => {
-                  if (element.id && props.onRowClick) {
-                    props.onRowClick(element.id);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
+        {/* Color Legend for Admin */}
+        {user.role === "Admin" && props.coloring && (
+          <div className="mb-4 p-4 bg-gray-100 rounded-md" role="region" aria-labelledby="legend-title">
+            <h6 id="legend-title" className="text-lg font-semibold mb-2 sr-only">
+              {t("Color Legend for Exam Statuses")}
+            </h6>
+            <ul className="flex flex-wrap gap-3" role="list" aria-label={t("Exam status color legend")}>
+              {[
+                { color: "bg-red-300", label: "Email Examiner Needed" },
+                { color: "bg-yellow-300", label: "Material Needed" },
+                { color: "bg-orange-300", label: "No Room Assigned" },
+                { color: "bg-green-300", label: "No Tutor Needed" },
+                { color: "bg-blue-400", label: "No Tutors Assigned" },
+                { color: "bg-blue-200", label: "No Tutor Picked Yet" },
+                { color: "bg-slate-300", label: "No Action Required" },
+              ].map((item, index) => (
+                <li key={index} className="flex items-center" role="listitem" aria-label={item.label}>
+                  <span className={`w-6 h-6 ${item.color} border-dashed border-black border-2 inline-block mr-2`} role="presentation" aria-hidden="true"></span>
+                  {item.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {/* Table Wrapper with Horizontal Scrolling */}
+        <div className="overflow-x-auto" role="table" aria-label={`${t(props.title)} ${t("Table")}`}>
+          <table className="min-w-full table-auto text-left border-2">
+            <thead>
+              <SortableHeaders fields={props.fields.map((field) => t(field))} keys={props.keys} elements={filtered} setElements={setFilteredData} />
+            </thead>
+            <tbody>
+              {entries.map((element: T, index) => (
+                <tr
+                  key={`${element.id}-${index}`}
+                  className={`${
+                    user.role == "Admin" && props.coloring
+                      ? getBorderColor(element.status, element.room_id, element.registeredTutors, element.tutor_id)
+                      : className
+                  }`}
+                  tabIndex={0}
+                  role="row"
+                  aria-label={`${t("Row")} ${index + 1}`}
+                  onClick={() => {
                     if (element.id && props.onRowClick) {
                       props.onRowClick(element.id);
                     }
-                  }
-                }}
-              >
-                {props.keys.map((key, idx) => (
-                  <td key={`${String(key)}-${idx}`} className="pl-2" tabIndex={0} role="cell">
-                    {typeof element[key] === "boolean"
-                      ? element[key]
-                        ? t("Yes")
-                        : t("No")
-                      : typeof element[key] === "string"
-                      ? !isDate(element[key] as string)
-                        ? (element[key] as string)
-                        : formatDateTime(element[key] as string)
-                      : Array.isArray(element[key])
-                      ? (element[key] as string[]).join(", ")
-                      : typeof element[key] === "number"
-                      ? (element[key] as number)
-                      : " "}
-                  </td>
-                ))}
-                <td className="pr-3" key="editButton" role="cell">
-                  <button
-                    aria-label={`${t("Edit")} ${props.title} ${t("Row")} ${index + 1}`}
-                    className="focus:outline-none focus:ring-2 focus:ring-blue-500 hover:underline"
-                  >
-                    {t(props.buttonName || "Edit")}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      if (element.id && props.onRowClick) {
+                        props.onRowClick(element.id);
+                      }
+                    }
+                  }}
+                >
+                  {props.keys.map((key, idx) => (
+                    <td key={`${String(key)}-${idx}`} className="pl-2" tabIndex={0} role="cell">
+                      {typeof element[key] === "boolean"
+                        ? element[key]
+                          ? t("Yes")
+                          : t("No")
+                        : typeof element[key] === "string"
+                        ? !isDate(element[key] as string)
+                          ? (element[key] as string)
+                          : formatDateTime(element[key] as string)
+                        : Array.isArray(element[key])
+                        ? (element[key] as string[]).join(", ")
+                        : typeof element[key] === "number"
+                        ? (element[key] as number)
+                        : " "}
+                    </td>
+                  ))}
+                  {props.onRowClick ? (
+                    <td className="pr-3" key="editButton" role="cell">
+                      <button
+                        aria-label={`${t("Edit")} ${props.title} ${t("Row")} ${index + 1}`}
+                        className="focus:outline-none focus:ring-2 focus:ring-blue-500 hover:underline"
+                      >
+                        {t(props.buttonName || "Edit")}
+                      </button>
+                    </td>
+                  ) : (
+                    <></>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-      {/* Pagination */}
-      <Pagination callback={setPage} pageNames={pages} activePage={page} />
-    </div>
-  );
+        {/* Pagination */}
+        <Pagination callback={setPage} pageNames={pages} activePage={page} />
+      </div>
+    );
+  else {
+    return <></>;
+  }
 }
 
 // Helper function to format the date

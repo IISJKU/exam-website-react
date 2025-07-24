@@ -11,18 +11,20 @@ import config from "../../../config";
 export default function ExamView() {
   const navigate = useNavigate(); // Initialize navigate
   const user = useAuth();
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
 
   const [exams, setExams] = useState<Exam[]>([]); // Store exams
-  const [loading, setLoading] = useState<boolean>(true); 
+  const [loading, setLoading] = useState<boolean>(true);
   const [isMobileView, setIsMobileView] = useState<boolean>(false); // Track mobile view
 
   // Determine fields and keys dynamically based on screen size
-  let fields = isMobileView ? [t("Exam Title"), t("Date/Time"), t("Student")]
+  let fields = isMobileView
+    ? [t("Exam Title"), t("Date/Time"), t("Student")]
     : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Institute"), t("Notes"), t("Student Misc")];
-  
-  let keys: (keyof Exam)[] = isMobileView ? ["title", "date", "student"] // Shortened keys for mobile
-   : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute", "notes", "student_misc"];
+
+  let keys: (keyof Exam)[] = isMobileView
+    ? ["title", "date", "student"] // Shortened keys for mobile
+    : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute", "notes", "student_misc"];
 
   if (user.role === "Tutor") {
     fields = isMobileView
@@ -32,8 +34,8 @@ export default function ExamView() {
     keys = isMobileView
       ? ["title", "date", "student"] // Shortened keys for mobile
       : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute"];
-  } 
- 
+  }
+
   // Update `isMobileView` based on window width
   useEffect(() => {
     const handleResize = () => {
@@ -44,14 +46,14 @@ export default function ExamView() {
     window.addEventListener("resize", handleResize); // Add listener on resize
 
     return () => window.removeEventListener("resize", handleResize); // Cleanup listener
-  }, []); 
+  }, []);
 
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
       //let data = [];
 
-      const data = (await fetchAll(config.strapiUrl +"/api/exams", user.token, t("Http error!"))) as Exam[];
+      const data = (await fetchAll(config.strapiUrl + "/api/exams", user.token, t("Http error!"))) as Exam[];
 
       // Filter out exams with the archived status
       const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
@@ -88,7 +90,7 @@ export default function ExamView() {
         return updatedExam;
       });
 
-      setExams(updatedData); 
+      setExams(updatedData);
     } catch (error) {
       showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error" });
     } finally {
@@ -106,13 +108,17 @@ export default function ExamView() {
   };
 
   if (loading) {
-    return <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>; 
+    return (
+      <p aria-live="polite" aria-busy="true">
+        {t("Loading exams...")}
+      </p>
+    );
   }
 
   return (
     <ContentView
       title={t("Upcoming Exams")}
-      onRowClick={handleExamClick} 
+      onRowClick={handleExamClick}
       fields={fields}
       keys={keys}
       buttonName={user.role === "Tutor" ? t("View") : t("Edit")}
