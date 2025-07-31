@@ -8,7 +8,7 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
   let count = 0;
   let allEntries: any[] = [];
   let hasMore = true;
-  const maxPages = 100; // safety limit to prevent infinite loop
+  const maxPages = 500; // safety limit to prevent infinite loop
   let pageCount = 0;
 
   while (hasMore && pageCount < maxPages) {
@@ -35,11 +35,14 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
       break;
     }
 
-    const data = result?.data || [];
+    const data = Array.isArray(result) ? result : result.data || [];
+
     allEntries = allEntries.concat(data);
 
-    const total = result?.meta?.pagination?.total;
-    hasMore = total != null ? allEntries.length < total : data.length === numEntries;
+    console.log(data);
+
+    // If fewer than numEntries are returned, we reached the end
+    hasMore = data.length === numEntries;
 
     count += numEntries;
     pageCount++;
