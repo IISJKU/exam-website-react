@@ -3,40 +3,60 @@ import { showToast } from "../components/ToastMessage";
 
 import { useAuth } from "../../../hooks/AuthProvider";
 
-export default async function fetchAll(link: string, token: string, errorMsg?: string): Promise<any[] | {}> {
+export default async function fetchAll(link: string, token: string, errorMsg?: string): Promise<any[]> {
   let count = 0;
-  let start = true;
-  let numEntries = 25;
-  let allEntries: any[] = [];
-  let data = [];
+  const numEntries = 25;
+  const allEntries: any[] = [];
 
-  while (start || data.length == numEntries) {
-    data = [];
-    start = false;
-
-    // Determine if the link already contains "?" for query parameters
+  while (true) {
+    // Construct the paginated link
     const paginatedLink: string = link.includes("?")
       ? `${link}&pagination[start]=${count}&pagination[limit]=${numEntries}`
       : `${link}?pagination[start]=${count}&pagination[limit]=${numEntries}`;
 
-    const response = await fetch(paginatedLink, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    data = await response.json();
+    try {
+      // Fetch data from the API
+      const response = await fetch(paginatedLink, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    if (!response.ok && errorMsg) {
+      // Parse the response
+      const data = await response.json();
+
+      // Handle non-OK responses
+      if (!response.ok) {
+        if (errorMsg) {
+          showToast({
+            message: `${errorMsg} Status: ${response.status}, Message: ${data.error?.message || "Unknown error"}.`,
+            type: "error",
+          });
+        }
+        break; // Exit the loop on error
+      }
+
+      // Add the fetched data to the result array
+      if (Array.isArray(data) && data.length > 0) {
+        allEntries.push(...data);
+      }
+
+      // Break the loop if fewer than `numEntries` items are returned
+      if (!Array.isArray(data) || data.length < numEntries) {
+        break;
+      }
+
+      // Increment the pagination counter
+      count += numEntries;
+    } catch (error) {
+      // Handle network or unexpected errors
       showToast({
-        message: `${errorMsg} Status: ${response.status}, Message: ${data.error?.message || "Unknown error"}.`,
+        message: `An error occurred while fetching data: ${Error || "Unknown error"}.`,
         type: "error",
       });
+      break; // Exit the loop on error
     }
-
-    count = count + numEntries;
-
-    if (data.length !== 0 && data != null) allEntries = allEntries.concat(data);
   }
 
   return allEntries;
