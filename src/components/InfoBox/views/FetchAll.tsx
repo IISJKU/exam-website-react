@@ -3,16 +3,19 @@ import { showToast } from "../components/ToastMessage";
 
 import { useAuth } from "../../../hooks/AuthProvider";
 
-export default async function fetchAll(link: string, token: string, errorMsg?: string): Promise<any[]> {
-  const numEntries = 25;
+export default async function fetchAll(link: string, token: string, errorMsg?: string): Promise<any[] | {}> {
   let count = 0;
+  let start = true;
+  let numEntries = 25;
   let allEntries: any[] = [];
-  let hasMore = true;
-  const maxPages = 500; // safety limit to prevent infinite loop
-  let pageCount = 0;
+  let data = [];
 
-  while (hasMore && pageCount < maxPages) {
-    const paginatedLink = link.includes("?")
+  while (start || data.length == numEntries) {
+    data = [];
+    start = false;
+
+    // Determine if the link already contains "?" for query parameters
+    const paginatedLink: string = link.includes("?")
       ? `${link}&pagination[start]=${count}&pagination[limit]=${numEntries}`
       : `${link}?pagination[start]=${count}&pagination[limit]=${numEntries}`;
 
@@ -22,30 +25,19 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
         Authorization: `Bearer ${token}`,
       },
     });
+    data = await response.json();
 
-    const result = await response.json();
-
-    if (!response.ok) {
-      if (errorMsg) {
-        showToast({
-          message: `${errorMsg} Status: ${response.status}, Message: ${result.error?.message || "Unknown error"}.`,
-          type: "error",
-        });
-      }
-      break;
+    if (!response.ok && errorMsg) {
+      showToast({
+        message: `${errorMsg} Status: ${response.status}, Message: ${data.error?.message || "Unknown error"}.`,
+        type: "error",
+      });
     }
 
-    const data = Array.isArray(result) ? result : result.data || [];
-
-    allEntries = allEntries.concat(data);
-
+    count = count + numEntries;
     console.log(data);
 
-    // If fewer than numEntries are returned, we reached the end
-    hasMore = data.length === numEntries;
-
-    count += numEntries;
-    pageCount++;
+    if (data.length !== 0 && data != null) allEntries = allEntries.concat(data);
   }
 
   return allEntries;
