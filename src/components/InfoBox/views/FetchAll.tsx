@@ -3,19 +3,16 @@ import { showToast } from "../components/ToastMessage";
 
 import { useAuth } from "../../../hooks/AuthProvider";
 
-export default async function fetchAll(link: string, token: string, errorMsg?: string): Promise<any[] | {}> {
+export default async function fetchAll(link: string, token: string, errorMsg?: string): Promise<any[]> {
+  const numEntries = 25;
   let count = 0;
-  let start = true;
-  let numEntries = 25;
   let allEntries: any[] = [];
-  let data = [];
+  let hasMore = true;
+  const maxPages = 500; // safety limit to prevent infinite loop
+  let pageCount = 0;
 
-  while (start || data.length == numEntries) {
-    data = [];
-    start = false;
-
-    // Determine if the link already contains "?" for query parameters
-    const paginatedLink: string = link.includes("?")
+  while (hasMore && pageCount < maxPages) {
+    const paginatedLink = link.includes("?")
       ? `${link}&pagination[start]=${count}&pagination[limit]=${numEntries}`
       : `${link}?pagination[start]=${count}&pagination[limit]=${numEntries}`;
 
@@ -25,19 +22,31 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
         Authorization: `Bearer ${token}`,
       },
     });
-    data = await response.json();
 
-    if (!response.ok && errorMsg) {
-      showToast({
-        message: `${errorMsg} Status: ${response.status}, Message: ${data.error?.message || "Unknown error"}.`,
-        type: "error",
-      });
+    const result = await response.json();
+
+    if (!response.ok) {
+      if (errorMsg) {
+        showToast({
+          message: `${errorMsg} Status: ${response.status}, Message: ${result.error?.message || "Unknown error"}.`,
+          type: "error",
+        });
+      }
+      break;
     }
 
-    count = count + numEntries;
-    console.log(data);
+    const data = Array.isArray(result) ? result : result.data || [];
 
-    if (data.length !== 0 && data != null) allEntries = allEntries.concat(data);
+    allEntries = allEntries.concat(data);
+
+    console.log(data);
+    console.log(paginatedLink);
+
+    // If fewer than numEntries are returned, we reached the end
+    hasMore = data.length === numEntries;
+
+    count += numEntries;
+    pageCount++;
   }
 
   return allEntries;
