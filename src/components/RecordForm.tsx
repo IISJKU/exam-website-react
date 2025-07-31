@@ -18,7 +18,7 @@ interface RecordFormProps {
   fields: string[];
   optionalFields?: string[];
   booleanFields?: string[];
-  relationalFields?: { name: string; options: any[], selectedValue?: any, displayField: string[] }[];
+  relationalFields?: { name: string; options: any[]; selectedValue?: any; displayField: string[] }[];
 }
 
 interface DataRecord {
@@ -37,10 +37,13 @@ export default function RecordForm(props: RecordFormProps) {
 
   useEffect(() => {
     if (props.record) {
-      const initialData = (props.relationalFields ?? []).reduce((acc, field) => {
-        acc[field.name] = field.selectedValue || "";
-        return acc;
-      }, { ...props.record });
+      const initialData = (props.relationalFields ?? []).reduce(
+        (acc, field) => {
+          acc[field.name] = field.selectedValue || "";
+          return acc;
+        },
+        { ...props.record }
+      );
 
       setFormData(initialData);
 
@@ -48,7 +51,6 @@ export default function RecordForm(props: RecordFormProps) {
       const roleField = props.relationalFields?.find((field) => field.name === "role");
       const roleValue = roleField?.options.find((option) => option.id === initialData.role)?.displayValue?.toLowerCase() || "";
       setRole(roleValue); // Initialize role state if role field exists
-
     } else {
       setFormData(defaultRecord);
     }
@@ -56,14 +58,14 @@ export default function RecordForm(props: RecordFormProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-  
+
     let roleText = value;
-  
+
     // If the target is a select element and the field name is 'role', get the selected option's display text
     if (e.target instanceof HTMLSelectElement && name === "role") {
       roleText = e.target.selectedOptions[0]?.text.toLowerCase() || "";
     }
-  
+
     setFormData((prev) => {
       if (name === "role") {
         return {
@@ -73,11 +75,11 @@ export default function RecordForm(props: RecordFormProps) {
           tutor: roleText === "tutor" ? prev.tutor : null,
         };
       }
-  
+
       // For other fields, just update normally
       return { ...prev, [name]: value };
     });
-  
+
     // Update role state if the field name is 'role'
     if (name === "role") {
       setRole(roleText);
@@ -92,30 +94,29 @@ export default function RecordForm(props: RecordFormProps) {
 
   function getEmail(options: any[], selectedId: number): string | null {
     if (!options || !selectedId) return null;
-  
+
     const selectedItem = options.find((option) => option.id === Number(selectedId));
     if (!selectedItem) return null;
-  
+
     // Check for 'student_email' directly
     if (selectedItem.email) {
       return selectedItem.email;
     }
-  
+
     // Check for nested 'user' email
     if (selectedItem.user?.data?.attributes?.email) {
       return selectedItem.user.data.attributes.email;
     }
-  
+
     return null;
   }
-  
 
   function generateChangesHtml(oldData: any, newData: any, options: any): string {
     const generateRow = (fieldName: string, oldValue: any, newValue: any) => {
       const prev = oldValue || t("N/A");
       const next = newValue || prev;
       const nextStyle = prev !== next ? `<span style="color: red; font-weight: bold;">${next}</span>` : next;
-  
+
       return `
         <tr>
           <td style="padding: 8px;">${t(fieldName)}</td>
@@ -124,7 +125,7 @@ export default function RecordForm(props: RecordFormProps) {
         </tr>
       `;
     };
-  
+
     return `
       <h3>${t("Exam Changes")}</h3>
       <p>${t("The following changes have been made")}:</p>
@@ -139,8 +140,11 @@ export default function RecordForm(props: RecordFormProps) {
         <tbody>
           ${generateRow(t("Title"), oldData?.title, newData?.title)}
           ${generateRow(t("LVA Number"), oldData?.lva_num, newData?.lva_num)}
-          ${generateRow(t("Date"), oldData?.date ? moment(oldData.date).format("DD.MM.YYYY HH:mm") : "N/A",
-            newData.date ? moment(newData.date).format("DD.MM.YYYY HH:mm") : moment(oldData.date).format("DD.MM.YYYY HH:mm"))}
+          ${generateRow(
+            t("Date"),
+            oldData?.date ? moment(oldData.date).format("DD.MM.YYYY HH:mm") : "N/A",
+            newData?.date ? moment(newData.date).format("DD.MM.YYYY HH:mm") : oldData?.date ? moment(oldData.date).format("DD.MM.YYYY HH:mm") : "N/A"
+          )}
           ${generateRow(t("Duration"), oldData?.duration, newData?.duration)}
           ${generateRow(t("Student"), matchValue(options.student, oldData?.student_id), matchValue(options.student, newData?.student))}
           ${generateRow(t("Tutor"), matchValue(options.tutor, oldData?.tutor_id), matchValue(options.tutor, newData?.tutor))}
@@ -163,7 +167,7 @@ export default function RecordForm(props: RecordFormProps) {
       student: formData.student || null,
       tutor: formData.tutor || null,
     };
-  
+
     const options = props.relationalFields?.reduce((acc, field) => {
       acc[field.name] = field.options ?? [];
       return acc;
@@ -180,7 +184,7 @@ export default function RecordForm(props: RecordFormProps) {
     const changesHtml = generateChangesHtml(props.record, sanitizedData, options);
 
     props.onSubmit(sanitizedData);
-  
+
     if (props.record) {
       try {
         const emailPromises = [];
@@ -211,10 +215,10 @@ export default function RecordForm(props: RecordFormProps) {
         console.error(t("Error sending emails"), error);
       }
     }
-  
+
     setFormData(defaultRecord);
     setRole("");
-  };  
+  };
 
   const handleCancel = () => {
     setFormData(defaultRecord);
@@ -225,16 +229,16 @@ export default function RecordForm(props: RecordFormProps) {
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDate = event.target.value;
     const currentTime = moment.utc(formData.date).format("HH:mm:ss"); // Preserve time, use UTC
-  
+
     // Combine date and time in ISO format
     const updatedDate = moment(`${selectedDate}T${currentTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString();
     setFormData((prev) => ({ ...prev, date: updatedDate }));
   };
-  
+
   const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedTime = event.target.value;
     const currentDate = moment.utc(formData.date).format("YYYY-MM-DD"); // Preserve date, use UTC
-  
+
     // Combine date and time in ISO format
     const updatedDate = moment(`${currentDate}T${selectedTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString();
     setFormData((prev) => ({ ...prev, date: updatedDate }));
@@ -284,11 +288,19 @@ export default function RecordForm(props: RecordFormProps) {
           date: <DateField editMode={true} dateValue={formData[field]} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />,
           salto_access: <DateField editMode={true} dateValue={formData[field]} onDateChange={handleDateChange} />,
           status: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(ExamStatus)} />,
-          in_distribution_list: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(InDistrbutionList)} />,
-          presence_multimedia: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(PresenceMultimedia)} />,
+          in_distribution_list: (
+            <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(InDistrbutionList)} />
+          ),
+          presence_multimedia: (
+            <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(PresenceMultimedia)} />
+          ),
           contract_type: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(ContractType)} />,
-          contract_completed: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(ContractCompleted)} />,
-          distribution_list: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(DistributionList)} />,
+          contract_completed: (
+            <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(ContractCompleted)} />
+          ),
+          distribution_list: (
+            <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(DistributionList)} />
+          ),
         };
 
         return (
@@ -297,18 +309,18 @@ export default function RecordForm(props: RecordFormProps) {
               {t(field.replace("_", " "))}:
             </label>
             {fieldComponents[field] ?? (
-            <input
-              type="text"
-              id={field}
-              name={field}
-              value={formData[field] || ""}
-              onChange={handleChange}
-              className="border border-gray-300 p-2 w-full rounded-md"
-              required={isRequired}
-              min="3"
-              aria-required={isRequired}
-              aria-describedby={isRequired ? errorId : undefined}
-            />
+              <input
+                type="text"
+                id={field}
+                name={field}
+                value={formData[field] || ""}
+                onChange={handleChange}
+                className="border border-gray-300 p-2 w-full rounded-md"
+                required={isRequired}
+                min="3"
+                aria-required={isRequired}
+                aria-describedby={isRequired ? errorId : undefined}
+              />
             )}
           </div>
         );
@@ -316,17 +328,12 @@ export default function RecordForm(props: RecordFormProps) {
 
       {/* Render relational fields */}
       {(props.relationalFields ?? [])
-        .filter(field => !props.fields.includes(field.name))
+        .filter((field) => !props.fields.includes(field.name))
         .map((field) => {
           const isRequired = !(props.optionalFields ?? []).includes(field.name);
-          const containsRoleField = props.relationalFields?.some(
-            (field) => field.name === "role"
-          );
+          const containsRoleField = props.relationalFields?.some((field) => field.name === "role");
           // Enable only 'student' field if role is 'student' and only 'tutor' field if role is 'tutor'
-          const isDisabled =
-          (containsRoleField) &&
-          ((field.name === "student" && role !== "student") ||
-           (field.name === "tutor" && role !== "tutor"));
+          const isDisabled = containsRoleField && ((field.name === "student" && role !== "student") || (field.name === "tutor" && role !== "tutor"));
 
           return (
             <div className="mb-4" key={field.name}>
@@ -334,24 +341,22 @@ export default function RecordForm(props: RecordFormProps) {
                 {t(field.name.replace("_", " "))}:
               </label>
               {field.name === "disability_types" ? (
-              <MultiSelect
-                options={dropdownOptions(field.options, "displayValue")}
-                value={
-                  Array.isArray(formData[field.name])
-                    ? formData[field.name].map((item: any) =>
-                        typeof item === "object" && item !== null ? item.id : item
-                      )
-                    : []
-                }
-                onChange={(selectedIds) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    [field.name]: field.options.filter((option) =>selectedIds.includes(option.id)),
-                  }));
-                }}
-                placeholder={t("Select Disability Types")}
-                aria-label={t("Edit student disability types")}
-              />
+                <MultiSelect
+                  options={dropdownOptions(field.options, "displayValue")}
+                  value={
+                    Array.isArray(formData[field.name])
+                      ? formData[field.name].map((item: any) => (typeof item === "object" && item !== null ? item.id : item))
+                      : []
+                  }
+                  onChange={(selectedIds) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      [field.name]: field.options.filter((option) => selectedIds.includes(option.id)),
+                    }));
+                  }}
+                  placeholder={t("Select Disability Types")}
+                  aria-label={t("Edit student disability types")}
+                />
               ) : (
                 <select
                   name={field.name}
@@ -363,9 +368,7 @@ export default function RecordForm(props: RecordFormProps) {
                   aria-required={isRequired}
                   aria-labelledby={`${field.name}-label`}
                 >
-                  <option value="">
-                    Select {(field.name.charAt(0).toUpperCase() + field.name.slice(1)).replace("_", " ")}
-                  </option>
+                  <option value="">Select {(field.name.charAt(0).toUpperCase() + field.name.slice(1)).replace("_", " ")}</option>
                   {field.options.map((option) => (
                     <option key={option.id} value={option.id}>
                       {option.displayValue}
