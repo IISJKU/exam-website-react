@@ -37,13 +37,16 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
         break; // Exit the loop on error
       }
 
-      // Add the fetched data to the result array
-      if (Array.isArray(data) && data.length > 0) {
-        allEntries.push(...data);
+      // Break the loop if no data is returned
+      if (!Array.isArray(data) || data.length === 0) {
+        break;
       }
 
+      // Add the fetched data to the result array
+      allEntries.push(...data);
+
       // Break the loop if fewer than `numEntries` items are returned
-      if (!Array.isArray(data) || data.length < numEntries) {
+      if (data.length < numEntries) {
         break;
       }
 
@@ -52,7 +55,7 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
     } catch (error) {
       // Handle network or unexpected errors
       showToast({
-        message: `An error occurred while fetching data: ${Error || "Unknown error"}.`,
+        message: `An error occurred while fetching data: ${error || "Unknown error"}.`,
         type: "error",
       });
       break; // Exit the loop on error
