@@ -148,7 +148,7 @@ export default function IndividualNotification() {
           setProposedExam(JSON.parse(proposedExams[0].information) as Exam);
         }
 
-        const examData = (await fetchAll(config.strapiUrl +"/api/exams", user.token)) as Exam[];
+        const examData = (await fetchAll(config.strapiUrl + "/api/exams", user.token)) as Exam[];
 
         if (examData) {
           let ex = new Exam();
@@ -162,7 +162,8 @@ export default function IndividualNotification() {
           if (ex) {
             setExam(ex);
             setTitle(ex.title);
-            setLvaNum(ex.lva_num);
+            if (ex.lva_num) setLvaNum(ex.lva_num);
+            else setLvaNum(0);
             setDate(ex.date);
             setDuration(ex.duration);
             setTutor(ex.tutor_id);
@@ -187,43 +188,43 @@ export default function IndividualNotification() {
     const fetchDropdownOptions = async () => {
       try {
         const [studentsRes, tutorsRes, examinersRes, majorsRes, institutesRes, modesRes, roomsRes] = await Promise.all([
-          fetch(config.strapiUrl +"/api/students", {
+          fetch(config.strapiUrl + "/api/students", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/tutors", {
+          fetch(config.strapiUrl + "/api/tutors", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/examiners", {
+          fetch(config.strapiUrl + "/api/examiners", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/majors", {
+          fetch(config.strapiUrl + "/api/majors", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/institutes", {
+          fetch(config.strapiUrl + "/api/institutes", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/exam-modes", {
+          fetch(config.strapiUrl + "/api/exam-modes", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
           }).then((res) => res.json()),
-          fetch(config.strapiUrl +"/api/rooms", {
+          fetch(config.strapiUrl + "/api/rooms", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -258,6 +259,8 @@ export default function IndividualNotification() {
     proposedExam.examiner = proposedExam.examiner_id;
     proposedExam.institute = proposedExam.institute_id;
 
+    if (!proposedExam.lva_num) proposedExam.lva_num = 0;
+
     //clean up fields
     delete (proposedExam as { student_id?: number }).student_id;
     delete (proposedExam as { tutor_id?: number }).tutor_id;
@@ -290,9 +293,9 @@ export default function IndividualNotification() {
     }
   };
 
-  function generateChangesHtml( currentExam: any, newExam: any, options: any, accept: boolean, emailContent: string ): string {
-    const isUpdate = (currentExam == null) ? false : true;
-    const current = (currentExam != null && newExam.title == undefined) ? currentExam : newExam;
+  function generateChangesHtml(currentExam: any, newExam: any, options: any, accept: boolean, emailContent: string): string {
+    const isUpdate = currentExam == null ? false : true;
+    const current = currentExam != null && newExam.title == undefined ? currentExam : newExam;
     return `
     <h3>${t("Exam Changes")}</h3>
     ${emailContent}
@@ -301,11 +304,11 @@ export default function IndividualNotification() {
         <tr>
           <th style="padding: 8px; text-align: left;">Field</th>
            ${
-            isUpdate ?
-            `<th style="padding: 8px; text-align: left;">${t("Old")}</th>
+             isUpdate
+               ? `<th style="padding: 8px; text-align: left;">${t("Old")}</th>
             <th style="padding: 8px; text-align: left;">${t("New")}</th>`
-            : `<th style="padding: 8px; text-align: left;">${t("Details")}</th>`
-            }
+               : `<th style="padding: 8px; text-align: left;">${t("Details")}</th>`
+           }
         </tr>
       </thead>
       <tbody>
@@ -314,16 +317,27 @@ export default function IndividualNotification() {
         ${generateRow(
           t("Date"),
           current?.date ? moment(current.date).format("DD.MM.YYYY HH:mm") : t("N/A"),
-          newExam.date ? moment(newExam.date).format("DD.MM.YYYY HH:mm") : moment(current.date).format("DD.MM.YYYY HH:mm"), isUpdate
+          newExam.date ? moment(newExam.date).format("DD.MM.YYYY HH:mm") : moment(current.date).format("DD.MM.YYYY HH:mm"),
+          isUpdate
         )}
         ${generateRow(t("Duration"), current?.duration, newExam.duration, isUpdate)}
         ${generateRow(t("Tutor"), match(options.tutors, current?.tutor_id || current?.tutor), match(options.tutors, newExam.tutor_id), isUpdate)}
         ${generateRow(t("Student"), match(options.students, current?.student_id || current?.student), match(options.students, newExam.student_id), isUpdate)}
-        ${generateRow(t("Examiner"), match(options.examiners, current?.examiner_id || current?.examiner), match(options.examiners, newExam.examiner_id), isUpdate)}
+        ${generateRow(
+          t("Examiner"),
+          match(options.examiners, current?.examiner_id || current?.examiner),
+          match(options.examiners, newExam.examiner_id),
+          isUpdate
+        )}
         ${generateRow(t("Major"), match(options.majors, current?.major_id || current?.major), match(options.majors, newExam.major_id), isUpdate)}
-        ${generateRow(t("Institute"), match(options.institutes, current?.institute_id || current?.institute), match(options.institutes, newExam.institute_id), isUpdate)}
+        ${generateRow(
+          t("Institute"),
+          match(options.institutes, current?.institute_id || current?.institute),
+          match(options.institutes, newExam.institute_id),
+          isUpdate
+        )}
         ${generateRow(t("Mode"), match(options.modes, current?.mode_id || current?.exam_mode), match(options.modes, newExam.mode_id), isUpdate)}
-        ${generateRow(t("Room"), match(options.rooms, current?.room_id ||  current?.room), match(options.rooms, newExam.room_id), isUpdate)}
+        ${generateRow(t("Room"), match(options.rooms, current?.room_id || current?.room), match(options.rooms, newExam.room_id), isUpdate)}
         ${generateRow(t("Notes"), current?.notes, newExam.notes, isUpdate)}
         ${generateRow(t("Status"), current?.status, newExam.status, isUpdate)}
       </tbody>
@@ -340,7 +354,7 @@ export default function IndividualNotification() {
         if (isNewExaminer(proposedExam.examiner) && !proposedExam.examiner_id) {
           const { first_name, last_name, email, phone } = proposedExam.examiner;
 
-          const examinerResponse = await fetch(config.strapiUrl +"/api/examiners", {
+          const examinerResponse = await fetch(config.strapiUrl + "/api/examiners", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -409,7 +423,9 @@ export default function IndividualNotification() {
           ];
           await Promise.all(emailPromises);
         } else {
+          console.log(proposedExam);
           fixProposedExam();
+          console.log(proposedExam);
 
           const response = await fetch(`${config.strapiUrl}/api/exams/`, {
             method: "POST",
@@ -431,14 +447,11 @@ export default function IndividualNotification() {
 
           let newExam: Exam | undefined;
 
+          console.log(examData);
+
           if (examData.length != 0) {
             for (let i = 0; i < examData.length; i++) {
-              if (
-                examData[i].title == proposedExam.title &&
-                examData[i].student_id == proposedExam.student &&
-                examData[i].duration == proposedExam.duration &&
-                examData[i].lva_num == proposedExam.lva_num
-              ) {
+              if (examData[i].title == proposedExam.title && examData[i].student_id == proposedExam.student && examData[i].duration == proposedExam.duration) {
                 newExam = examData[i];
               }
             }
@@ -489,7 +502,7 @@ export default function IndividualNotification() {
         showToast({ message: t("Error updating exam"), type: "error" });
       }
     } else {
-      const availableExam = (proposedExam.title == undefined) ? exam : proposedExam;
+      const availableExam = proposedExam.title == undefined ? exam : proposedExam;
       //set notif to passive, discard changes
       if (notification && (exam == null || exam.id == undefined || exam.id == 0)) {
         const notif = await fetch(`${config.strapiUrl}/api/notifications/${notification.id}`, {
@@ -501,7 +514,13 @@ export default function IndividualNotification() {
         });
 
         sendNotification(false);
-        const changesHtml = generateChangesHtml(null, availableExam, options, accept, `<p>${t("We regret to inform you that the proposed exam has been <strong>declined</strong>. Below are the details of the declined exam:")}:</p>`);
+        const changesHtml = generateChangesHtml(
+          null,
+          availableExam,
+          options,
+          accept,
+          `<p>${t("We regret to inform you that the proposed exam has been <strong>declined</strong>. Below are the details of the declined exam:")}:</p>`
+        );
         // Send emails to both tutor and student
         const emailPromises = [
           sendEmail({
@@ -522,7 +541,15 @@ export default function IndividualNotification() {
         await Promise.all(emailPromises);
       } else {
         sendNotification(false);
-        const changesHtml = generateChangesHtml(null, availableExam, options, accept, `<p>${t("We regret to inform you that the proposed exam changes has been <strong>declined</strong>. Below are the current details of the exam:")}:</p>`);
+        const changesHtml = generateChangesHtml(
+          null,
+          availableExam,
+          options,
+          accept,
+          `<p>${t(
+            "We regret to inform you that the proposed exam changes has been <strong>declined</strong>. Below are the current details of the exam:"
+          )}:</p>`
+        );
         // Send emails to both tutor and student
         const emailPromises = [
           sendEmail({
@@ -547,8 +574,8 @@ export default function IndividualNotification() {
     navigate("/admin/notifications");
   };
 
-   // Update `proposedExam` with new examiner details.
-  const saveUpdatedExaminer = (updatedExaminer: { firstName: string; lastName: string; email: string; phone: string;}) => {
+  // Update `proposedExam` with new examiner details.
+  const saveUpdatedExaminer = (updatedExaminer: { firstName: string; lastName: string; email: string; phone: string }) => {
     const newExaminer = new Examiner();
     newExaminer.id = proposedExam.examiner_id || 0; // Default ID
     newExaminer.first_name = updatedExaminer.firstName;
@@ -573,18 +600,16 @@ export default function IndividualNotification() {
       label: lastNameField
         ? `${item[firstNameField]} ${item[lastNameField]}` // Concatenate first and last name
         : item[firstNameField], // For fields with just one field (like 'name' for institutes or majors)
-  }));
-  
+    }));
+
   function doesNameExistInDropdown(obj: Examiner): Examiner | null {
     const matchingExaminer = options.examiners.find(
-      (examiner) =>
-        examiner.first_name.toLowerCase() === obj.first_name.toLowerCase() &&
-        examiner.last_name.toLowerCase() === obj.last_name.toLowerCase()
+      (examiner) => examiner.first_name.toLowerCase() === obj.first_name.toLowerCase() && examiner.last_name.toLowerCase() === obj.last_name.toLowerCase()
     );
     return matchingExaminer ?? null; // Return null if undefined
   }
 
-  function examinerCheck(proposedExam: Exam): string | { first_name: string; last_name: string; email: string; phone: string }{
+  function examinerCheck(proposedExam: Exam): string | { first_name: string; last_name: string; email: string; phone: string } {
     if (isNewExaminer(proposedExam.examiner)) {
       const matchingExaminer = doesNameExistInDropdown(proposedExam.examiner as Examiner);
       if (matchingExaminer) {
@@ -755,11 +780,7 @@ export function generateRow(fieldName: string, previousValue: any, newValue: any
     <tr>
       <td style="padding: 8px;">${fieldName}</td>
       <td style="padding: 8px;">${prev}</td>
-      ${
-        includeNewValue
-          ? `<td style="padding: 8px;">${nextText}</td>`
-          : ""
-      }
+      ${includeNewValue ? `<td style="padding: 8px;">${nextText}</td>` : ""}
     </tr>
   `;
 }

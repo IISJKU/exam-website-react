@@ -44,17 +44,20 @@ export default function TutorRegisteredExams() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch(config.strapiUrl +"/api/exams/find-registered", {
+      const response = await fetch(config.strapiUrl + "/api/exams/find-registered", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
       const data = await response.json();
-       // Filter out exams with the archived status
+      // Filter out exams with the archived status
       const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
       if (!response.ok) {
-        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
+        showToast({
+          message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`,
+          type: "error",
+        });
       }
 
       // Modify the data array before setting it to exams
@@ -108,12 +111,14 @@ export default function TutorRegisteredExams() {
 
   if (loading) {
     return (
-      <p aria-live="polite" aria-busy="true">{t("Loading exams...")}</p>
+      <p aria-live="polite" aria-busy="true">
+        {t("Loading exams...")}
+      </p>
     );
   }
 
   const handleRemove = async () => {
-    const response = await fetch(config.strapiUrl +"/api/exams/deregister-tutor", {
+    const response = await fetch(config.strapiUrl + "/api/exams/deregister-tutor", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

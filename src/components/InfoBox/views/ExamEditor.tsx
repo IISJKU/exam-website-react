@@ -21,6 +21,9 @@ import { sendEmail } from "../../../services/EmailService";
 import { generateRow, match } from "./IndividualNotification";
 import config from "../../../config";
 import EnumSelector from "../components/EnumSelector";
+import CopyExamEmail from "../components/CopyExamEmail";
+import ExamProtocolGenerator from "../components/ExamProtocolGenerator";
+import DeleteExamButton from "../components/DeleteExamButton";
 
 export default function ExamEditor() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -50,6 +53,8 @@ export default function ExamEditor() {
   const [originalExam, setOriginalExam] = useState<Exam>(new Exam());
   const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null); // Track selected room ID for confirmation
+
+  const [editDisabled, disableEdit] = useState<boolean>(false);
 
   const [options, setOptions] = useState({
     students: [] as Student[],
@@ -107,7 +112,35 @@ export default function ExamEditor() {
         }
 
         if (examData) {
-          if (user.role == "Student") examData = formatExamData(examData);
+          if (user.role == "Student") {
+            console.log(examData);
+            examData = formatExamData(examData);
+
+            let today = new Date();
+
+            // Convert 'today' to UTC
+            let todayUTC = new Date(today.toISOString());
+
+            let target = new Date(examData.date);
+
+            // Convert 'target' (exam date) to UTC if it's not already
+            let targetUTC = new Date(target.toISOString());
+
+            let timeDiff = targetUTC.getTime() - todayUTC.getTime();
+            let dayDiff = timeDiff / (1000 * 60 * 60 * 24);
+
+            console.log(dayDiff);
+
+            if (dayDiff < 2.0) {
+              disableEdit(true);
+            } else {
+              disableEdit(false);
+            }
+
+            console.log(dayDiff < 2.0);
+            console.log(today);
+            console.log(editDisabled);
+          }
 
           setExam(examData);
           setOriginalExam(examData);
@@ -615,6 +648,23 @@ export default function ExamEditor() {
               onChange={(e) => setNotes(e.target.value)}
               aria-label={t("Exam Notes")}
             />
+            <CopyExamEmail
+              student={student ? options.students.find((s) => s.id === student) : undefined}
+              exam={exam}
+              examiner={examiner ? options.examiners.find((s) => s.id === examiner) : undefined}
+              user={user.user}
+              editMode={editMode}
+            ></CopyExamEmail>
+            <ExamProtocolGenerator
+              student={student ? options.students.find((s) => s.id === student) : undefined}
+              exam={exam}
+              examiner={examiner ? options.examiners.find((s) => s.id === examiner) : undefined}
+              user={user.user}
+              editMode={editMode}
+              tutor={tutor ? options.tutors.find((s) => s.id === tutor) : undefined}
+              room={room ? options.rooms.find((s) => s.id === room)?.name : ""}
+              mode={mode ? options.modes.find((s) => s.id === mode)?.name : ""}
+            ></ExamProtocolGenerator>
           </div>
         </div>
         <div className="m-5 mt-4 flex flex-row md:flex-row space-x-2">
@@ -636,15 +686,18 @@ export default function ExamEditor() {
             {editMode ? t("Save") : t("Edit")}
           </button>
           {editMode && (
-            <button
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
-              onClick={() => {
-                setEditMode(false);
-              }}
-              aria-label={t("Cancel editing")}
-            >
-              {t("Cancel")}
-            </button>
+            <>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
+                onClick={() => {
+                  setEditMode(false);
+                }}
+                aria-label={t("Cancel editing")}
+              >
+                {t("Cancel")}
+              </button>
+              <DeleteExamButton id={exam.id} success={() => navigate(-1)}></DeleteExamButton>
+            </>
           )}
         </div>
         {showConfirmDialog && (
@@ -782,8 +835,14 @@ export default function ExamEditor() {
                   setEditMode(!editMode);
                   if (editMode) handleUpdate();
                 }}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
-                aria-label={editMode ? t("Save changes") : t("Edit exam")}
+                className={
+                  !editDisabled
+                    ? "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:bg-blue-700"
+                    : "px-4 py-2 rounded opacity-40 rounded bg-gray-200 line-through"
+                }
+                aria-label={editDisabled ? t("Editing deadline has expired") : editMode ? t("Save changes") : t("Edit exam")}
+                title={editDisabled ? "Editing deadline has expired. Cannot edit 48 hours before exam." : "Edit exam"}
+                disabled={editDisabled}
               >
                 {editMode ? t("Save") : t("Edit")}
               </button>

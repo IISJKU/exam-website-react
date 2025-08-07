@@ -1,7 +1,9 @@
 import { ToastOptions } from "react-toastify";
 import { showToast } from "../components/ToastMessage";
 
-import { useAuth } from "../../../hooks/AuthProvider";
+function arraysEqual(a: any[], b: any[]): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
 
 export default async function fetchAll(link: string, token: string, errorMsg?: string): Promise<any[]> {
   const numEntries = 25;
@@ -11,7 +13,9 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
   const maxPages = 500; // safety limit to prevent infinite loop
   let pageCount = 0;
 
-  while (hasMore && pageCount < maxPages) {
+  let oldData = [];
+
+  while (hasMore && count < 5000) {
     const paginatedLink = link.includes("?")
       ? `${link}&pagination[start]=${count}&pagination[limit]=${numEntries}`
       : `${link}?pagination[start]=${count}&pagination[limit]=${numEntries}`;
@@ -37,16 +41,19 @@ export default async function fetchAll(link: string, token: string, errorMsg?: s
 
     const data = Array.isArray(result) ? result : result.data || [];
 
-    allEntries = allEntries.concat(data);
+    if (!arraysEqual(oldData, data)) {
+      allEntries = allEntries.concat(data);
 
-    console.log(data);
-    console.log(paginatedLink);
+      // If fewer than numEntries are returned, we reached the end
+      hasMore = data.length === numEntries;
 
-    // If fewer than numEntries are returned, we reached the end
-    hasMore = data.length === numEntries;
-
-    count += numEntries;
-    pageCount++;
+      count += numEntries;
+      pageCount++;
+      oldData = data;
+    } else {
+      console.log("broke!!!");
+      hasMore = false;
+    }
   }
 
   return allEntries;

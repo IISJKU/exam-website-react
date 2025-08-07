@@ -35,6 +35,37 @@ export default function ContentView<T extends { id?: number; status?: ExamStatus
     return !isNaN(Date.parse(t)) && t.includes("T");
   }
 
+  function editExpired(element: T): boolean {
+    if (user.role != "Tutor") {
+      return false;
+    }
+
+    if ("date" in element && typeof element.date == "string") {
+      let today = new Date();
+
+      // Convert 'today' to UTC
+      let todayUTC = new Date(today.toISOString());
+
+      let target = new Date(element.date);
+
+      // Convert 'target' (exam date) to UTC if it's not already
+      let targetUTC = new Date(target.toISOString());
+
+      let timeDiff = targetUTC.getTime() - todayUTC.getTime();
+      let dayDiff = timeDiff / (1000 * 60 * 60 * 24);
+
+      console.log(dayDiff);
+
+      if (dayDiff < 2.0) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   const getBorderColor = (status?: ExamStatus, room_id?: number, registeredTutors?: Tutor[], tutor_id?: number): string => {
     if (status === ExamStatus.NoEmailExaminer) {
       return "hover:bg-red-100 border-dashed border-black border-2 bg-red-200 cursor-pointer focus:outline-none focus:ring-2"; // Light red
@@ -119,16 +150,18 @@ export default function ContentView<T extends { id?: number; status?: ExamStatus
                   role="row"
                   aria-label={`${t("Row")} ${index + 1}`}
                   onClick={() => {
-                    if (element.id && props.onRowClick) {
-                      props.onRowClick(element.id);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
+                    if (user.role != "Tutor" && !editExpired(element))
                       if (element.id && props.onRowClick) {
                         props.onRowClick(element.id);
                       }
-                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (!editExpired(element))
+                      if (e.key === "Enter" || e.key === " ") {
+                        if (element.id && props.onRowClick) {
+                          props.onRowClick(element.id);
+                        }
+                      }
                   }}
                 >
                   {props.keys.map((key, idx) => (
@@ -148,17 +181,34 @@ export default function ContentView<T extends { id?: number; status?: ExamStatus
                         : " "}
                     </td>
                   ))}
-                  {props.onRowClick ? (
+                  {props.onRowClick && !editExpired(element) ? (
                     <td className="pr-3" key="editButton" role="cell">
                       <button
                         aria-label={`${t("Edit")} ${props.title} ${t("Row")} ${index + 1}`}
                         className="focus:outline-none focus:ring-2 focus:ring-blue-500 hover:underline"
+                        onClick={() => {
+                          if (user.role == "Tutor")
+                            if (element.id && props.onRowClick) {
+                              props.onRowClick(element.id);
+                            }
+                        }}
                       >
                         {t(props.buttonName || "Edit")}
                       </button>
                     </td>
                   ) : (
-                    <></>
+                    <>
+                      {" "}
+                      <td className="pr-3" key="editButton" role="cell">
+                        <div
+                          aria-label={t("Editing deadline has expired. Cannot edit 48 hours before exam.")}
+                          className="focus:outline-none focus:ring-2 focus:ring-blue-500 line-through opacity-50"
+                          title={t("Editing deadline has expired")}
+                        >
+                          {""}
+                        </div>
+                      </td>
+                    </>
                   )}
                 </tr>
               ))}

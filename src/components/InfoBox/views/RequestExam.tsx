@@ -150,7 +150,6 @@ export default function RequestExam() {
     const fieldMapping = {
       title: t("Exam Title"),
       studentEmail: t("Student Email"),
-      lva_num: t("LVA Number"),
       date: t("Date/Time"),
       duration: t("Duration"),
       examiner: t("Examiner"),
@@ -297,8 +296,8 @@ export default function RequestExam() {
         text={lva_num?.toString() ?? ""}
         onChange={(e) => setLvaNum(Number(e.target.value))}
         aria-label={t("Add Exam LVA Num")}
-        required={true}
-        aria-required="true"
+        required={false}
+        aria-required="false"
       />
       <DateField
         title={t("Date/Time")}
@@ -312,7 +311,7 @@ export default function RequestExam() {
       />
       <div className="m-2"></div>
       <EditField
-        title={t("Duration")}
+        title={t("Duration (min)")}
         editMode={editMode}
         text={duration?.toString() ?? ""}
         onChange={(e) => setDuration(Number(e.target.value))}

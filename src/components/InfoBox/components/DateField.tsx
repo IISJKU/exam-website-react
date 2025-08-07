@@ -18,15 +18,25 @@ export default function DateField(props: DateFieldProps) {
   const formattedTime = props.dateValue ? moment(props.dateValue).format("HH:mm") : "";
 
   return (
-    <div className="flex flex-col relative w-96" role="group" aria-labelledby={props.title ? `datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}` : undefined} tabIndex={0}>
-      {props.title ? (<label id={`datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}`} className="font-bold">{t(props.title)}{" "}
-        {props.required && <span className="text-red-500">{" "}*</span>}  
-      </label>) : null}
+    <div
+      className="flex flex-col relative w-96"
+      role="group"
+      aria-labelledby={props.title ? `datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}` : undefined}
+      tabIndex={0}
+    >
+      {props.title ? (
+        <label id={`datefield-${props.title.replace(/\s+/g, "-").toLowerCase()}`}>
+          <b>
+            {t(props.title)} {props.required && <span className="text-red-500"> *</span>}
+          </b>
+          {props.editMode ? <div className="text-sm pb-2">{t("(Set time to 00:00, if unknown)")}</div> : <></>}
+        </label>
+      ) : null}
       {props.editMode ? (
         <div>
           {/* Date Input */}
           <label htmlFor="date-input" className="sr-only">
-          {t("Enter date")}
+            {t("Enter date")}
           </label>
           <input
             id="date-input"
@@ -36,16 +46,26 @@ export default function DateField(props: DateFieldProps) {
             className="border border-gray-300 p-2 w-48 rounded-md"
             aria-required="true"
             aria-label={t("Enter date")}
-            required={props.required} 
+            title={t("Format (day/month/year)")}
+            required={props.required}
           />
           {props.onTimeChange && (
             <>
               {/* Time Input */}
               <label htmlFor="time-input" className="sr-only">
-              {t("Enter time")}
+                {t("Enter time")}
               </label>
-              <input id="time-input" type="time" value={formattedTime} onChange={props.onTimeChange} className="border border-gray-300 p-2 w-32 rounded-md ml-1" aria-required="true"
-                    aria-label={t("Enter time")} required={props.required} /> 
+              <input
+                id="time-input"
+                type="time"
+                value={formattedTime}
+                onChange={props.onTimeChange}
+                className="border border-gray-300 p-2 w-32 rounded-md ml-1"
+                aria-required="true"
+                aria-label={t("Enter time")}
+                title={t("Format (00:00 - 24:00)")}
+                required={props.required}
+              />
             </>
           )}
         </div>

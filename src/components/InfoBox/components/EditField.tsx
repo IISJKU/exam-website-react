@@ -56,7 +56,7 @@ export default function EditField(props: EditFieldProps) {
       )}
       <div className="relative mt-1">
         {props.editMode ? (
-          props.title === "Notes" || props.title ==="Misc" || props.title ==="Updates" ? (
+          props.title === "Notes" || props.title === "Misc" || props.title === "Updates" ? (
             <textarea
               id={`edit-field-${props.title?.replace(/\s+/g, "-").toLowerCase()}`}
               onChange={handleChange}
@@ -72,7 +72,7 @@ export default function EditField(props: EditFieldProps) {
               id={`edit-field-${props.title?.replace(/\s+/g, "-").toLowerCase()}`}
               onChange={handleChange}
               className="mb-2 border border-gray-300 p-2 w-80 rounded-md px-1"
-              type={(props.type || "text")}
+              type={props.type || "text"}
               value={value}
               aria-label={t(props.title || "Field")}
               required={props.required}
