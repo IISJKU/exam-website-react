@@ -7,6 +7,7 @@ export enum NotificationType {
   adminChange = "adminChange",
   tutorConfirm = "tutorConfirm",
   tutorDecline = "tutorDecline",
+  deleteRequest = "deleteRequest",
 }
 
 export default class Notification {
