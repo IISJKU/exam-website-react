@@ -23,8 +23,9 @@ export default function ExamProtocolGenerator(props: ExamProtocolGeneratorProps)
   const t = useTranslation();
 
   let misc: string[] = [];
-  if (props.student?.misc) misc = props.student?.misc.split("; ");
 
+  if (props.student?.misc) misc = props.student?.misc.split("; ");
+  if (props.student?.bonus_time && props.student?.bonus_time != 1) misc.unshift(`${props.student?.bonus_time * 100 - 100}% Mehrzeit,`);
   misc.push("Betreuung durch Institut Integriert Studieren");
 
   const createProtocol = async () => {
@@ -152,7 +153,7 @@ export default function ExamProtocolGenerator(props: ExamProtocolGeneratorProps)
               text: "Genehmigung Prüfungsmethoden",
               style: "normalText",
             }),
-            createBulletPoint(`${(props.student?.bonus_time ?? 1) * 100 - 100}% Mehrzeit,`),
+
             ...misc.map((elem: string) => (elem ? createBulletPoint(elem) : createBulletPoint(""))),
             new Paragraph({
               text: "Bestätigungen",
