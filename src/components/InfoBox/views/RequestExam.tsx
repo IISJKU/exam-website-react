@@ -45,6 +45,7 @@ export default function RequestExam() {
   const [duration, setDuration] = useState<number | undefined>();
   const [examiner, setExaminer] = useState<number | string | undefined>();
   const [examinerEmail, setExaminerEmail] = useState<string>("");
+  const [examinerPhone, setExaminerPhone] = useState<string>("");
   const [institute, setInstitute] = useState<number | string | undefined>();
   const [mode, setMode] = useState<number | undefined>();
   const [studentEmail, setStudentEmail] = useState<string>(user.userEmail || "");
@@ -158,7 +159,7 @@ export default function RequestExam() {
 
     // Find missing fields
     const missingFields = Object.entries(fieldMapping)
-      .filter(([field]) => !eval(field)) // Dynamically check if the field is missing
+      .filter(([field]) => typeof eval(field) === "undefined" || eval(field) === null) // Dynamically check if the field is missing
       .map(([, label]) => label); // Get the user-friendly label
 
     if (missingFields.length > 0) {
@@ -189,10 +190,13 @@ export default function RequestExam() {
         let firstName = examiner?.substring(0, examiner.indexOf(" ")).trim();
         let lastName = examiner?.substring(examiner.indexOf(" "), examiner.length).trim();
         let exEmail = examinerEmail ?? "";
+        let exPhone = examinerPhone ?? "";
 
         nuExaminer.first_name = firstName;
         nuExaminer.last_name = lastName;
         nuExaminer.email = exEmail;
+        nuExaminer.phone = exPhone;
+
         data.examiner = nuExaminer;
       }
     }
@@ -262,6 +266,7 @@ export default function RequestExam() {
     }));
     setExaminer(newExaminer.first_name + " " + newExaminer.last_name);
     setExaminerEmail(newExaminer.email || "");
+    setExaminerPhone(newExaminer.phone || "");
     showToast({ message: t("Examiner added successfully"), type: "success" });
   };
 

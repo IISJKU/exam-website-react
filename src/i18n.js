@@ -7,6 +7,7 @@ import { initReactI18next } from "react-i18next";
 const resources = {
   en: {
     translation: {
+      "proposed a new Exam": "hat eine neue Prüfung vorgeschlagen",
       "Editing deadline has expired": "Editierungsfrist ist abgelaufen",
       "Editing deadline has expired. Cannot edit 48 hours before exam.": "Editierungsfrist abgelaufen. Prüfung kann nicht 48h vorher editiert werden.",
       "Welcome to React": "Welcome to React and react-i18next",
@@ -138,7 +139,7 @@ const resources = {
       "No Action Required": "No Action Required",
       "Data Administration": "Data Administration",
       ID: "ID",
-      "Delete Exam": "Prüfung Löschen",
+
       Actions: "Actions",
       "N/A": "N/A",
       "Loading...": "Loading...",
@@ -419,9 +420,6 @@ const resources = {
       "Login Form": "Login Form",
       "Server can't be reached": "Server can't be reached",
       "Username or Password don't match.": "Username or Password don't match.",
-      Delete: "Löschen",
-      "Are you sure you want to delete this exam?": "Bist du dir sicher, dass du die Prüfung löschen möchtest?",
-      "Confirm Delete": "Löschen Bestätigen",
     },
   },
   de: {
@@ -433,6 +431,7 @@ const resources = {
       "Upcoming Exams": "Bevorstehende Prüfungen",
       "Upcoming Monitored Exams": "Eingetragene Prüfungen",
       "Request New Exam": "Prüfung Anfragen",
+      "Delete Exam": "Prüfung Löschen",
       "Exams Overview": "Prüfungsübersicht",
       Tutors: "Tutoren",
       "First Name": "Vorname",
@@ -482,6 +481,9 @@ const resources = {
       "No Tutor Needed": "Kein Tutor erforderlich",
       "No Action Required": "Keine Aktion erforderlich",
       Archived: "Archiviert",
+      "(Select the primary examiner)": "(Wähle Hauptprüfer)",
+      "proposes to delete": "beantragt löschung von",
+      "proposed to delete the exam.": "hat angefragt die Klausur zu löschen.",
       /*
       confirmChange: "Änderung Bestätigen",
       discardChange: "Änderung Verwerfen",
@@ -549,7 +551,6 @@ const resources = {
       "Notification from": "Benachrichtigung von",
       "click to": "klicken Sie, um",
       details: "Details",
-      "proposed a new Exam": "hat eine neue Prüfung vorgeschlagen",
       "Edit notification details": "Benachrichtigungsdetails bearbeiten",
       changed: "geändert",
       "proposed an Exam": "hat eine Prüfung vorgeschlagen",
@@ -894,6 +895,9 @@ const resources = {
       "Salto Access": "Salto-Zugang",
       Location: "Standort",
       "Yes Until": "Ja bis",
+      Delete: "Löschen",
+      "Are you sure you want to delete this exam?": "Bist du dir sicher, dass du die Prüfung löschen möchtest?",
+      "Confirm Delete": "Löschen Bestätigen",
       "Edit tutor Study": "Studium des Tutors bearbeiten",
       "Edit tutor contract type": "Vertragstyp des Tutors bearbeiten",
       "Edit tutor contract completed": "Vertragsabschluss des Tutors bearbeiten",
@@ -925,6 +929,7 @@ const resources = {
       "Edit student updates": "Updates für Studenten bearbeiten",
       "Copy Email Text": "Email Text Kopieren",
       "Email Text Copied!": "Email Text Kopiert!",
+      "Delete this exam?": "Diese Klausur löschen?",
     },
   },
 };

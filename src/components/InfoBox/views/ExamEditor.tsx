@@ -288,7 +288,7 @@ export default function ExamEditor() {
       if (lva_num != exam.lva_num) t = t + ' "lva_num" : "' + lva_num + '",';
       if (date != exam.date) t = t + ' "date" : "' + date + '",';
       if (duration != exam.duration) t = t + ' "duration" : "' + duration + '",';
-      if (notes != exam.notes) t = t + ' "notes" : "' + notes + '",';
+      if (notes != exam.notes && notes.trim() != "") t = t + ' "notes" : "' + notes + '",';
       if (user.role == "Admin") {
         if (!compareField("student", student)) t = t + ' "student_id" : "' + student + '",';
         if (!compareField("tutor", tutor)) t = t + ' "tutor_id" : "' + tutor + '",';
@@ -312,6 +312,7 @@ export default function ExamEditor() {
       t = t.substring(0, t.length - 1);
       t = "{" + t + "}";
     }
+
     return t;
   }
 
@@ -408,6 +409,7 @@ export default function ExamEditor() {
       let change = examChanged();
 
       if (change != "" && exam) {
+        console.log(change);
         let notif = new Notification(change, JSON.stringify(originalExam), user.user, exam.id);
         if (user.role == "Admin") notif.type = NotificationType.adminChange;
         else notif.type = NotificationType.proposeChange;
@@ -664,6 +666,7 @@ export default function ExamEditor() {
               tutor={tutor ? options.tutors.find((s) => s.id === tutor) : undefined}
               room={room ? options.rooms.find((s) => s.id === room)?.name : ""}
               mode={mode ? options.modes.find((s) => s.id === mode)?.name : ""}
+              institute={institute ? options.institutes.find((s) => s.id === institute)?.name : ""}
             ></ExamProtocolGenerator>
           </div>
         </div>
@@ -847,15 +850,36 @@ export default function ExamEditor() {
                 {editMode ? t("Save") : t("Edit")}
               </button>
               {editMode && (
-                <button
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
-                  onClick={() => {
-                    setEditMode(!editMode);
-                  }}
-                  aria-label={t("Cancel editing")}
-                >
-                  {t("Cancel")}
-                </button>
+                <>
+                  <button
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:bg-red-700"
+                    onClick={() => {
+                      setEditMode(!editMode);
+                    }}
+                    aria-label={t("Cancel editing")}
+                  >
+                    {t("Cancel")}
+                  </button>
+                  {/*
+                  <DeleteExamButton
+                    id={exam.id}
+                    success={async () => {
+                      let notif = new Notification("", JSON.stringify(exam), user.user, exam.id);
+                      notif.type = NotificationType.deleteRequest;
+
+                      const notify = await fetch(`${config.strapiUrl}/api/notifications`, {
+                        method: "POST",
+                        headers: {
+                          Authorization: `Bearer ${user.token}`,
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ data: notif }),
+                      });
+
+                      navigate(-1);
+                    }}
+                  ></DeleteExamButton>  */}
+                </>
               )}
             </>
           ) : (

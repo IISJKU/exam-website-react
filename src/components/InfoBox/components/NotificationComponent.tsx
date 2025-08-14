@@ -36,7 +36,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
   const hasStaticTitle = (title: string): boolean => staticTitles.includes(title);
 
   const getElem = (index: any, type: string): string => {
-    if (type === "examiner" ) {
+    if (type === "examiner") {
       if (index?.first_name && index?.last_name) {
         return `${index.first_name} ${index.last_name}`;
       }
@@ -179,9 +179,13 @@ export default function NotificationComponent(props: NotificationComponentProps)
                 ? `${getName()} ${t("will monitor")} ${props.exam.title}`
                 : notifications[0].type == NotificationType.tutorDecline
                 ? `${getName()} ${t("will no longer monitor")} ${props.exam.title}`
+                : notifications[0].type == NotificationType.deleteRequest
+                ? `${getName()}  ${t("proposes to delete")} ${props.exam.title} `
                 : `${props.exam.title}  ${t("was edited by")} ${getName()}`
               : ` ${t("Exam was declined by")} ${getName()}`}
-            {(notifications[0].type != NotificationType.proposeChange && notifications[0].type != NotificationType.createExam) ||
+            {(notifications[0].type != NotificationType.proposeChange &&
+              notifications[0].type != NotificationType.createExam &&
+              notifications[0].type != NotificationType.deleteRequest) ||
             auth.role == "Tutor" ||
             auth.role == "Student" ? null : (
               <a
@@ -215,23 +219,28 @@ export default function NotificationComponent(props: NotificationComponentProps)
                   notification.type == NotificationType.createExamOld ||
                   notification.type == NotificationType.createExam ? (
                     <div className={`pl-${tabs[index]}`}>
-                        {t("At")} {moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm")} {notification.sentBy}{" "}
+                      {t("At")} {moment(notification.createdAt).tz("Europe/Vienna").format("DD.MM.YYYY HH:mm")} {notification.sentBy}{" "}
                       {notification.type == NotificationType.adminChange
                         ? t("changed")
                         : notification.type == NotificationType.createExamOld
                         ? t("proposed an Exam")
                         : t("proposed a change")}
                       :
-                      {Object.keys(JSON.parse(notification.information)).map((elem: string) => (
-                        ((elem === "examiner_id" && JSON.parse(notification.information)[elem] == 0)
-                          || (auth.role == "Student" && (elem === "student_id" || elem === "student_email"))
-                          || (getElem(JSON.parse(notification.information)[elem], elem) == "")) ? <></> :  
-                        <li className="bg-white border border-grey p-1" key={`entry2_${notification.id}`}>
-                          {notification.type == NotificationType.createExam || notification.type == NotificationType.createExamOld
-                            ? getTitle(JSON.parse(notification.information)[elem], elem) + ": " + getElem(JSON.parse(notification.information)[elem], elem)
-                            : getElem(JSON.parse(notification.oldInformation)[elem], elem) + " -> " + getElem(JSON.parse(notification.information)[elem], elem)}
-                        </li>
-                      ))}
+                      {Object.keys(JSON.parse(notification.information)).map((elem: string) =>
+                        (elem === "examiner_id" && JSON.parse(notification.information)[elem] == 0) ||
+                        (auth.role == "Student" && (elem === "student_id" || elem === "student_email")) ||
+                        getElem(JSON.parse(notification.information)[elem], elem) == "" ? (
+                          <></>
+                        ) : (
+                          <li className="bg-white border border-grey p-1" key={`entry2_${notification.id}`}>
+                            {notification.type == NotificationType.createExam || notification.type == NotificationType.createExamOld
+                              ? getTitle(JSON.parse(notification.information)[elem], elem) + ": " + getElem(JSON.parse(notification.information)[elem], elem)
+                              : getElem(JSON.parse(notification.oldInformation)[elem], elem) +
+                                " -> " +
+                                getElem(JSON.parse(notification.information)[elem], elem)}
+                          </li>
+                        )
+                      )}
                     </div>
                   ) : notification.type == NotificationType.tutorConfirm || notification.type == NotificationType.tutorDecline ? (
                     <div
@@ -242,7 +251,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                         "font-bold"
                       ).toString()}
                     >
-                        {t("Tutor")} {notification.sentBy}{" "}
+                      {t("Tutor")} {notification.sentBy}{" "}
                       {notification.type === NotificationType.tutorConfirm ? t("registered to monitor the exam.") : t("canceled to monitor the exam.")}
                     </div>
                   ) : (
@@ -254,18 +263,29 @@ export default function NotificationComponent(props: NotificationComponentProps)
                         "font-bold"
                       ).toString()}
                     >
-                      {notification.sentBy} {notification.type === NotificationType.confirmChange ? t("approved the changes.") : t("declined the changes.")}
-                      {notification.oldInformation != "" && Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) => (
-                        getElem(JSON.parse(notification.oldInformation)[elem], elem) == "" ? <></> : 
-                          <li
-                            className={
-                              (notification.type == NotificationType.discardChange ? "line-through " : "").toString() + "bg-white border border-black p-1"
-                            }
-                            key={"entry_" + notification.id}
-                          >
-                             {getTitle(JSON.parse(notification.oldInformation)[elem], elem) + ": " + getElem(JSON.parse(notification.oldInformation)[elem], elem)}
-                          </li>
-                        ))}{" "}
+                      {notification.sentBy}{" "}
+                      {notification.type === NotificationType.confirmChange
+                        ? t("approved the changes.")
+                        : notification.type == NotificationType.deleteRequest
+                        ? t("proposed to delete the exam.")
+                        : t("declined the changes.")}
+                      {notification.oldInformation != "" &&
+                        Object.keys(JSON.parse(notification.oldInformation)).map((elem: string) =>
+                          getElem(JSON.parse(notification.oldInformation)[elem], elem) == "" ? (
+                            <></>
+                          ) : (
+                            <li
+                              className={
+                                (notification.type == NotificationType.discardChange ? "line-through " : "").toString() + "bg-white border border-black p-1"
+                              }
+                              key={"entry_" + notification.id}
+                            >
+                              {getTitle(JSON.parse(notification.oldInformation)[elem], elem) +
+                                ": " +
+                                getElem(JSON.parse(notification.oldInformation)[elem], elem)}
+                            </li>
+                          )
+                        )}{" "}
                     </div>
                   )}
                 </ul>

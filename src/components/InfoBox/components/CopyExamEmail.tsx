@@ -33,11 +33,11 @@ export default function CopyExamEmail(props: CopyExamEmailProps) {
 
     if(props.student?.bonus_time && props.student?.bonus_time != 1)
     text = text + 
-    `• ${props.student?.bonus_time * 10}% Mehrzeit,` + `\n`;
+    `• ${props.student?.bonus_time * 100 - 100}% Mehrzeit,` + `\n`;
 
     
     if(props.student?.misc && props.student?.misc != "")
-    props.student?.misc.split(", ").forEach(asd => {
+    props.student?.misc.split("; ").forEach(asd => {
       text = text + 
         `• ${asd},` + `\n`;}
     ); 

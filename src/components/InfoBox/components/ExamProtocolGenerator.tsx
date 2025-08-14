@@ -5,6 +5,7 @@ import Examiner from "../../classes/Examiner";
 import Exam from "../../classes/Exam";
 import { format, addMinutes } from "date-fns";
 import Tutor from "../../classes/Tutor";
+import Institute from "../../classes/Institute";
 
 interface ExamProtocolGeneratorProps {
   student?: Student | undefined;
@@ -13,6 +14,7 @@ interface ExamProtocolGeneratorProps {
   user?: string | undefined;
   editMode: boolean;
   tutor?: Tutor | undefined;
+  institute?: string | undefined;
   room?: string;
   mode?: string;
 }
@@ -21,7 +23,9 @@ export default function ExamProtocolGenerator(props: ExamProtocolGeneratorProps)
   const t = useTranslation();
 
   let misc: string[] = [];
-  if (props.student?.misc) misc = props.student?.misc.split(", ");
+  if (props.student?.misc) misc = props.student?.misc.split("; ");
+
+  misc.push("Betreuung durch Institut Integriert Studieren");
 
   const createProtocol = async () => {
     // Documents contain sections, you can have multiple sections per document, go here to learn more about sections
@@ -148,6 +152,7 @@ export default function ExamProtocolGenerator(props: ExamProtocolGeneratorProps)
               text: "Genehmigung Prüfungsmethoden",
               style: "normalText",
             }),
+            createBulletPoint(`${(props.student?.bonus_time ?? 1) * 100 - 100}% Mehrzeit,`),
             ...misc.map((elem: string) => (elem ? createBulletPoint(elem) : createBulletPoint(""))),
             new Paragraph({
               text: "Bestätigungen",
@@ -218,7 +223,7 @@ export default function ExamProtocolGenerator(props: ExamProtocolGeneratorProps)
                 new TableRow({
                   children: [
                     new TableCell({
-                      children: [new Paragraph(""), new Paragraph(""), new Paragraph(""), new Paragraph(""), new Paragraph("")],
+                      children: [new Paragraph("")],
                     }),
                   ],
                 }),
@@ -229,7 +234,7 @@ export default function ExamProtocolGenerator(props: ExamProtocolGeneratorProps)
               heading: HeadingLevel.HEADING_2,
             }),
             new Paragraph({
-              text: "Timestamp eMail gesendet (lt. Groupwise): _______________________________________________",
+              text: "Timestamp eMail gesendet (lt. Groupwise): ",
               style: "normalText",
             }),
             new Paragraph({
@@ -237,11 +242,11 @@ export default function ExamProtocolGenerator(props: ExamProtocolGeneratorProps)
               style: "normalText",
             }),
             new Paragraph({
-              children: [new TextRun({ text: props.examiner?.first_name + " " + props.examiner?.last_name, bold: true, font: "Calibri" })],
+              children: [new TextRun({ text: "z.h. " + props.examiner?.first_name + " " + props.examiner?.last_name, bold: true, font: "Calibri" })],
               style: "normalText",
             }),
             new Paragraph({
-              children: [new TextRun({ text: "Institute", bold: true, font: "Calibri" })],
+              children: [new TextRun({ text: props?.institute, bold: true, font: "Calibri" })],
               style: "normalText",
             }),
           ],

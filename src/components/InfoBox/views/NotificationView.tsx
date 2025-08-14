@@ -1,6 +1,6 @@
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom"; 
+import { useOutletContext } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Notification, { NotificationType } from "../../classes/Notification";
 import Exam from "../../classes/Exam";
@@ -29,18 +29,18 @@ export default function NotificationView() {
   const [seenNotifications, setSeenNotifications] = useState<Notification[]>([]);
   const [newNotifications, setNewNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // State for loading
-  const { refreshKey } = useOutletContext<{ refreshKey: number }>(); 
+  const { refreshKey } = useOutletContext<{ refreshKey: number }>();
 
-  let notificationRoute = config.strapiUrl +"/api/notifications";
-  let examRoute = config.strapiUrl +"/api/exams";
-  let tutRoute = config.strapiUrl +"/api/tutors";
-  let studentRoute = config.strapiUrl +"/api/students";
+  let notificationRoute = config.strapiUrl + "/api/notifications";
+  let examRoute = config.strapiUrl + "/api/exams";
+  let tutRoute = config.strapiUrl + "/api/tutors";
+  let studentRoute = config.strapiUrl + "/api/students";
 
   if (user.role == "Student") {
     notificationRoute = `${config.strapiUrl}/api/notifications/me`;
     examRoute = `${config.strapiUrl}/api/exams/me`;
     tutRoute = `${config.strapiUrl}/api/tutors/me`;
-    studentRoute = config.strapiUrl +"/api/students/me";
+    studentRoute = config.strapiUrl + "/api/students/me";
   } else if (user.role == "Tutor") {
     notificationRoute = `${config.strapiUrl}/api/notifications/me`;
   }
@@ -54,7 +54,6 @@ export default function NotificationView() {
     modes: [] as ExamMode[],
     rooms: [] as Room[],
   });
-
 
   const getNotifications = (id: number): Notification[] => {
     let notifs: Notification[] = [];
@@ -108,8 +107,8 @@ export default function NotificationView() {
       setLoading(true);
       const data = (await fetchAll(notificationRoute, user.token)) as any;
 
-      let examsLink = config.strapiUrl +"/api/exams";
-      if (user.role == "Student") examsLink = config.strapiUrl +"/api/exams/me";
+      let examsLink = config.strapiUrl + "/api/exams";
+      if (user.role == "Student") examsLink = config.strapiUrl + "/api/exams/me";
       const examData = (await fetchAll(examsLink, user.token)) as Exam[];
 
       let tempNew: Notification[] = [];
@@ -139,7 +138,6 @@ export default function NotificationView() {
             if (threads[i][0].exam_id == elem.exam_id && elem.exam_id != 0) {
               threads[i].push(elem);
               foundThread = true;
-
             }
           }
         }
@@ -159,7 +157,7 @@ export default function NotificationView() {
           }
         });
 
-        if (thread[thread.length - 1].type == "proposeChange") {
+        if (thread[thread.length - 1].type == "proposeChange" || "deleteRequest") {
           hasChange = true;
         }
 
@@ -216,31 +214,31 @@ export default function NotificationView() {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch(config.strapiUrl +"/api/examiners", {
+        fetch(config.strapiUrl + "/api/examiners", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch(config.strapiUrl +"/api/majors", {
+        fetch(config.strapiUrl + "/api/majors", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch(config.strapiUrl +"/api/institutes", {
+        fetch(config.strapiUrl + "/api/institutes", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch(config.strapiUrl +"/api/exam-modes", {
+        fetch(config.strapiUrl + "/api/exam-modes", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         }).then((res) => res.json()),
-        fetch(config.strapiUrl +"/api/rooms", {
+        fetch(config.strapiUrl + "/api/rooms", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -271,7 +269,9 @@ export default function NotificationView() {
 
   if (loading) {
     return (
-      <p aria-live="polite" aria-busy="true">{t("Loading notifications...")}</p>
+      <p aria-live="polite" aria-busy="true">
+        {t("Loading notifications...")}
+      </p>
     );
   }
 

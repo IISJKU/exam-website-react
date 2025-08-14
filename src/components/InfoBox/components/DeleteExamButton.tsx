@@ -3,6 +3,8 @@ import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import PopUp from "./PopUp";
 import config from "../../../config";
+import Notification from "../../classes/Notification";
+import { NotificationType } from "../../classes/Notification";
 
 interface DeleteExamButtonProps {
   id: number;
@@ -15,21 +17,25 @@ export default function DeleteExamButton(props: DeleteExamButtonProps) {
   const user = useAuth();
 
   async function deleteExam() {
-    try {
-      const response = await fetch(config.strapiUrl + "/api/exams/" + props.id, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+    if (user.role == "Admin") {
+      try {
+        const response = await fetch(config.strapiUrl + "/api/exams/" + props.id, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete item");
+        if (!response.ok) {
+          throw new Error("Failed to delete item");
+        }
+        props.success();
+      } catch (error) {
+        console.error("Error deleting item:", error);
       }
+    } else {
       props.success();
-    } catch (error) {
-      console.error("Error deleting item:", error);
     }
   }
 

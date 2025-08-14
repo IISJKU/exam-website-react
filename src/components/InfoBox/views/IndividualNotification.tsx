@@ -43,6 +43,8 @@ export default function IndividualNotification() {
 
   const user = useAuth();
 
+  const [deleteRequest, setDeleteRequest] = useState<boolean>(false);
+
   const [options, setOptions] = useState({
     students: [] as Student[],
     tutors: [] as Tutor[],
@@ -106,6 +108,9 @@ export default function IndividualNotification() {
 
               if (element.type == NotificationType.confirmChange) proposedExams = [];
               else if (element.type != NotificationType.tutorConfirm && element.type != NotificationType.tutorDecline) proposedExams.push(t);
+              if (element.type == NotificationType.deleteRequest) {
+                setDeleteRequest(true);
+              }
             }
           });
         } else {
@@ -131,21 +136,23 @@ export default function IndividualNotification() {
 
         if (proposedExams.length != 1) {
           for (let i = 0; i < proposedExams.length; i++) {
-            const examInfo = proposedExams[i].information;
-            const parsedExam = JSON.parse(examInfo) as Exam;
+            if (proposedExams[i].information) {
+              const examInfo = proposedExams[i].information;
+              const parsedExam = JSON.parse(examInfo) as Exam;
 
-            Object.entries(parsedExam).forEach(([key, value]) => {
-              // Check if key is a valid property of Exam
-              if (value != undefined) {
-                propEx[key as keyof Exam] = value; // Type assertion to keyof Exam
-              }
-            });
+              Object.entries(parsedExam).forEach(([key, value]) => {
+                // Check if key is a valid property of Exam
+                if (value != undefined) {
+                  propEx[key as keyof Exam] = value; // Type assertion to keyof Exam
+                }
+              });
+            }
           }
 
           let converted = convertToExam(propEx);
           setProposedExam(converted);
         } else {
-          setProposedExam(JSON.parse(proposedExams[0].information) as Exam);
+          if (proposedExams[0].information) setProposedExam(JSON.parse(proposedExams[0].information) as Exam);
         }
 
         const examData = (await fetchAll(config.strapiUrl + "/api/exams", user.token)) as Exam[];
@@ -349,157 +356,171 @@ export default function IndividualNotification() {
     if (accept) {
       //reset notif, set to passive & apply changes
 
-      try {
-        // Check if a new examiner needs to be created
-        if (isNewExaminer(proposedExam.examiner) && !proposedExam.examiner_id) {
-          const { first_name, last_name, email, phone } = proposedExam.examiner;
+      if (!deleteRequest)
+        try {
+          // Check if a new examiner needs to be created
+          if (isNewExaminer(proposedExam.examiner) && !proposedExam.examiner_id) {
+            const { first_name, last_name, email, phone } = proposedExam.examiner;
 
-          const examinerResponse = await fetch(config.strapiUrl + "/api/examiners", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-            body: JSON.stringify({
-              data: {
-                first_name,
-                last_name,
-                email,
-                phone,
+            const examinerResponse = await fetch(config.strapiUrl + "/api/examiners", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user.token}`,
               },
-            }),
-          });
-
-          if (!examinerResponse.ok) {
-            showToast({ message: t("Failed to save new examiner"), type: "error" });
-            return;
-          }
-
-          const savedExaminer = await examinerResponse.json();
-          proposedExam.examiner_id = savedExaminer.data.id; // Link the new examiner ID
-          setExaminer(savedExaminer.data.id);
-        }
-        if (exam != null && exam.id != undefined) {
-          const response = await fetch(`${config.strapiUrl}/api/exams/${exam.id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-            body: JSON.stringify({ data: proposedExam }),
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            showToast({
-              message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`,
-              type: "error",
+              body: JSON.stringify({
+                data: {
+                  first_name,
+                  last_name,
+                  email,
+                  phone,
+                },
+              }),
             });
-            return;
+
+            if (!examinerResponse.ok) {
+              showToast({ message: t("Failed to save new examiner"), type: "error" });
+              return;
+            }
+
+            const savedExaminer = await examinerResponse.json();
+            proposedExam.examiner_id = savedExaminer.data.id; // Link the new examiner ID
+            setExaminer(savedExaminer.data.id);
           }
+          if (exam != null && exam.id != undefined) {
+            const response = await fetch(`${config.strapiUrl}/api/exams/${exam.id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user.token}`,
+              },
+              body: JSON.stringify({ data: proposedExam }),
+            });
 
-          showToast({ message: t("Exam updated successfully"), type: "success" });
+            if (!response.ok) {
+              const errorData = await response.json();
+              showToast({
+                message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${errorData.error.message || t("Unknown error")}}.`,
+                type: "error",
+              });
+              return;
+            }
 
-          sendNotification(accept);
-          // Generate changesHtml using the helper function
-          const changesHtml = generateChangesHtml(exam, proposedExam, options, accept, `<p>${t("The following changes have been made to the exam")}:</p>`);
+            showToast({ message: t("Exam updated successfully"), type: "success" });
 
-          // Send emails to both tutor and student
-          const emailPromises = [
-            sendEmail({
-              to: exam.tutor_email || "",
-              subject: t("Exam Update Notification"),
-              text: t("The exam has been updated successfully."),
-              html: changesHtml,
-              token: user.token,
-            }),
-            sendEmail({
-              to: exam.student_email || "",
-              subject: t("Exam Update Notification"),
-              text: t("The exam has been updated successfully."),
-              html: changesHtml,
-              token: user.token,
-            }),
-          ];
-          await Promise.all(emailPromises);
-        } else {
-          console.log(proposedExam);
-          fixProposedExam();
-          console.log(proposedExam);
+            sendNotification(accept);
+            // Generate changesHtml using the helper function
+            const changesHtml = generateChangesHtml(exam, proposedExam, options, accept, `<p>${t("The following changes have been made to the exam")}:</p>`);
 
-          const response = await fetch(`${config.strapiUrl}/api/exams/`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ data: proposedExam }),
-          });
+            // Send emails to both tutor and student
+            const emailPromises = [
+              sendEmail({
+                to: exam.tutor_email || "",
+                subject: t("Exam Update Notification"),
+                text: t("The exam has been updated successfully."),
+                html: changesHtml,
+                token: user.token,
+              }),
+              sendEmail({
+                to: exam.student_email || "",
+                subject: t("Exam Update Notification"),
+                text: t("The exam has been updated successfully."),
+                html: changesHtml,
+                token: user.token,
+              }),
+            ];
+            await Promise.all(emailPromises);
+          } else {
+            fixProposedExam();
 
-          const examResponse = await fetch(`${config.strapiUrl}/api/exams/?sort[0]=id:desc&pagination[start]=0&pagination[limit]=25`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          });
+            const response = await fetch(`${config.strapiUrl}/api/exams/`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ data: proposedExam }),
+            });
 
-          const examData = await examResponse.json();
+            const examResponse = await fetch(`${config.strapiUrl}/api/exams/?sort[0]=id:desc&pagination[start]=0&pagination[limit]=25`, {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            });
 
-          let newExam: Exam | undefined;
+            const examData = await examResponse.json();
 
-          console.log(examData);
+            let newExam: Exam | undefined;
 
-          if (examData.length != 0) {
-            for (let i = 0; i < examData.length; i++) {
-              if (examData[i].title == proposedExam.title && examData[i].student_id == proposedExam.student && examData[i].duration == proposedExam.duration) {
-                newExam = examData[i];
+            if (examData.length != 0) {
+              for (let i = 0; i < examData.length; i++) {
+                if (
+                  examData[i].title == proposedExam.title &&
+                  examData[i].student_id == proposedExam.student &&
+                  examData[i].duration == proposedExam.duration
+                ) {
+                  newExam = examData[i];
+                }
               }
             }
-          }
 
-          if (newExam) {
-            proposedExam.id = newExam.id;
-            let newNotif = notification;
+            if (newExam) {
+              proposedExam.id = newExam.id;
+              let newNotif = notification;
 
-            if (newNotif != undefined) {
-              newNotif.exam_id = newExam.id;
+              if (newNotif != undefined) {
+                newNotif.exam_id = newExam.id;
 
-              newNotif.type = NotificationType.createExamOld;
-              const notif = await fetch(`${config.strapiUrl}/api/notifications/${newNotif.id}`, {
-                method: "PUT",
-                headers: {
-                  Authorization: `Bearer ${user.token}`,
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ data: newNotif }),
-              });
+                newNotif.type = NotificationType.createExamOld;
+                const notif = await fetch(`${config.strapiUrl}/api/notifications/${newNotif.id}`, {
+                  method: "PUT",
+                  headers: {
+                    Authorization: `Bearer ${user.token}`,
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ data: newNotif }),
+                });
+              }
+            } else {
+              showToast({ message: t("New Exam Not Found"), type: "error" });
             }
-          } else {
-            showToast({ message: t("New Exam Not Found"), type: "error" });
+            const changesHtml = generateChangesHtml(null, proposedExam, options, accept, `<p>${t("The new exam has been accepted")}:</p>`);
+            // Send emails to both tutor and student
+            const emailPromises = [
+              sendEmail({
+                to: proposedExam?.tutor_email || "",
+                subject: t("Exam Accepted Notification"),
+                text: t("The exam has been accepted."),
+                html: changesHtml,
+                token: user.token,
+              }),
+              sendEmail({
+                to: proposedExam?.student_email || "",
+                subject: t("Exam Accepted Notification"),
+                text: t("The exam has been accepted."),
+                html: changesHtml,
+                token: user.token,
+              }),
+            ];
+            await Promise.all(emailPromises);
+            sendNotification(accept);
           }
-          const changesHtml = generateChangesHtml(null, proposedExam, options, accept, `<p>${t("The new exam has been accepted")}:</p>`);
-          // Send emails to both tutor and student
-          const emailPromises = [
-            sendEmail({
-              to: proposedExam?.tutor_email || "",
-              subject: t("Exam Accepted Notification"),
-              text: t("The exam has been accepted."),
-              html: changesHtml,
-              token: user.token,
-            }),
-            sendEmail({
-              to: proposedExam?.student_email || "",
-              subject: t("Exam Accepted Notification"),
-              text: t("The exam has been accepted."),
-              html: changesHtml,
-              token: user.token,
-            }),
-          ];
-          await Promise.all(emailPromises);
-          sendNotification(accept);
+        } catch (error) {
+          showToast({ message: t("Error updating exam"), type: "error" });
         }
-      } catch (error) {
-        showToast({ message: t("Error updating exam"), type: "error" });
+      else {
+        console.log(exam?.id);
+        if (exam)
+          try {
+            const response = await fetch(config.strapiUrl + "/api/exams/" + exam.id, {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user.token}`,
+              },
+            });
+          } catch {}
       }
     } else {
       const availableExam = proposedExam.title == undefined ? exam : proposedExam;
@@ -626,8 +647,9 @@ export default function IndividualNotification() {
   return (
     <div className="m-5" role="main" aria-labelledby="notification-heading">
       <h1 id="notification-heading" className="text-4xl font-bold">
-        {t("Proposed Changes")}
+        {!deleteRequest ? t("Proposed Changes") : t("Student wants to delete this exam") + "⚠️"}
       </h1>
+
       <section aria-label={t("Comparison Fields")}>
         <ComparisonField
           label={t("Title")}
