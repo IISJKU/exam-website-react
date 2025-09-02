@@ -13,9 +13,10 @@ interface DateFieldProps {
 
 export default function DateField(props: DateFieldProps) {
   const { t } = useTranslation();
+  const isValidDate = moment(props.dateValue).isValid();
   // Format the date and time as per "en-GB" (DD/MM/YYYY HH:mm)
-  const formattedDate = props.dateValue ? moment(props.dateValue).format("YYYY-MM-DD") : "";
-  const formattedTime = props.dateValue ? moment(props.dateValue).format("HH:mm") : "";
+  const formattedDate = isValidDate ? moment(props.dateValue).format("YYYY-MM-DD") : "";
+  const formattedTime = isValidDate ? moment(props.dateValue).format("HH:mm") : "";
 
   return (
     <div
@@ -41,7 +42,7 @@ export default function DateField(props: DateFieldProps) {
           <input
             id="date-input"
             type="date"
-            value={moment(props.dateValue).format("YYYY-MM-DD")} // Input expects YYYY-MM-DD format
+            value={isValidDate ? moment(props.dateValue).format("YYYY-MM-DD") : ""} // Input expects YYYY-MM-DD format
             onChange={props.onDateChange}
             className="border border-gray-300 p-2 w-48 rounded-md"
             aria-required="true"

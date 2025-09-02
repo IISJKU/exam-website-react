@@ -226,21 +226,27 @@ export default function RecordForm(props: RecordFormProps) {
     props.onCancel();
   };
 
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+ /*  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDate = event.target.value;
     const currentTime = moment.utc(formData.date).format("HH:mm:ss"); // Preserve time, use UTC
+    console.log("selected selectedDate "+ selectedDate )
 
     // Combine date and time in ISO format
-    const updatedDate = moment(`${selectedDate}T${currentTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString();
+    const updatedDate = selectedDate;  //currentTime ? moment(`${selectedDate}T${currentTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString() : selectedDate;
     setFormData((prev) => ({ ...prev, date: updatedDate }));
-  };
+  }; */
+
+  const handleDateChange = (fieldName: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const selectedDate = event.target.value;
+  setFormData((prev) => ({ ...prev, [fieldName]: selectedDate }));
+};
+
 
   const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedTime = event.target.value;
     const currentDate = moment.utc(formData.date).format("YYYY-MM-DD"); // Preserve date, use UTC
-
     // Combine date and time in ISO format
-    const updatedDate = moment(`${currentDate}T${selectedTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString();
+    const updatedDate = moment(`${currentDate}T${selectedTime}`, "YYYY-MM-DDTHH:mm:ss").utc().toISOString() ;
     setFormData((prev) => ({ ...prev, date: updatedDate }));
   };
 
@@ -285,8 +291,8 @@ export default function RecordForm(props: RecordFormProps) {
         };
 
         const fieldComponents: Record<string, JSX.Element> = {
-          date: <DateField editMode={true} dateValue={formData[field]} onDateChange={handleDateChange} onTimeChange={handleTimeChange} />,
-          salto_access: <DateField editMode={true} dateValue={formData[field]} onDateChange={handleDateChange} />,
+          date: <DateField editMode={true}  dateValue={formData.date} onDateChange={handleDateChange("date")} onTimeChange={handleTimeChange} />,
+          salto_access: <DateField editMode={true}  dateValue={formData.salto_access} onDateChange={handleDateChange("salto_access")} />,
           status: <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(ExamStatus)} />,
           in_distribution_list: (
             <EnumSelector value={formData[field] || ""} onChange={(v) => handleEnumChange(field, v)} options={Object.values(InDistrbutionList)} />
