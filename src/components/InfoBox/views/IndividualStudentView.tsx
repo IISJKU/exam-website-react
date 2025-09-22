@@ -15,6 +15,7 @@ import { dropdownOptions } from "./ExamEditor";
 import BooleanDropdown from "../components/BooleanDropdown";
 import EnumSelector from "../components/EnumSelector";
 import MultiSelect from "../components/MultiSelect";
+import fetchAll from "./FetchAll";
 
 export default function IndividualStudent() {
   const { t } = useTranslation();
@@ -85,18 +86,18 @@ export default function IndividualStudent() {
 
     const fetchDropdownData = async () => {
       try {
-        const [majorsRes, locationsRes, facultyRes, disabilityTypesRes] = await Promise.all([
-          fetch(config.strapiUrl + "/api/majors", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/locations", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/faculties", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/disability-types", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+        const [majors, locations, faculties, disabilityTypes] = await Promise.all([
+          fetchAll(`${config.strapiUrl}/api/majors`, user.token, t("HTTP error!")),
+          fetchAll(`${config.strapiUrl}/api/locations`, user.token, t("HTTP error!")),
+          fetchAll(`${config.strapiUrl}/api/faculties`, user.token, t("HTTP error!")),
+          fetchAll(`${config.strapiUrl}/api/disability-types`, user.token, t("HTTP error!")),
         ]);
 
-        setMajors(majorsRes);
-        setLocations(locationsRes);
-        setFaculties(facultyRes);
-        setAllDisTypes(disabilityTypesRes);
-      } catch (error) {
+        setMajors(majors);
+        setLocations(locations);
+        setFaculties(faculties);
+        setAllDisTypes(disabilityTypes);
+      } catch {
         showToast({ message: t("Error fetching dropdown data."), type: "error" });
       }
     };

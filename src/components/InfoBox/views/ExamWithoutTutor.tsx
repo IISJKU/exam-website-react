@@ -6,13 +6,14 @@ import { useNavigate } from "react-router-dom"; // Import navigate from react-ro
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import config from "../../../config";
+import fetchAll from "./FetchAll";
 
 export default function ExamWithoutTutor() {
   const { t } = useTranslation();
   const navigate = useNavigate(); // Initialize navigate
   const user = useAuth();
 
-  const [exams, setExams] = useState([]); // Store exams
+  const [exams, setExams] = useState<Exam[]>([]); // Store exams
   const [loading, setLoading] = useState<boolean>(true);
   const [isMobileView, setIsMobileView] = useState<boolean>(false); // Track mobile view
 
@@ -41,56 +42,37 @@ export default function ExamWithoutTutor() {
   // Fetch data from Strapi API
   const fetchExams = async () => {
     try {
-      const response = await fetch(config.strapiUrl +"/api/exams/without-tutor", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });      
-      const data = await response.json();
-      if (!response.ok) {
-        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
-      }
- 
-      // Filter out exams with the archived status
-      const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
-      // Modify the data array before setting it to exams
-      const updatedData = nonArchivedExams.map((exam: any) => {
-        let updatedExam = { ...exam };
+      const exams: any[] = await fetchAll(`${config.strapiUrl}/api/exams/without-tutor`,user.token,t("HTTP error!"));
+        const nonArchived = exams.filter(
+      (exam: any) => exam.status !== ExamStatus.archived
+    );
 
-        // Update student to matrikel_number if exists
-        if (exam.student?.matrikel_number) {
-          updatedExam.student = exam.student.matrikel_number;
-        }
+    const updatedData = nonArchived.map((exam: any) => {
+      const e = { ...exam };
 
-        // Update tutor to first and last name if exists
-        if (exam.tutor?.first_name && exam.tutor?.last_name) {
-          updatedExam.tutor = `${exam.tutor.first_name} ${exam.tutor.last_name}`;
-        }
+      if (exam.student?.matrikel_number)
+        e.student = exam.student.matrikel_number;
 
-        // Update examiner to first and last name if exists
-        if (exam.examiner?.first_name && exam.examiner?.last_name) {
-          updatedExam.examiner = `${exam.examiner.first_name} ${exam.examiner.last_name}`;
-        }
+      if (exam.tutor?.first_name && exam.tutor?.last_name)
+        e.tutor = `${exam.tutor.first_name} ${exam.tutor.last_name}`;
 
-        // Update exam_mode name
-        if (exam.exam_mode?.name) {
-          updatedExam.exam_mode = exam.exam_mode.name;
-        }
+      if (exam.examiner?.first_name && exam.examiner?.last_name)
+        e.examiner = `${exam.examiner.first_name} ${exam.examiner.last_name}`;
 
-        // Update institute abbreviation
-        if (exam.institute?.abbreviation) {
-          updatedExam.institute = exam.institute.abbreviation;
-        }
+      if (exam.exam_mode?.name) e.exam_mode = exam.exam_mode.name;
+      if (exam.institute?.abbreviation) e.institute = exam.institute.abbreviation;
 
-        return updatedExam;
+      return e;
+    });
+
+    setExams(updatedData);
+    } catch (err) {
+      showToast({
+        message: `${t("Error fetching exams")}: ${err}`,
+        type: "error",
       });
-
-      setExams(updatedData); // Set the updated data to exams
-    } catch (error) {
-      showToast({ message: `${t("Error fetching exams")}: ${error}.`, type: "error" });
     } finally {
-      setLoading(false); // Set loading to false when the fetch is complete
+      setLoading(false);
     }
   };
 

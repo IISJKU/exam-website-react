@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"; // Import navigate from react-ro
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import config from "../../../config";
+import fetchAll from "./FetchAll";
 
 export default function StudentView() {
   const { t } = useTranslation();
@@ -23,31 +24,24 @@ export default function StudentView() {
   // Fetch data from API
   const fetchStudents = async () => {
     try {
-      const response = await fetch(config.strapiUrl +"/api/students", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      const data = await response.json();
-      
-      if (!response.ok) {
-        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
-        return;
-       }
-      // Map and modify data to extract the 'major' name
-      const updatedData = data.map((student: any) => ({
+      const students: any[] = await fetchAll(
+        `${config.strapiUrl}/api/students`,
+        user.token,
+        t("HTTP error!")
+      );
+
+      const updated = students.map((student) => ({
         ...student,
-        major: student.major?.name || t("N/A"), // Set major name or "N/A" if not available
+        major: student.major?.name || t("N/A"),
         location: student.location?.name || t("N/A"),
         faculty: student.faculty?.abbreviation || t("N/A"),
       }));
 
-      setStudentData(updatedData); // Update state with the fetched students
+      setStudentData(updated);
     } catch (error) {
-      showToast({ message: `${t("Error fetching students")}: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching students")}: ${error}`, type: "error" });
     } finally {
-      setLoading(false); // Set loading to false once data fetching is done
+      setLoading(false);
     }
   };
 

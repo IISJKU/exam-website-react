@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"; // Import navigate from react-ro
 import { useAuth } from "../../../hooks/AuthProvider";
 import { useTranslation } from "react-i18next";
 import config from "../../../config";
+import fetchAll from "./FetchAll";
 
 export default function TutorView() {
   const { t } = useTranslation();
@@ -20,36 +21,29 @@ export default function TutorView() {
   // Fetch data from Strapi API
   const fetchTutors = async () => {
     try {
-      const response = await fetch(config.strapiUrl +"/api/tutors", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+      const tutors: any[] = await fetchAll(
+        `${config.strapiUrl}/api/tutors`,
+        user.token,
+        t("HTTP error!")
+      );
+
+      const updated = tutors.map((tutor) => {
+        const obj = { ...tutor };
+
+        if (tutor.location?.name) obj.location = tutor.location.name;
+
+        obj.salto_access = tutor.salto_access
+          ? `${t("Yes Until")} ${formatDateTime(tutor.salto_access)}`
+          : t("No");
+
+        return obj;
       });
-      const data = await response.json();
-      if (!response.ok) {
-        showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${data.error.message || t("Unknown error")}}.`, type: "error"});
-      }
-      const updatedData = data.map((tutor: any) => {
-        let updatedTutor = { ...tutor };
 
-        if (tutor.location?.name) {
-          updatedTutor.location = tutor.location.name;
-        }
-
-        if (tutor.salto_access) {
-          updatedTutor.salto_access = t("Yes Until") + " " + formatDateTime(tutor.salto_access);
-        } else {
-          updatedTutor.salto_access = t("No")
-        }
-
-        return updatedTutor;
-      });
-      setTutors(updatedData); 
+      setTutors(updated);
     } catch (error) {
-      showToast({ message: `${t("Error fetching tutors")}: ${error}.`, type: "error" });
+      showToast({ message: `${t("Error fetching tutors")}: ${error}`, type: "error" });
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 

@@ -24,6 +24,7 @@ import EnumSelector from "../components/EnumSelector";
 import CopyExamEmail from "../components/CopyExamEmail";
 import ExamProtocolGenerator from "../components/ExamProtocolGenerator";
 import DeleteExamButton from "../components/DeleteExamButton";
+import fetchAll from "./FetchAll";
 
 export default function ExamEditor() {
   const { id } = useParams(); // Get exam ID from URL params
@@ -171,77 +172,41 @@ export default function ExamEditor() {
 
     const fetchDropdownOptions = async () => {
       try {
-        const [studentsRes, tutorsRes, examinersRes, majorsRes, institutesRes, modesRes, roomsRes] = await Promise.all([
-          fetch(config.strapiUrl + "/api/students", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          user.role == "Admin" &&
-            fetch(config.strapiUrl + "/api/tutors", {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/examiners", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/majors", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/institutes", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/exam-modes", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/rooms", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          })
-            .then((res) => res.json())
-            .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)), // Filter for available rooms
+        const [students, tutors, examiners, majors, institutes, modes, rooms] = await Promise.all([
+          fetchAll(`${config.strapiUrl}/api/students`, user.token, t("HTTP error!")),
+          user.role === "Admin"
+            ? fetchAll(`${config.strapiUrl}/api/tutors`, user.token, t("HTTP error!"))
+            : Promise.resolve([]),
+          fetchAll(`${config.strapiUrl}/api/examiners`, user.token, t("HTTP error!")),
+          fetchAll(`${config.strapiUrl}/api/majors`, user.token, t("HTTP error!")),
+          fetchAll(`${config.strapiUrl}/api/institutes`, user.token, t("HTTP error!")),
+          fetchAll(`${config.strapiUrl}/api/exam-modes`, user.token, t("HTTP error!")),
+          fetchAll(`${config.strapiUrl}/api/rooms`, user.token, t("HTTP error!")),
         ]);
 
+        const availableRooms = rooms.filter((r: any) => r.isAvailable === true);
+
         setOptions({
-          students: studentsRes,
-          tutors: tutorsRes,
-          examiners: examinersRes,
-          majors: majorsRes,
-          institutes: institutesRes,
-          modes: modesRes,
-          rooms: roomsRes,
+          students,
+          tutors,
+          examiners,
+          majors,
+          institutes,
+          modes,
+          rooms: availableRooms,
         });
-      } catch (error) {
+      } catch {
         showToast({ message: t("Error fetching dropdown options"), type: "error" });
       }
     };
 
+
     // Fetch exams
-    const fetchAllExams = async () => {
-      const response = await fetch(config.strapiUrl + "/api/exams", {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      const data = await response.json();
-      const nonArchivedExams = data.filter((exam: Exam) => exam.status !== ExamStatus.archived);
-      setAllExams(nonArchivedExams);
-    };
+  const fetchAllExams = async () => {
+    const exams = await fetchAll(`${config.strapiUrl}/api/exams`, user.token, t("Error fetching exams"));
+    setAllExams(exams.filter((e: any) => e.status !== ExamStatus.archived));
+  };
+
 
     fetchExam();
     fetchDropdownOptions();

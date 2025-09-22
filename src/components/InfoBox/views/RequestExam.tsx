@@ -14,6 +14,7 @@ import Exam from "../../classes/Exam";
 import Notification, { NotificationType } from "../../classes/Notification";
 import ExaminerDropdown from "../components/ExaminerDropdown";
 import config from "../../../config";
+import fetchAll from "./FetchAll";
 
 // Define initial state type to include all properties
 interface InitialState {
@@ -75,26 +76,32 @@ export default function RequestExam() {
   useEffect(() => {
     const fetchDropdownOptions = async () => {
       try {
-        const [examinersRes, studentRes, modesRes] = await Promise.all([
-          fetch(config.strapiUrl + "/api/examiners", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/students/me", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/exam-modes", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/rooms", { headers: { Authorization: `Bearer ${user.token}` } }).then((res) => res.json()),
+        const [examiners, studentResp, modes, rooms] = await Promise.all([
+          fetchAll(`${config.strapiUrl}/api/examiners`, user.token, t("HTTP error!")),
+          fetch(`${config.strapiUrl}/api/students/me`, {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }).then((res) => res.json()),
+          fetchAll(`${config.strapiUrl}/api/exam-modes`, user.token, t("HTTP error!")),
+          fetchAll(`${config.strapiUrl}/api/rooms`, user.token, t("HTTP error!")),
         ]);
-        setExaminers(examinersRes ?? []); // Populate examiners
 
+        setExaminers(examiners ?? []);
         setOptions({
-          examiners: examinersRes ?? [],
-          modes: modesRes ?? [],
+          examiners: examiners ?? [],
+          modes: modes ?? [],
         });
 
-        setStudent(studentRes[0].id);
+        // `/students/me` usually returns a single object or small array
+        const studentId = Array.isArray(studentResp)
+          ? studentResp[0]?.id
+          : studentResp?.id;
+        if (studentId) setStudent(studentId);
 
         setInitialState({
           exam,
           title,
           lva_num,
-          student: student,
+          student: studentId,
           date,
           duration,
           examiner,

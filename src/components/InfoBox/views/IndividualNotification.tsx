@@ -194,64 +194,33 @@ export default function IndividualNotification() {
 
     const fetchDropdownOptions = async () => {
       try {
-        const [studentsRes, tutorsRes, examinersRes, majorsRes, institutesRes, modesRes, roomsRes] = await Promise.all([
-          fetch(config.strapiUrl + "/api/students", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/tutors", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/examiners", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/majors", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/institutes", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/exam-modes", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }).then((res) => res.json()),
-          fetch(config.strapiUrl + "/api/rooms", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          })
-            .then((res) => res.json())
-            .then((rooms) => rooms.filter((room: Room) => room.isAvailable === true)),
-        ]);
+        const [students, tutors, examiners, majors, institutes, modes, rooms] =
+          await Promise.all([
+            fetchAll(`${config.strapiUrl}/api/students`, user.token, t("HTTP error!")),
+            fetchAll(`${config.strapiUrl}/api/tutors`, user.token, t("HTTP error!")),
+            fetchAll(`${config.strapiUrl}/api/examiners`, user.token, t("HTTP error!")),
+            fetchAll(`${config.strapiUrl}/api/majors`, user.token, t("HTTP error!")),
+            fetchAll(`${config.strapiUrl}/api/institutes`, user.token, t("HTTP error!")),
+            fetchAll(`${config.strapiUrl}/api/exam-modes`, user.token, t("HTTP error!")),
+            fetchAll(`${config.strapiUrl}/api/rooms`, user.token, t("HTTP error!")),
+          ]);
+
+        const availableRooms = rooms.filter((r: Room) => r.isAvailable === true);
 
         setOptions({
-          students: studentsRes,
-          tutors: tutorsRes,
-          examiners: examinersRes,
-          majors: majorsRes,
-          institutes: institutesRes,
-          modes: modesRes,
-          rooms: roomsRes,
+          students,
+          tutors,
+          examiners,
+          majors,
+          institutes,
+          modes,
+          rooms: availableRooms,
         });
       } catch (error) {
-        showToast({ message: t("Error fetching dropdown options"), type: "error" });
+        showToast({
+          message: t("Error fetching dropdown options"),
+          type: "error",
+        });
       }
     };
 
