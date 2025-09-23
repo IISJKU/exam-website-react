@@ -12,7 +12,6 @@ import moment from "moment";
 import DropdownWithSearch from "../components/DropdownWithSearch";
 import { dropdownOptions } from "./ExamEditor";
 import Location from "../../classes/Location";
-import fetchAll from "./FetchAll";
 
 export default function IndividualTutor() {
   const { t } = useTranslation();
@@ -71,13 +70,17 @@ export default function IndividualTutor() {
     // Fetch majors data for the dropdown
     const fetchLocations = async () => {
       try {
-        const locations = await fetchAll(
-          `${config.strapiUrl}/api/locations`,
-          user.token,
-          t("HTTP error!")
-        );
-
-        setLocationOptions(locations);
+        const response = await fetch(config.strapiUrl +"/api/locations", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          showToast({ message: `${t("HTTP error!")} ${t("Status")}: ${response.status}, ${t("Message")}: ${result.error.message || t("Unknown error")}}.`, type: "error"});
+        }
+        setLocationOptions(result);
       } catch (error) {
         showToast({ message: t("Error fetching locations."), type: "error" });
       }
