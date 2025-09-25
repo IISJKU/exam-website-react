@@ -10,6 +10,7 @@ import { ContractCompleted, ContractType, DistributionList } from "./classes/Tut
 import { ExamStatus } from "./classes/Exam";
 import MultiSelect from "./InfoBox/components/MultiSelect";
 import { dropdownOptions } from "./InfoBox/views/ExamEditor";
+import { showToast } from "./InfoBox/components/ToastMessage";
 
 interface RecordFormProps {
   record: DataRecord | null;
@@ -162,6 +163,16 @@ export default function RecordForm(props: RecordFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+     // Check required selects
+    for (const field of props.relationalFields ?? []) {
+      const isRequired = !(props.optionalFields ?? []).includes(field.name);
+      if (isRequired && !formData[field.name]) {
+        showToast({ message: t(`Please select ${field.name}`), type: "error" });
+        return; // stop submit
+      }
+    }
+    
     const sanitizedData: DataRecord = {
       ...formData,
       student: formData.student || null,
@@ -276,7 +287,7 @@ export default function RecordForm(props: RecordFormProps) {
                 aria-required={isRequired}
                 aria-labelledby={`${field}-label`}
               >
-                <option value="">Select {field}</option>
+                <option value="" disabled hidden>Select {field}</option>
                 <option value="true">True</option>
                 <option value="false">False</option>
               </select>
@@ -370,11 +381,11 @@ export default function RecordForm(props: RecordFormProps) {
                   onChange={handleChange}
                   className={`border border-gray-300 p-2 w-full rounded-md ${isDisabled ? "opacity-50" : ""}`}
                   disabled={isDisabled}
-                  required={isRequired}
+                  required={isRequired && !isDisabled}
                   aria-required={isRequired}
                   aria-labelledby={`${field.name}-label`}
                 >
-                  <option value="">Select {(field.name.charAt(0).toUpperCase() + field.name.slice(1)).replace("_", " ")}</option>
+                  <option value="" disabled hidden>Select {(field.name.charAt(0).toUpperCase() + field.name.slice(1)).replace("_", " ")}</option>
                   {field.options.map((option) => (
                     <option key={option.id} value={option.id}>
                       {option.displayValue}

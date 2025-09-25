@@ -8,7 +8,7 @@ const tableConfigurations = {
     students: {
       tableName: "students",
       selectedFields: ["first_name", "last_name", "matrikel_number", "phone", "emergency_contact", "bonus_time", "misc", "conditions_approved", "in_distribution_list", "disability", "presence_multimedia", "updates"],
-      optionalFields: ["misc","conditions_approved","disability", "presence_multimedia", "updates", "disability_type"],
+      optionalFields: ["misc","conditions_approved","disability", "presence_multimedia", "updates", "disability_type", "emergency_contact"],
       populateFields: [
         { name: "major", populateTable: "majors", displayField: ["name"] },
         { name: "location", populateTable: "locations", displayField: ["name"] },

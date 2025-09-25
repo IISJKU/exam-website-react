@@ -63,8 +63,13 @@ export default function ExamView() {
         let updatedExam = { ...exam };
 
         // Update student to matrikel_number if exists
-        if (exam.student?.matrikel_number) {
+        /* if (exam.student?.matrikel_number) {
           updatedExam.student = exam.student.matrikel_number;
+        } */
+        
+        // Update tutor to first and last name if exists
+        if (exam.student?.first_name && exam.student?.last_name) {
+          updatedExam.student = `${exam.student.first_name} ${exam.student.last_name}`;
         }
 
         // Update tutor to first and last name if exists
