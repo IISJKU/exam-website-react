@@ -261,7 +261,9 @@ export default function DataAdministration(props: DataAdministrationProps) {
           <table className="table-auto w-full bg-white shadow-md rounded-lg" role="table">
             <thead>
               <tr role="row">
-                <th role="columnheader" scope="col" className="border px-4 py-2">{t("ID")}</th>
+               {/*  // hide ID field
+                <th role="columnheader" scope="col" className="border px-4 py-2">{t("ID")}</th> */}
+                <th role="columnheader" scope="col" className="border px-4 py-2">{t("Actions")}</th>
                 {fields.map((field) => (
                   <th role="columnheader" scope="col" className="border px-4 py-2 capitalize" key={field}>
                     {field.replace("_", " ")}
@@ -272,13 +274,29 @@ export default function DataAdministration(props: DataAdministrationProps) {
                     {t(field.name).replace("_", " ")}
                   </th>
                 ))}
-                <th role="columnheader" scope="col" className="border px-4 py-2">{t("Actions")}</th>
               </tr>
             </thead>
             <tbody>
               {data.map((record, idx) => (
                 <tr key={record.id} className="hover:bg-gray-100 text-center" role="row" aria-label={`${t("Row")} ${idx + 1}`}>
-                  <td className="border px-4 py-2" role="cell">{record.id}</td>
+                  {/*  // hide ID field
+                  <td className="border px-4 py-2" role="cell">{record.id}</td> */}
+                   <td className="border px-4 py-2" role="cell">
+                    <button
+                      className="text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label={`${t("Edit record")} ${record.id}`}
+                      onClick={() => handleEditClick(record)}
+                    >
+                      {t("Edit")}
+                    </button>
+                    <button
+                      className="text-red-500 hover:text-red-700 ml-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      aria-label={`${t("Delete record")} ${record.id}`}
+                      onClick={() => openConfirmDialog(record.id!)}
+                    >
+                      {t("Delete")}
+                    </button>
+                  </td>
                   {fields.map((field) => (
                     <td className="border px-4 py-2" role="cell" key={`${record.id}-${field}`}>
                       {typeof record[field] === "boolean"
@@ -301,22 +319,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
                       }
                     </td>
                   ))}
-                  <td className="border px-4 py-2" role="cell">
-                    <button
-                      className="text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-label={`${t("Edit record")} ${record.id}`}
-                      onClick={() => handleEditClick(record)}
-                    >
-                      {t("Edit")}
-                    </button>
-                    <button
-                      className="text-red-500 hover:text-red-700 ml-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-                      aria-label={`${t("Delete record")} ${record.id}`}
-                      onClick={() => openConfirmDialog(record.id!)}
-                    >
-                      {t("Delete")}
-                    </button>
-                  </td>
+                 
                 </tr>
               ))}
             </tbody>

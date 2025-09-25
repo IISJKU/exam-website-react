@@ -8,7 +8,7 @@ const tableConfigurations = {
     students: {
       tableName: "students",
       selectedFields: ["first_name", "last_name", "matrikel_number", "phone", "emergency_contact", "bonus_time", "misc", "conditions_approved", "in_distribution_list", "disability", "presence_multimedia", "updates"],
-      optionalFields: ["misc","conditions_approved","disability", "presence_multimedia", "updates", "disability_type", "emergency_contact"],
+      optionalFields: ["misc","conditions_approved","disability", "disability_type", "presence_multimedia", "updates", "emergency_contact"],
       populateFields: [
         { name: "major", populateTable: "majors", displayField: ["name"] },
         { name: "location", populateTable: "locations", displayField: ["name"] },
@@ -73,8 +73,8 @@ const tableConfigurations = {
     },
     users: {
       tableName: "users",
-      selectedFields: ["username", "email", "provider", "confirmed", "blocked", "password"],
-      optionalFields: ["provider","password", "student", "tutor"],
+      selectedFields: ["username", "email", "confirmed", "blocked", "password"],
+      optionalFields: ["password", "student", "tutor"],
       populateFields: [
         { name: "role", populateTable: "users-permissions/roles", displayField: ["name"] },
         { name: "student", populateTable: "students", displayField: ["first_name", "last_name"] },
@@ -98,7 +98,7 @@ const tableConfigurations = {
     location: {
     tableName: "locations",
     selectedFields: ["name"],
-    optionalFields: [],
+    optionalFields: ["faculty"],
     populateFields: [
       { name: "faculty", populateTable: "faculties", displayField: ["name"] },
     ],

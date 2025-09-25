@@ -20,20 +20,20 @@ export default function ExamView() {
   // Determine fields and keys dynamically based on screen size
   let fields = isMobileView
     ? [t("Exam Title"), t("Date/Time"), t("Student")]
-    : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Institute"), t("Notes"), t("Student Misc")];
+    : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Notes"), t("Student Misc")];
 
   let keys: (keyof Exam)[] = isMobileView
     ? ["title", "date", "student"] // Shortened keys for mobile
-    : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute", "notes", "student_misc"];
+    : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "notes", "student_misc"];
 
   if (user.role === "Tutor") {
     fields = isMobileView
       ? [t("Exam Title"), t("Date/Time"), t("Student")]
-      : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner"), t("Institute")];
+      : [t("Exam Title"), t("LVA Nr."), t("Date/Time"), t("Duration"), t("Mode"), t("Student"), t("Examiner")];
 
     keys = isMobileView
       ? ["title", "date", "student"] // Shortened keys for mobile
-      : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner", "institute"];
+      : ["title", "lva_num", "date", "duration", "exam_mode", "student", "examiner"];
   }
 
   // Update `isMobileView` based on window width
@@ -88,9 +88,9 @@ export default function ExamView() {
         }
 
         // Update institute abbreviation
-        if (exam.institute?.abbreviation) {
+        /* if (exam.institute?.abbreviation) {
           updatedExam.institute = exam.institute.abbreviation;
-        }
+        } */
 
         return updatedExam;
       });
