@@ -37,7 +37,7 @@ export default function ExamEditor() {
   const [exam, setExam] = useState<Exam | null>(null); // Store exam data
   const [allExams, setAllExams] = useState<Exam[]>([]);
   const [title, setTitle] = useState<string>("");
-  const [lva_num, setLvaNum] = useState<number | undefined>();
+  const [lva_num, setLvaNum] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [duration, setDuration] = useState<number | undefined>();
   const [tutor, setTutor] = useState<number | undefined>();
@@ -293,7 +293,7 @@ export default function ExamEditor() {
       institute,
       exam_mode: mode,
       room,
-      lva_num,
+      lva_num: (lva_num ?? "").toString().trim(),
       notes,
       status,
     };
@@ -486,13 +486,12 @@ export default function ExamEditor() {
           {/* First div */}
           <div className="w-1/2 p-4 rounded shadow-md" role="region" aria-labelledby="first-div-heading">
             <EditField
-              title={t("LVA Num")}
-              editMode={editMode}
-              text={lva_num ? lva_num.toString() : ""}
-              hideTitle={false}
-              onChange={(e) => setLvaNum(Number(e.target.value))}
-              aria-label={t("LVA course Number")}
-              required={true}
+            title={t("LVA Num")}
+            editMode={editMode}
+            text={lva_num}
+            hideTitle={false}
+            onChange={(e) => setLvaNum(e.target.value.replace(",", ".").trim())}
+            required
             />
 
             <DateField
@@ -721,15 +720,16 @@ export default function ExamEditor() {
         />
 
         <EditField
-          title={t("LVA Num")}
-          editMode={editMode}
-          text={lva_num?.toString() ?? ""}
-          hideTitle={false}
-          onChange={(e) => setLvaNum(Number(e.target.value))}
-          aria-label={t("LVA course Number")}
-          required={true}
-          aria-required="true"
+        title={t("LVA Num")}
+        editMode={editMode}
+        text={lva_num}
+        hideTitle={false}
+        onChange={(e) => setLvaNum(e.target.value.replace(",", ".").trim())}
+        aria-label={t("LVA course Number")}
+        required={true}
+        aria-required="true"
         />
+        
         <DateField
           title={t("Date/Time")}
           editMode={editMode}
