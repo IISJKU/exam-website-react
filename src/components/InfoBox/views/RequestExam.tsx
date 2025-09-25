@@ -185,7 +185,7 @@ export default function RequestExam() {
       examiner_id: 0,
       examiner: undefined,
       exam_mode: mode,
-      lva_num,
+      lva_num: (lva_num ?? "").toString().trim(),
       student_email: studentEmail,
     };
 

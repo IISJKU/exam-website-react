@@ -29,7 +29,7 @@ export default function IndividualNotification() {
   const [exam, setExam] = useState<Exam | null>(null); // Store exam data
 
   const [title, setTitle] = useState<string>("");
-  const [lva_num, setLvaNum] = useState<number | undefined>();
+  const [lva_num, setLvaNum] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [duration, setDuration] = useState<number | undefined>();
   const [tutor, setTutor] = useState<number | undefined>();
@@ -66,7 +66,7 @@ export default function IndividualNotification() {
     if (partial.duration != undefined) ex.duration = partial.duration;
     if (partial.date != undefined) ex.date = partial.date;
     if (partial.institute_id != undefined) ex.institute_id = partial.institute_id;
-    if (partial.lva_num != undefined) ex.lva_num = partial.lva_num;
+    if (partial.lva_num != undefined) ex.lva_num = String(partial.lva_num);
     if (partial.notes != undefined) ex.notes = partial.notes;
     if (partial.student_email != undefined) ex.student_email = partial.student_email;
     if (partial.tutor_email != undefined) ex.tutor_email = partial.tutor_email;
@@ -169,8 +169,7 @@ export default function IndividualNotification() {
           if (ex) {
             setExam(ex);
             setTitle(ex.title);
-            if (ex.lva_num) setLvaNum(ex.lva_num);
-            else setLvaNum(0);
+            setLvaNum(ex.lva_num ?? "");
             setDate(ex.date);
             setDuration(ex.duration);
             setTutor(ex.tutor_id);
@@ -235,7 +234,8 @@ export default function IndividualNotification() {
     proposedExam.examiner = proposedExam.examiner_id;
     proposedExam.institute = proposedExam.institute_id;
 
-    if (!proposedExam.lva_num) proposedExam.lva_num = 0;
+    if (proposedExam.lva_num == null) proposedExam.lva_num = "";
+    proposedExam.lva_num = String(proposedExam.lva_num).trim();
 
     //clean up fields
     delete (proposedExam as { student_id?: number }).student_id;
@@ -357,13 +357,17 @@ export default function IndividualNotification() {
             setExaminer(savedExaminer.data.id);
           }
           if (exam != null && exam.id != undefined) {
+            const dataToSend = {
+              ...proposedExam,
+              lva_num: String(proposedExam.lva_num ?? "").trim(),
+            };
             const response = await fetch(`${config.strapiUrl}/api/exams/${exam.id}`, {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${user.token}`,
               },
-              body: JSON.stringify({ data: proposedExam }),
+              body: JSON.stringify({ data: dataToSend }),
             });
 
             if (!response.ok) {
@@ -402,13 +406,18 @@ export default function IndividualNotification() {
           } else {
             fixProposedExam();
 
+            const dataToSend = {
+              ...proposedExam,
+              lva_num: String(proposedExam.lva_num ?? "").trim(),
+            };
+
             const response = await fetch(`${config.strapiUrl}/api/exams/`, {
               method: "POST",
               headers: {
                 Authorization: `Bearer ${user.token}`,
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ data: proposedExam }),
+              body: JSON.stringify({ data: dataToSend }),
             });
 
             const examResponse = await fetch(`${config.strapiUrl}/api/exams/?sort[0]=id:desc&pagination[start]=0&pagination[limit]=25`, {
@@ -630,9 +639,8 @@ export default function IndividualNotification() {
         <ComparisonField
           label={t("LVA Num")}
           options={[]}
-          value={lva_num?.toString() || ""}
-          proposedVal={proposedExam.lva_num?.toString() || ""}
-          aria-label={t("LVA number comparison")}
+          value={lva_num || ""}
+          proposedVal={proposedExam.lva_num ? String(proposedExam.lva_num) : ""}
         />
 
         <ComparisonField
