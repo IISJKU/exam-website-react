@@ -8,7 +8,7 @@ const tableConfigurations = {
     students: {
       tableName: "students",
       selectedFields: ["first_name", "last_name", "matrikel_number", "phone", "emergency_contact", "bonus_time", "misc", "conditions_approved", "in_distribution_list", "disability", "presence_multimedia", "updates"],
-      optionalFields: ["misc","conditions_approved","disability", "disability_type", "presence_multimedia", "updates", "emergency_contact"],
+      optionalFields: ["phone", "misc", "bonus_time", "conditions_approved", "disability", "disability_type", "presence_multimedia", "updates", "emergency_contact", "in_distribution_list"],
       populateFields: [
         { name: "major", populateTable: "majors", displayField: ["name"] },
         { name: "location", populateTable: "locations", displayField: ["name"] },
@@ -19,7 +19,7 @@ const tableConfigurations = {
     tutors: {
       tableName: "tutors",
       selectedFields: ["first_name", "last_name", "matrikel_number", "phone", "study", "contract_type", "contract_completed", "salto_access", "distribution_list"],
-      optionalFields: ["matrikel_number", "study", "contract_type", "contract_completed", "salto_access", "distribution_list", "location"],
+      optionalFields: ["phone", "matrikel_number", "study", "contract_type", "contract_completed", "salto_access", "distribution_list", "location"],
       populateFields: [
         { name: "location", populateTable: "locations", displayField: ["name"] },
       ],
@@ -27,7 +27,7 @@ const tableConfigurations = {
     exams: {
       tableName: "exams",
       selectedFields: ["title", "date", "duration", "lva_num", "notes", "status", "confirmed"],
-      optionalFields: [],
+      optionalFields: ["tutor", "examiner", "institute", "room", "exam_mode", "notes", "confirmed", "status"],
       populateFields: [
         { name: "student", populateTable: "students", displayField: ["matrikel_number"] },
         { name: "tutor", populateTable: "tutors", displayField: ["first_name", "last_name"] },
@@ -40,7 +40,7 @@ const tableConfigurations = {
     examiners: {
       tableName: "examiners",
       selectedFields: ["first_name", "last_name", "email", "phone"],
-      optionalFields: [],
+      optionalFields: ["email", "phone"],
       populateFields: [],
     },
     exam_modes: {
@@ -52,13 +52,13 @@ const tableConfigurations = {
     institutes: {
       tableName: "institutes",
       selectedFields: ["name", "abbreviation", "email", "department"],
-      optionalFields: ["department"],
+      optionalFields: ["abbreviation", "email", "department"],
       populateFields: [],
     },
     majors: {
       tableName: "majors",
       selectedFields: ["name", "abbreviation"],
-      optionalFields: [],
+      optionalFields: ["abbreviation", "faculty"],
       populateFields: [
         { name: "faculty", populateTable: "faculties", displayField: ["name"] },
       ],
@@ -66,7 +66,7 @@ const tableConfigurations = {
     rooms: {
       tableName: "rooms",
       selectedFields: ["name", "building", "capacity", "isAvailable"],
-      optionalFields: [],
+      optionalFields: ["building", "location"],
       populateFields: [
         { name: "location", populateTable: "locations", displayField: ["name"] },
       ],
@@ -74,7 +74,7 @@ const tableConfigurations = {
     users: {
       tableName: "users",
       selectedFields: ["username", "email", "confirmed", "blocked", "password"],
-      optionalFields: ["password", "student", "tutor"],
+      optionalFields: ["confirmed", "blocked", "password", "student", "tutor"],
       populateFields: [
         { name: "role", populateTable: "users-permissions/roles", displayField: ["name"] },
         { name: "student", populateTable: "students", displayField: ["first_name", "last_name"] },
@@ -84,13 +84,13 @@ const tableConfigurations = {
     disability_type: {
     tableName: "disability-types",
     selectedFields: ["abbreviation", "definition"],
-    optionalFields: [],
+    optionalFields: ["definition"],
     populateFields: [],
     },
     faculty: {
     tableName: "faculties",
-    selectedFields: ["abbreviation", "name"],
-    optionalFields: [],
+    selectedFields: ["name", "abbreviation"],
+    optionalFields: ["abbreviation", "location"],
     populateFields: [
       { name: "location", populateTable: "locations", displayField: ["name"] },
     ],
