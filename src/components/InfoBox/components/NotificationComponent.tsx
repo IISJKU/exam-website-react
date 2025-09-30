@@ -170,7 +170,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
             {!(firstType === NotificationType.proposeChange || first.type === NotificationType.createExam) ||
             auth.role === "Tutor" ||
             auth.role === "Student" ? null : (
-              <a
+              <button
                 className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -187,7 +187,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                 aria-label={t("Edit notification details")}
               >
                 {t("Edit")}
-              </a>
+              </button>
             )}
           </div>
         ) : (
@@ -204,7 +204,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
             {!(first?.type === NotificationType.proposeChange || firstType === NotificationType.createExam || first?.type === NotificationType.deleteRequest) ||
             auth.role === "Tutor" ||
             auth.role === "Student" ? null : (
-              <a
+              <button
                 className="absolute right-0 hover:opacity-80 hover:border-2 border-black z-10"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -221,7 +221,7 @@ export default function NotificationComponent(props: NotificationComponentProps)
                 aria-label={t("Edit notification details")}
               >
                 {t("Edit")}
-              </a>
+              </button>
             )}
           </div>
         )}
