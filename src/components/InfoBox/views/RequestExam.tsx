@@ -41,7 +41,7 @@ export default function RequestExam() {
 
   const [title, setTitle] = useState<string>("");
   const [student, setStudent] = useState<number>(user.userId);
-  const [lva_num, setLvaNum] = useState<number | undefined>();
+  const [lva_num, setLvaNum] = useState<number | 0>();
   const [date, setDate] = useState<string>("");
   const [duration, setDuration] = useState<number | undefined>();
   const [examiner, setExaminer] = useState<number | string | undefined>();
@@ -58,7 +58,7 @@ export default function RequestExam() {
   const [initialState, setInitialState] = useState<InitialState>({
     exam: null,
     title: "",
-    lva_num: undefined,
+    lva_num: 0,
     student: student,
     date: "",
     duration: undefined,
@@ -185,7 +185,7 @@ export default function RequestExam() {
       examiner_id: 0,
       examiner: undefined,
       exam_mode: mode,
-      lva_num: (lva_num ?? "").toString().trim(),
+      lva_num: (lva_num ?? 0).toString().trim(),
       student_email: studentEmail,
     };
 
@@ -305,10 +305,10 @@ export default function RequestExam() {
       <EditField
         title={t("LVA Num")}
         editMode={editMode}
-        text={lva_num?.toString() ?? ""}
+        text={lva_num?.toString() ?? 0}
         onChange={(e) => setLvaNum(Number(e.target.value))}
         aria-label={t("Add Exam LVA Num")}
-        required={false}
+        required={true}
         aria-required="false"
       />
       <DateField
