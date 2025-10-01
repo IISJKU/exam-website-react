@@ -14,7 +14,7 @@ interface ExamProtocolGeneratorProps {
   user?: string | undefined;
   editMode: boolean;
   tutor?: Tutor | undefined;
-  institute?: string | undefined;
+  institute?: Institute | undefined;
   room?: string;
   mode?: string;
 }
@@ -128,14 +128,14 @@ export default function ExamProtocolGenerator(props: ExamProtocolGeneratorProps)
               style: "titlePara",
             }),
             new Paragraph({
-              text: props.exam?.title ?? "",
+              text: (props.exam?.title) ? props.exam?.title + " - " +  props.exam?.lva_num : "",
               heading: HeadingLevel.HEADING_1,
             }),
             createBulletPoint("Datum: ", format(new Date(props.exam?.date ?? ""), "dd.MM.yyyy")),
             createBulletPoint("Raum/Gerät: ", props.room),
             createBulletPoint("Prüfer:in: ", props.examiner?.first_name + " " + props.examiner?.last_name),
             createBulletPoint("Abgabe an E-Mail: ", props.examiner?.email ?? ""),
-            createBulletPoint("Und in CC: "),
+            createBulletPoint("Und in CC: ", props.institute?.email ?? ""),
             createBulletPoint("Prüfungsbedingungen: ", props.mode),
             createBulletPoint("Weitere Anmerkungen zum Ablauf: "),
             new Paragraph({
@@ -224,8 +224,10 @@ export default function ExamProtocolGenerator(props: ExamProtocolGeneratorProps)
                 new TableRow({
                   children: [
                     new TableCell({
-                      children: [new Paragraph("")],
+                      children: [new Paragraph(""),
+                                new Paragraph("")],
                     }),
+                    
                   ],
                 }),
               ],
@@ -243,11 +245,11 @@ export default function ExamProtocolGenerator(props: ExamProtocolGeneratorProps)
               style: "normalText",
             }),
             new Paragraph({
-              children: [new TextRun({ text: "z.h. " + props.examiner?.first_name + " " + props.examiner?.last_name, bold: true, font: "Calibri" })],
+              children: [new TextRun({ text: props?.institute?.name, bold: true, font: "Calibri" })],
               style: "normalText",
             }),
             new Paragraph({
-              children: [new TextRun({ text: props?.institute, bold: true, font: "Calibri" })],
+              children: [new TextRun({ text: "z.h. " + props.examiner?.first_name + " " + props.examiner?.last_name, bold: true, font: "Calibri" })],
               style: "normalText",
             }),
           ],

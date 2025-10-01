@@ -410,7 +410,7 @@ export default function ExamEditor() {
             tutor={tutor ? options.tutors.find((s) => s.id === tutor) : undefined}
             room={room ? options.rooms.find((s) => s.id === room)?.name : ""}
             mode={mode ? options.modes.find((s) => s.id === mode)?.name : ""}
-            institute={institute ? options.institutes.find((s) => s.id === institute)?.name : ""}
+            institute={institute ? options.institutes.find((s) => s.id === institute) : undefined}
           />
         </div>
       </div>
