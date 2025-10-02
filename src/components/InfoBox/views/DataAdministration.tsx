@@ -365,7 +365,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
             </thead>
             <tbody>
               {filteredData.map((record, idx) => (
-                <tr key={record.id} className="hover:bg-gray-100 text-center" role="row" aria-label={`${t("Row")} ${idx + 1}`}>
+                <tr key={record.id ?? `row-${idx}`} className="hover:bg-gray-100 text-center" role="row" aria-label={`${t("Row")} ${idx + 1}`}>
                   <td className="border px-4 py-2" role="cell">
                     <button
                       className="text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
