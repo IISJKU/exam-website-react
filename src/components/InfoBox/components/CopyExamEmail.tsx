@@ -19,7 +19,7 @@ export default function CopyExamEmail(props: CopyExamEmailProps) {
   const [copied, setCopied] = useState(false);
   const { t } = useTranslation();
   let text =
-    `Angepasste Prüfungsbedingungen ${props.exam?.title} (${props.exam?.lva_num}) - ${props.student?.first_name + " " + props.student?.last_name} (${props.student?.matrikel_number})` +`\n` +
+    `Angepasste Prüfungsbedingungen ${props.exam?.title} (${props.exam?.lva_num}) - ${props.student?.first_name + " " + props.student?.last_name} (${props.student?.matrikel_number}) am ${format(new Date(props.exam?.date ?? ""), "dd.MM.yyyy")} test. ${props.examiner?.email}` +`\n` +
     `\n`+
 
     `Sehr geehrter Prof. ${props.examiner?.last_name}!` + `\n` +
