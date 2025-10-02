@@ -306,12 +306,18 @@ export default function DataAdministration(props: DataAdministrationProps) {
 
   return (
     <div className="p-4 h-full" role="region" aria-labelledby="data-admin-title">
-      <h1 id="data-admin-title" className="text-2xl font-bold mb-4 capitalize" tabIndex={0} role="heading">
+      {/* Header with inline search */}
+    <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <h1
+        id="data-admin-title"
+        className="text-2xl font-bold capitalize"
+        tabIndex={0}
+        role="heading"
+      >
         {t("Data Administration")} - {t(props.tableName.replace("-", " "))}
       </h1>
 
-      {/* NEW: search input */}
-      <div className="mb-3 flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full sm:w-auto">
         <label htmlFor="table-search" className="sr-only">
           {t("Search")}
         </label>
@@ -321,7 +327,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t("Search in table")}
-          className="w-full max-w-md border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full sm:w-80 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-label={t("Search in table")}
         />
         {searchQuery && (
@@ -335,6 +341,7 @@ export default function DataAdministration(props: DataAdministrationProps) {
           </button>
         )}
       </div>
+    </div>
 
       {isLoading ? (
         <p aria-live="polite" aria-busy="true">{t("Loading...")}</p>
